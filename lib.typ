@@ -3,6 +3,10 @@
 
 /// #internal[Mostly internal.]
 /// The counter used for the note icons.
+///
+/// It is reccomended to reset this counter regularly if the default symbols are used,
+/// as after eight notes it will start to number them.
+///#example(scale-preview: 100%, `notecounter.update(1)`)
 /// -> counter
 #let notecounter = counter("notecounter")
 
@@ -12,11 +16,19 @@
 /// #internal[Mostly internal.]
 /// Format a counter like the note icons.
 /// Default numbering for notes.
+///#example(`notecounter.display(as-note)`)
+///#example(```
+///let i = 1
+///while i < 12 {
+///  [ #as-note(i) ]
+///  i = i + 1
+///}
+///```)
 /// - ..counter (int):
 /// -> content
 #let as-note(..counter) = {}
 #let as-note(.., last) = {
-  let symbol = if last >= _notenumbering.len() or last <= 0 [ #(last - _notenumbering.len() + 1) ] else { _notenumbering.at(last - 1) }
+  let symbol = if last > _notenumbering.len() or last <= 0 [ #(last - _notenumbering.len()) ] else { _notenumbering.at(last - 1) }
   return text(weight: 900, font: "Inter", size: 6pt, style: "normal", fill: rgb(54%, 72%, 95%), symbol)
 }
 
@@ -59,8 +71,8 @@
 ///
 ///     If partial dictionary is given, it will be filled up with defaults.
 /// - outer (dictionary): Outside/right margins. Analogous to `inner`.
-/// - top (relative length): Top margin.
-/// - bottom (relative length): Bottom margin.
+/// - top (length): Top margin.
+/// - bottom (length): Bottom margin.
 ///
 ///     These are not used for any of the Marginalia-functionality, they are only used when passed to @@page_setup().
 /// - book (boolean): If ```typc true```, will use inside/outside margins, alternating on each page. If ```typc false```, will use left/right margins with all pages the same.
@@ -85,8 +97,11 @@
 /* Page setup helper */
 
 /// This will generate a dictionary ```typc ( margin: .. )``` compatible with the passed config.
+/// This can then be spread into the page setup like so:
+///```typ
+/// #set page( ..page_setup(..config) )```
 /// 
-/// Takes the same options as @@configure()
+/// Takes the same options as @@configure().
 /// - ..config (dictionary): Missing entries are filled with package defaults. Note: missing entries are _not_ taken from the current marginalia config, as this would require context.
 /// -> dictionary
 #let page_setup(..config) = {
@@ -167,9 +182,9 @@
       dy: vadjust + dy,
       notebox
     )
-  ) 
-  let new_descent = anchor.y + vadjust + measure(notebox).height;
-  // 6pt spacing between notes
+  )
+  let new_descent = anchor.y + vadjust + measure(notebox).height + measure(v(dy)).height;
+  // 8pt spacing between notes
   context _set_note_descents(new_descent + 8pt, "left", str(page))
 }
 
@@ -194,11 +209,19 @@
       notebox
     )
   )
-  // 6pt spacing between notes
-  context _set_note_descents(anchor.y + vadjust + measure(notebox).height + 8pt, "right", str(page))
+  let new_descent = anchor.y + vadjust + measure(notebox).height + measure(v(dy)).height;
+  // 8pt spacing between notes
+  context _set_note_descents(new_descent + 8pt, "right", str(page))
 }
 
-/// TODO
+/// Create a marginnote.
+/// Will adjust it's position downwards to avoid previously placed notes, to a limit.
+/// Typst starts to complain about the layout not converging at three notes that are in conflict, and the fourth note will overlap.
+///
+/// - numbered (boolean): Whether to put a mark.
+/// - reverse (boolean): Whether to put it in the opposite (inner/left) margin.
+/// - dy (length): Vertical offset of the note.
+/// - body (content):
 #let note(numbered: true, reverse: false, dy: 0pt, body) = {
   set text(size: 9pt, style: "italic", weight: "regular")
   if numbered {
@@ -254,7 +277,7 @@
 ///```typst
 ///#configure(..config, book: false)
 ///#set page(..page_setup(..config, book: false))
-///#wideblock[...]
+///#wideblock(reverse: true)[...]
 ///```
 ///
 /// - reverse (boolean): Whether to extend into the inside/left margin instead.
