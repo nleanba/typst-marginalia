@@ -11,7 +11,7 @@
 #let notecounter = counter("notecounter")
 
 // #let _notenumbering = ("●","○","◆","◇","■","□","▲","△")
-#let _notenumbering = ("◆","●","■","▲","◇","○","□","△")
+#let _notenumbering = ("◆", "●", "■", "▲", "◇", "○", "□", "△")
 
 /// #internal[Mostly internal.]
 /// Format a counter like the note icons.
@@ -26,9 +26,11 @@
 ///```)
 /// - ..counter (int):
 /// -> content
-#let as-note(..counter) = {}
+#let as-note(..counter) = { }
 #let as-note(.., last) = {
-  let symbol = if last > _notenumbering.len() or last <= 0 [ #(last - _notenumbering.len()) ] else { _notenumbering.at(last - 1) }
+  let symbol = if last > _notenumbering.len() or last <= 0 [ #(last - _notenumbering.len()) ] else {
+    _notenumbering.at(last - 1)
+  }
   return text(weight: 900, font: "Inter", size: 6pt, style: "normal", fill: rgb(54%, 72%, 95%), symbol)
 }
 
@@ -36,8 +38,8 @@
 #let _fill_config(..config) = {
   let config = config.named()
   // default margins a4 are 2.5 cm
-  let inner = config.at("inner", default: ( far: 5mm, width: 15mm, sep: 5mm ))
-  let outer = config.at("outer", default: ( far: 5mm, width: 15mm, sep: 5mm ))
+  let inner = config.at("inner", default: (far: 5mm, width: 15mm, sep: 5mm))
+  let outer = config.at("outer", default: (far: 5mm, width: 15mm, sep: 5mm))
   return (
     inner: (
       far: inner.at("far", default: 5mm),
@@ -79,20 +81,24 @@
 /// - flush_numbers (boolean): Disallow note icons hanging into the whitespace.
 /// - numbering (str, function): Function or `numbering`-string to generate the note markers from the `notecounter`.
 #let configure(
-  inner: ( far: 5mm, width: 15mm, sep: 5mm ),
-  outer: ( far: 5mm, width: 15mm, sep: 5mm ),
+  inner: (far: 5mm, width: 15mm, sep: 5mm),
+  outer: (far: 5mm, width: 15mm, sep: 5mm),
   top: 2.5cm,
   bottom: 2.5cm,
   book: false,
   flush_numbers: false,
   numbering: as-note,
-) = {}
-#let configure(..config) = context {
-  _config.update(old => {
-    if type(old) != dictionary { panic("marginalia _config should always be a dictionary") }
-    _fill_config(..old, ..config)
-  })
-}
+) = { }
+#let configure(..config) = (
+  context {
+    _config.update(old => {
+      if type(old) != dictionary {
+        panic("marginalia _config should always be a dictionary")
+      }
+      _fill_config(..old, ..config)
+    })
+  }
+)
 
 /* Page setup helper */
 
@@ -100,7 +106,7 @@
 /// This can then be spread into the page setup like so:
 ///```typ
 /// #set page( ..page_setup(..config) )```
-/// 
+///
 /// Takes the same options as @@configure().
 /// - ..config (dictionary): Missing entries are filled with package defaults. Note: missing entries are _not_ taken from the current marginalia config, as this would require context.
 /// -> dictionary
@@ -111,16 +117,18 @@
       margin: (
         inside: config.inner.far + config.inner.width + config.inner.sep,
         outside: config.outer.far + config.outer.width + config.outer.sep,
-        top: config.top, bottom: config.bottom,
-      )
+        top: config.top,
+        bottom: config.bottom,
+      ),
     )
   } else {
     return (
       margin: (
         left: config.inner.far + config.inner.width + config.inner.sep,
         right: config.outer.far + config.outer.width + config.outer.sep,
-        top: config.top, bottom: config.bottom,
-      )
+        top: config.top,
+        bottom: config.bottom,
+      ),
     )
   }
 }
@@ -128,7 +136,7 @@
 /// #internal()
 #let _get_left(oddpage) = {
   let config = _config.get()
-  if not(config.book) or oddpage {
+  if not (config.book) or oddpage {
     return config.inner
   } else {
     return config.outer
@@ -137,7 +145,7 @@
 /// #internal()
 #let _get_right(oddpage) = {
   let config = _config.get()
-  if not(config.book) or oddpage {
+  if not (config.book) or oddpage {
     return config.outer
   } else {
     return config.inner
@@ -146,7 +154,7 @@
 
 /// #internal()
 /// Manages the state.
-#let _note_descents = state("_note_descents", ( "1": (left: 0pt, right: 0pt)))
+#let _note_descents = state("_note_descents", ("1": (left: 0pt, right: 0pt)))
 
 /// #internal()
 /// - _note_descents_dict (dictionary): Usually ```typc _note_descents.get()```
@@ -155,64 +163,78 @@
 }
 
 /// #internal()
-#let _set_note_descents(y, side, page) = context {
-  _note_descents.update(old => {
-    let new = old.at(page, default: (left: 0pt, right: 0pt))
-    new.insert(side, y)
-    old.insert(page, new)
-    old
-  })
-}
+#let _set_note_descents(y, side, page) = (
+  context {
+    _note_descents.update(old => {
+      let new = old.at(page, default: (left: 0pt, right: 0pt))
+      new.insert(side, y)
+      old.insert(page, new)
+      old
+    })
+  }
+)
 
 // absolute left
 /// #internal()
-#let _note_left(dy: 0pt, body) = context { 
-  let anchor = here().position()
-  let page = here().page()
-  let oddpage = calc.odd(page)
-  let prev_descent = _get_note_descents(_note_descents.get(), "left", str(page));
-  let lineheight = measure(v(par.leading)).height
-  let vadjust = if prev_descent > anchor.y - lineheight { prev_descent - anchor.y } else { -lineheight }
-  let offset = _get_left(oddpage).far - anchor.x
-  let width = _get_left(oddpage).width
-  let notebox = box(width: _get_left(oddpage).width, body)
-  box(
-    place(
-      dx: offset,
-      dy: vadjust + dy,
-      notebox
+#let _note_left(dy: 0pt, body) = (
+  context {
+    let anchor = here().position()
+    let page = here().page()
+    let oddpage = calc.odd(page)
+    let prev_descent = _get_note_descents(_note_descents.get(), "left", str(page))
+    let lineheight = measure(v(par.leading)).height
+    let vadjust = if prev_descent > anchor.y - lineheight {
+      prev_descent - anchor.y
+    } else {
+      -lineheight
+    }
+    let offset = _get_left(oddpage).far - anchor.x
+    let width = _get_left(oddpage).width
+    let notebox = box(width: _get_left(oddpage).width, body)
+    box(
+      place(
+        dx: offset,
+        dy: vadjust + dy,
+        notebox,
+      ),
     )
-  )
-  let new_descent = anchor.y + vadjust + measure(notebox).height + measure(v(dy)).height;
-  // 8pt spacing between notes
-  context _set_note_descents(new_descent + 8pt, "left", str(page))
-}
+    let new_descent = anchor.y + vadjust + measure(notebox).height + measure(v(dy)).height
+    // 8pt spacing between notes
+    context _set_note_descents(new_descent + 8pt, "left", str(page))
+  }
+)
 
 // absolute right
 /// #internal()
-#let _note_right(dy: 0pt, body) = context {
-  let anchor = here().position()
-  let pagewidth = page.width
-  let page = here().page()
-  let oddpage = calc.odd(page)
-  let prev_descent = _get_note_descents(_note_descents.get(), "right", str(page));
-  let lineheight = measure(v(par.leading)).height
-  let vadjust = if prev_descent > anchor.y - lineheight { prev_descent - anchor.y } else { -lineheight }
-  let offset = pagewidth - anchor.x - _get_right(oddpage).far - _get_right(oddpage).width
-  let width = _get_right(oddpage).width
-  let notebox = box(width: _get_right(oddpage).width, body)
-  box(
-    width: 0pt,
-    place(
-      dx: offset,
-      dy: vadjust + dy,
-      notebox
+#let _note_right(dy: 0pt, body) = (
+  context {
+    let anchor = here().position()
+    let pagewidth = page.width
+    let page = here().page()
+    let oddpage = calc.odd(page)
+    let prev_descent = _get_note_descents(_note_descents.get(), "right", str(page))
+    let lineheight = measure(v(par.leading)).height
+    let vadjust = if prev_descent > anchor.y - lineheight {
+      prev_descent - anchor.y
+    } else {
+      -lineheight
+    }
+    let offset = pagewidth - anchor.x - _get_right(oddpage).far - _get_right(oddpage).width
+    let width = _get_right(oddpage).width
+    let notebox = box(width: _get_right(oddpage).width, body)
+    box(
+      width: 0pt,
+      place(
+        dx: offset,
+        dy: vadjust + dy,
+        notebox,
+      ),
     )
-  )
-  let new_descent = anchor.y + vadjust + measure(notebox).height + measure(v(dy)).height;
-  // 8pt spacing between notes
-  context _set_note_descents(new_descent + 8pt, "right", str(page))
-}
+    let new_descent = anchor.y + vadjust + measure(notebox).height + measure(v(dy)).height
+    // 8pt spacing between notes
+    context _set_note_descents(new_descent + 8pt, "right", str(page))
+  }
+)
 
 /// Create a marginnote.
 /// Will adjust it's position downwards to avoid previously placed notes, to a limit.
@@ -232,10 +254,13 @@
       body
     } else {
       set par(spacing: 6pt, leading: 4pt)
-      box(width: 0pt, {
-        h(-1.5pt - measure(notecounter.display(_config.get().numbering)).width)
-        notecounter.display(_config.get().numbering)
-      })
+      box(
+        width: 0pt,
+        {
+          h(-1.5pt - measure(notecounter.display(_config.get().numbering)).width)
+          notecounter.display(_config.get().numbering)
+        },
+      )
       h(0pt, weak: true)
       body
     }
@@ -284,33 +309,43 @@
 /// - double (boolean): Whether to extend into both margins. Cannot be combined with `reverse`.
 /// - body (content):
 /// -> content
-#let wideblock(reverse: false, double: false, body) = context {
-  if double and reverse {
-    panic("Cannot be both reverse and double wide.")
-  }
-  
-  let oddpage = calc.odd(here().page())
-  let config = _config.get()
-  
-  let left = if not(config.book) or oddpage {
-    if double or reverse {
-      config.inner.width + config.inner.sep
-    } else { 0pt }
-  } else {
-    if reverse { 0pt } else {
-      config.outer.width + config.outer.sep
+#let wideblock(reverse: false, double: false, body) = (
+  context {
+    if double and reverse {
+      panic("Cannot be both reverse and double wide.")
     }
-  }
 
-  let right = if not(config.book) or oddpage {
-    if reverse { 0pt } else {
-      config.outer.width + config.outer.sep
+    let oddpage = calc.odd(here().page())
+    let config = _config.get()
+
+    let left = if not (config.book) or oddpage {
+      if double or reverse {
+        config.inner.width + config.inner.sep
+      } else {
+        0pt
+      }
+    } else {
+      if reverse {
+        0pt
+      } else {
+        config.outer.width + config.outer.sep
+      }
     }
-  } else {
-    if double or reverse {
-      config.inner.width + config.inner.sep
-    } else { 0pt }
-  }
 
-  pad(left: -left, right: -right, body)
-}
+    let right = if not (config.book) or oddpage {
+      if reverse {
+        0pt
+      } else {
+        config.outer.width + config.outer.sep
+      }
+    } else {
+      if double or reverse {
+        config.inner.width + config.inner.sep
+      } else {
+        0pt
+      }
+    }
+
+    pad(left: -left, right: -right, body)
+  }
+)

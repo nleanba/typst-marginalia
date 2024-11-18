@@ -12,7 +12,9 @@
 #marginalia.configure(..config)
 #set page(
   ..marginalia.page_setup(..config),
-  header: { marginalia.notecounter.update(0) }
+  header: {
+    marginalia.notecounter.update(0)
+  },
 )
 // #show heading.where(level: 1): it => { marginalia.notecounter.update(0); it }
 
@@ -20,9 +22,11 @@
 #set text(fill: luma(30))
 #show link: underline
 
-#block(text(size: 3em, weight: "black")[
-  Marginalia
-])
+#block(
+  text(size: 3em, weight: "black")[
+    Marginalia
+  ],
+)
 _Write into the margins!_
 #note(numbered: false)[
   #outline(indent: 2em, depth: 2)
@@ -158,7 +162,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
 // no more book-style to allow for multipage wideblock
 #marginalia.configure(..config, book: false)
 #set page(
-  ..marginalia.page_setup(..config, book: false)
+  ..marginalia.page_setup(..config, book: false),
 )
 #context counter(heading).update(0)
 #show heading.where(level: 1): set heading(numbering: "A.1", supplement: "Appendix")
@@ -182,8 +186,8 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
         h(0pt, weak: true)
         // set text(fill: white, weight: 600, size: 9pt)
         // block(fill: luma(40%), inset: 2pt, outset: 2pt, radius: 2pt, body)
-      }
-    )
+      },
+    ),
   )
 
   #tidy.show-module(
