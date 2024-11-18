@@ -133,19 +133,30 @@
   }
 }
 
-/// #internal()
-#let _get_left(oddpage) = {
+/// #internal[Mostly internal.]
+/// Returns a dictionary with the keys `far`, `width`, `sep` containing the resepctive widths of the
+/// left margin on the current page. (On both even and odd pages.)
+///
+/// Requires context.
+/// -> dictionary
+#let get_left() = {
   let config = _config.get()
-  if not (config.book) or oddpage {
+  if not (config.book) or calc.odd(here().page()) {
     return config.inner
   } else {
     return config.outer
   }
 }
-/// #internal()
-#let _get_right(oddpage) = {
+
+/// #internal[Mostly internal.]
+/// Returns a dictionary with the keys `far`, `width`, `sep` containing the resepctive widths of the
+/// right margin on the current page. (On both even and odd pages.)
+///
+/// Requires context.
+/// -> dictionary
+#let get_right() = {
   let config = _config.get()
-  if not (config.book) or oddpage {
+  if not (config.book) or calc.odd(here().page()) {
     return config.outer
   } else {
     return config.inner
@@ -180,7 +191,6 @@
   context {
     let anchor = here().position()
     let page = here().page()
-    let oddpage = calc.odd(page)
     let prev_descent = _get_note_descents(_note_descents.get(), "left", str(page))
     let lineheight = measure(v(par.leading)).height
     let vadjust = if prev_descent > anchor.y - lineheight {
@@ -188,9 +198,9 @@
     } else {
       -lineheight
     }
-    let offset = _get_left(oddpage).far - anchor.x
-    let width = _get_left(oddpage).width
-    let notebox = box(width: _get_left(oddpage).width, body)
+    let offset = get_left().far - anchor.x
+    let width = get_left().width
+    let notebox = box(width: get_left().width, body)
     box(
       place(
         dx: offset,
@@ -211,7 +221,6 @@
     let anchor = here().position()
     let pagewidth = page.width
     let page = here().page()
-    let oddpage = calc.odd(page)
     let prev_descent = _get_note_descents(_note_descents.get(), "right", str(page))
     let lineheight = measure(v(par.leading)).height
     let vadjust = if prev_descent > anchor.y - lineheight {
@@ -219,9 +228,9 @@
     } else {
       -lineheight
     }
-    let offset = pagewidth - anchor.x - _get_right(oddpage).far - _get_right(oddpage).width
-    let width = _get_right(oddpage).width
-    let notebox = box(width: _get_right(oddpage).width, body)
+    let offset = pagewidth - anchor.x - get_right().far - get_right().width
+    let width = get_right().width
+    let notebox = box(width: get_right().width, body)
     box(
       width: 0pt,
       place(

@@ -3,7 +3,7 @@
 #let config = (
   inner: ( far: 16mm, width: 20mm, sep: 8mm ),
   outer: ( far: 16mm, width: 40mm, sep: 8mm ),
-  top: 16mm + 2em, bottom: 16mm,
+  top: 32mm + 1em, bottom: 16mm,
   book: true,
   // flush_numbers: false,
   // numbering: "a",
@@ -12,25 +12,84 @@
 #marginalia.configure(..config)
 #set page(
   ..marginalia.page_setup(..config),
-  header: {
+  header-ascent: 16mm,
+  header: context {
     marginalia.notecounter.update(0)
+    let book = marginalia._config.get().book
+    let leftm = marginalia.get_left()
+    let rightm = marginalia.get_right()
+    if here().page() > 1 {
+      wideblock(
+        double: true,
+        {
+          box(
+            width: leftm.width,
+            {
+              if not (book) or calc.odd(here().page()) [
+                Page
+                #counter(page).display("1 of 1", both: true)
+              ] else [
+                #datetime.today().display("[day]. [month repr:long] [year]")
+              ]
+            },
+          )
+          h(leftm.sep)
+          box(width: 1fr, smallcaps[Marginalia])
+          h(rightm.sep)
+          box(
+            width: rightm.width,
+            {
+              if not (book) or calc.odd(here().page()) [
+                #datetime.today().display("[day]. [month repr:long] [year]")
+              ] else [
+                Page
+                #counter(page).display("1 of 1", both: true)
+              ]
+            },
+          )
+        },
+      )
+    }
+  },
+  background: context {
+    let leftm = marginalia.get_left()
+    let rightm = marginalia.get_right()
+    place(
+      dx: leftm.far,
+      rect(width: leftm.width, height: 100%, stroke: (x: luma(90%))),
+    )
+    place(
+      dx: leftm.far + leftm.width + leftm.sep,
+      rect(width: 10pt, height: 100%, stroke: (left: luma(90%))),
+    )
+    place(
+      right,
+      dx: -rightm.far,
+      rect(width: rightm.width, height: 100%, stroke: (x: luma(90%))),
+    )
+    place(
+      right,
+      dx: -rightm.far - rightm.width - rightm.sep,
+      rect(width: 10pt, height: 100%, stroke: (right: luma(90%))),
+    )
   },
 )
-// #show heading.where(level: 1): it => { marginalia.notecounter.update(0); it }
 
 #set par(justify: true)
 #set text(fill: luma(30))
 #show link: underline
 
+#v(16mm)
 #block(
   text(size: 3em, weight: "black")[
-    Marginalia
+    Marginalia#note(numbered: false)[
+  #outline(indent: 2em, depth: 2)
+]
   ],
 )
 _Write into the margins!_
-#note(numbered: false)[
-  #outline(indent: 2em, depth: 2)
-]
+#v(1em)
+
 
 #show heading.where(level: 1): set heading(numbering: "1.1")
 #show heading.where(level: 2): set heading(numbering: "1.1")
@@ -116,16 +175,75 @@ or per heading:
 ]
 
 #wideblock(reverse: true)[
-  ```typst #wideblock(reverse: true)[...]```:
-  #lorem(27)
+  ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.
+  #lorem(13)
 ]
 
 #wideblock(double: true)[
-  ```typst #wideblock(double: true)[...]```:
-  #lorem(30)
+  ```typst #wideblock(double: true)[...]```: The `double` option makes it extend both ways.
+  Note that setting both `reverse: true` and `double: true` will panic.
 ]
 
-Note that setting both `reverse: true` and `double: true` will panic.
+= Headers and Page Background
+This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the resepctive config option.
+Please don't ever try to ```typc .update``` the `marginalia._config` directly, this might easily break the code.
+
+Here's how the headers in this document were made:
+```typst
+#set page(header: context {
+  marginalia.notecounter.update(0)
+  let book = marginalia._config.get().book
+  let leftm = marginalia.get_left()
+  let rightm = marginalia.get_right()
+  if here().page() > 1 {
+    wideblock(double: true, {
+      box(width: leftm.width, {
+        if not (book) or calc.odd(here().page()) [
+          Page
+          #counter(page).display("1 of 1", both: true)
+        ] else [
+          #datetime.today().display(/**/)
+        ]
+      })
+      h(leftm.sep)
+      box(width: 1fr, smallcaps[Marginalia])
+      h(rightm.sep)
+      box(width: rightm.width, {
+        if not (book) or calc.odd(here().page()) [
+          #datetime.today().display(/**/)
+        ] else [
+          Page
+          #counter(page).display("1 of 1", both: true)
+        ]
+      })
+    })
+  }
+})
+```
+
+And here's the code for the lines in the background:#note[Not that you should copy them, they're mostly here to showcase the columns and help me verify that everything gets placed in the right spot.]
+```typst
+#set page(background: context {
+  let leftm = marginalia.get_left()
+  let rightm = marginalia.get_right()
+  place(
+    dx: leftm.far,
+    rect(width: leftm.width, height: 100%,
+      stroke: (x: luma(90%))))
+  place(
+    dx: leftm.far + leftm.width + leftm.sep,
+    rect(width: 10pt, height: 100%,
+      stroke: (left: luma(90%))))
+  place(right,
+    dx: -rightm.far,
+    rect(width: rightm.width, height: 100%,
+      stroke: (x: luma(90%))))
+  place(right,
+    dx: -rightm.far - rightm.width - rightm.sep,
+    rect(width: 10pt, height: 100%,
+      stroke: (right: luma(90%))))
+})
+```
 
 = Thanks
 Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
