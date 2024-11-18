@@ -134,7 +134,7 @@
 }
 
 /// #internal[Mostly internal.]
-/// Returns a dictionary with the keys `far`, `width`, `sep` containing the resepctive widths of the
+/// Returns a dictionary with the keys `far`, `width`, `sep` containing the respective widths of the
 /// left margin on the current page. (On both even and odd pages.)
 ///
 /// Requires context.
@@ -149,7 +149,7 @@
 }
 
 /// #internal[Mostly internal.]
-/// Returns a dictionary with the keys `far`, `width`, `sep` containing the resepctive widths of the
+/// Returns a dictionary with the keys `far`, `width`, `sep` containing the respective widths of the
 /// right margin on the current page. (On both even and odd pages.)
 ///
 /// Requires context.
