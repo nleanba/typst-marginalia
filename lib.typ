@@ -4,7 +4,7 @@
 /// #internal[Mostly internal.]
 /// The counter used for the note icons.
 ///
-/// It is reccomended to reset this counter regularly if the default symbols are used,
+/// It is recommended to reset this counter regularly if the default symbols are used,
 /// as after eight notes it will start to number them.
 ///#example(scale-preview: 100%, `notecounter.update(1)`)
 /// -> counter
@@ -63,7 +63,7 @@
 
 /// This will update the marginalia config with the provided config options.
 ///
-/// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly reccomended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
+/// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
 /// - inner (dictionary): Inside/left margins.
 ///     - `far`: Distance between edge of page and margin (note) column.
 ///     - `width`: Width of the margin column.
