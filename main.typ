@@ -1,4 +1,4 @@
-#import "lib.typ" as marginalia: page-setup, note, wideblock
+#import "lib.typ" as marginalia: note, wideblock
 
 #let config = (
   inner: ( far: 16mm, width: 18mm, sep: 8mm ),
@@ -102,9 +102,9 @@ Put something akin to the following at the start of your `.typ` file:
 // ```
 // ]
 #block[
-  #set text(size: 0.9em)
+  #set text(size: 0.84em)
   ```typst
-  #import "@preview/marginalia:0.1.0": note, wideblock
+  #import "@preview/marginalia:0.1.0" as marginalia: note, wideblock
   #let config = (
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -154,14 +154,14 @@ To change the markers, you can override ```typc config.numbering```-function whi
 
 It is recommended to reset the `notecounter` regularly, either per page:
 #block[
-  #set text(size: 0.9em)
+  #set text(size: 0.84em)
   ```typ
   #set page(header: { marginalia.notecounter.update(0) })
   ```
 ]
 or per heading:
 #block[
-  #set text(size: 0.9em)
+  #set text(size: 0.84em)
   ```typ
   #show heading.where(level: 1): it =>
     { marginalia.notecounter.update(0); it }
@@ -194,7 +194,7 @@ In your documents, consider removing this check and simplifying the ```typc if``
 
 Here's how the headers in this document were made:
 #block[
-  #set text(size: 0.9em)
+  #set text(size: 0.84em)
   ```typst
   #set page(header: context {
     marginalia.notecounter.update(0)
@@ -232,7 +232,7 @@ And here's the code for the lines in the background:#note[
   Not that you should copy them, they're mostly here to showcase the columns and help me verify that everything gets placed in the right spot.
 ]
 #block[
-  #set text(size: 0.9em)
+  #set text(size: 0.84em)
   ```typst
   #set page(background: context {
     let leftm = marginalia.get-left()
