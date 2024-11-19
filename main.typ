@@ -1,23 +1,23 @@
-#import "lib.typ" as marginalia: page_setup, note, wideblock
+#import "lib.typ" as marginalia: page-setup, note, wideblock
 
 #let config = (
-  inner: ( far: 16mm, width: 20mm, sep: 8mm ),
+  inner: ( far: 16mm, width: 18mm, sep: 8mm ),
   outer: ( far: 16mm, width: 40mm, sep: 8mm ),
   top: 32mm + 1em, bottom: 16mm,
   book: true,
-  // flush_numbers: false,
+  // flush-numbers: false,
   // numbering: "a",
 )
 
 #marginalia.configure(..config)
 #set page(
-  ..marginalia.page_setup(..config),
+  ..marginalia.page-setup(..config),
   header-ascent: 16mm,
   header: context {
     marginalia.notecounter.update(0)
     let book = marginalia._config.get().book
-    let leftm = marginalia.get_left()
-    let rightm = marginalia.get_right()
+    let leftm = marginalia.get-left()
+    let rightm = marginalia.get-right()
     if here().page() > 1 {
       wideblock(
         double: true,
@@ -52,8 +52,8 @@
     }
   },
   background: context {
-    let leftm = marginalia.get_left()
-    let rightm = marginalia.get_right()
+    let leftm = marginalia.get-left()
+    let rightm = marginalia.get-right()
     place(
       dx: leftm.far,
       rect(width: leftm.width, height: 100%, stroke: (x: luma(90%))),
@@ -104,20 +104,20 @@ Put something akin to the following at the start of your `.typ` file:
 #block[
   #set text(size: 0.9em)
   ```typst
-  #import "@preview/marginalia:version": note, wideblock
+  #import "@preview/marginalia:0.1.0": note, wideblock
   #let config = (
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
     // top: 2.5cm,
     // bottom: 2.5cm,
     // book: false,
-    // flush_numbers: false,
+    // flush-numbers: false,
     // numbering: /* numbering-function */,
   )
   #marginalia.configure(..config)
   #set page(
     // setup margins:
-    ..marginalia.page_setup(..config),
+    ..marginalia.page-setup(..config),
     /* other page setup */
   )
   ```
@@ -126,7 +126,7 @@ Put something akin to the following at the start of your `.typ` file:
 Where you can then customize `config` to your preferences. Shown here (as comments) are the default values taken if the corresponding keys are unset.
 
 See the appendix for a more detailed explanation of the #link(label("marginaliaconfigure()"), [```typc configure()```])
-and #link(label("marginaliapage_setup()"), [```typc page_setup()```])
+and #link(label("marginaliapage-setup()"), [```typc page-setup()```])
 functions.
 
 
@@ -148,7 +148,7 @@ If~#note[Note 1] we~#note[Note 2] place/*~#note[Note 3]*/ multiple/*~#note[Note 
 However, a ```typc dy``` argument can be passed to shift them by that length vertically.
 
 == Markers
-The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set the configuration option ```typc flush_numbers: true```.
+The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set the configuration option ```typc flush-numbers: true```.
 Setting the argument ```typc numbered: false```, we obtain notes without icon/number.#note(numbered: false)[Like this.]
 To change the markers, you can override ```typc config.numbering```-function which is used to generate the markers.
 
@@ -156,21 +156,15 @@ It is recommended to reset the `notecounter` regularly, either per page:
 #block[
   #set text(size: 0.9em)
   ```typ
-  #set page(
-    header: {
-      marginalia.notecounter.update(0)
-    }
-  )
+  #set page(header: { marginalia.notecounter.update(0) })
   ```
 ]
 or per heading:
 #block[
   #set text(size: 0.9em)
   ```typ
-  #show heading.where(level: 1): it => {
-    marginalia.notecounter.update(0)
-    it
-  }
+  #show heading.where(level: 1): it =>
+    { marginalia.notecounter.update(0); it }
   ```
 ]
 
@@ -192,10 +186,10 @@ or per heading:
   Note that setting both `reverse: true` and `double: true` will panic.
 ]
 
-= Headers and Page Background
+= Headers and Background
 This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the respective config option.
 In your documents, consider removing this check and simplifying the ```typc if``` a bit.
-Also, please don't ever try to ```typc .update``` the `marginalia._config` directly, this might easily break the code.
+#note[Also, please don't ```typc .update()``` the `marginalia._config` directly, this can easily break the notes.]
 
 
 Here's how the headers in this document were made:
@@ -205,8 +199,8 @@ Here's how the headers in this document were made:
   #set page(header: context {
     marginalia.notecounter.update(0)
     let book = marginalia._config.get().book
-    let leftm = marginalia.get_left()
-    let rightm = marginalia.get_right()
+    let leftm = marginalia.get-left()
+    let rightm = marginalia.get-right()
     if here().page() > 1 {
       wideblock(double: true, {
         box(width: leftm.width, {
@@ -241,8 +235,8 @@ And here's the code for the lines in the background:#note[
   #set text(size: 0.9em)
   ```typst
   #set page(background: context {
-    let leftm = marginalia.get_left()
-    let rightm = marginalia.get_right()
+    let leftm = marginalia.get-left()
+    let rightm = marginalia.get-right()
     place(
       dx: leftm.far,
       rect(width: leftm.width, height: 100%,
@@ -298,7 +292,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
 // no more book-style to allow for multipage wideblock
 #marginalia.configure(..config, book: false)
 #set page(
-  ..marginalia.page_setup(..config, book: false),
+  ..marginalia.page-setup(..config, book: false),
 )
 #context counter(heading).update(0)
 #show heading.where(level: 1): set heading(numbering: "A.1", supplement: "Appendix")
