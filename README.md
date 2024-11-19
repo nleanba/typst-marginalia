@@ -29,7 +29,7 @@ pages. Notes are placed in the outside margin by default.
 
 Where you can then customize `config` to your preferences. Shown here (as
 comments) are the default values taken if the corresponding keys are unset.
-[Please refer to the PDF documentation for more details on the configuration.](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
+[Please refer to the PDF documentation for more details on the configuration.](https://github.com/nleanba/typst-marginalia/blob/v0.1.0/Marginalia.pdf)
 
 ## Margin-Notes
 
@@ -52,4 +52,4 @@ Note: `reverse` and `double are mutually exclusive.
 
 Note: It does not handle pagebreaks in `book: true` documents well.
 
-[![first page of the documentation](preview.svg)](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
+[![first page of the documentation](https://raw.githubusercontent.com/nleanba/typst-marginalia/refs/tags/v0.1.0/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/v0.1.0/Marginalia.pdf)
