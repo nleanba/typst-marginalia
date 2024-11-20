@@ -48,7 +48,7 @@ Provided via the `#wideblock[...]` command.
 - `#note(reverse: true)[...]` to extend into the inside margin instead.
 - `#note(double: true)[...]` to extend into both margins.
 
-Note: `reverse` and `double are mutually exclusive.
+Note: `reverse` and `double` are mutually exclusive.
 
 Note: It does not handle pagebreaks in `book: true` documents well.
 

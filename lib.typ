@@ -266,8 +266,10 @@
       box(
         width: 0pt,
         {
-          h(-1.5pt - measure(notecounter.display(_config.get().numbering)).width)
+          h(-8pt)
+          h(1fr)
           notecounter.display(_config.get().numbering)
+          h(1fr)
         },
       )
       h(0pt, weak: true)
