@@ -163,54 +163,83 @@
   }
 }
 
-/// #internal()
-/// Manages the state.
-#let _note_descents = state("_note_descents", ("1": (left: 0pt, right: 0pt)))
 
-/// #internal()
-/// - _note_descents_dict (dictionary): Usually ```typc _note_descents.get()```
-#let _get_note_descents(_note_descents_dict, side, page) = {
-  _note_descents_dict.at(page, default: (left: 0pt, right: 0pt)).at(side)
+#let _note_extends_left = state("_note_extends_left", ("1": ()))
+#let _note_offset_left(page) = {
+  let extends = _note_extends_left.final().at(page, default: ())
+  let offsets_down = ()
+  let cur = 0pt
+  for note in extends {
+    if cur <= note.natural {
+      // 8pt spacing between nodes
+      cur = note.natural + note.height + 8pt
+      offsets_down.push(0pt)
+    } else {
+      offsets_down.push(cur - note.natural)
+      cur = cur + note.height + 8pt
+    }
+  }
+
+  // let max = page.height - _config.get().bottom
+  // let offsets_final = ()
+  offsets_down
 }
 
-/// #internal()
-#let _set_note_descents(y, side, page) = (
-  context {
-    _note_descents.update(old => {
-      let new = old.at(page, default: (left: 0pt, right: 0pt))
-      new.insert(side, y)
-      old.insert(page, new)
-      old
-    })
+#let _note_extends_right = state("_note_extends_right", ("1": ()))
+#let _note_offset_right(page) = {
+  let extends = _note_extends_right.final().at(page, default: ())
+  let offsets_down = ()
+  let cur = 0pt
+  for note in extends {
+    if cur <= note.natural {
+      // 8pt spacing between nodes
+      cur = note.natural + note.height + 8pt
+      offsets_down.push(0pt)
+    } else {
+      offsets_down.push(cur - note.natural)
+      cur = cur + note.height + 8pt
+    }
   }
-)
+
+  // let max = page.height - _config.get().bottom
+  // let offsets_final = ()
+  offsets_down
+}
 
 // absolute left
 /// #internal()
 #let _note_left(dy: 0pt, body) = (
   context {
     let anchor = here().position()
+    let pagewidth = page.width
     let page = here().page()
-    let prev_descent = _get_note_descents(_note_descents.get(), "left", str(page))
     let lineheight = measure(v(par.leading)).height
-    let vadjust = if prev_descent > anchor.y - lineheight {
-      prev_descent - anchor.y
-    } else {
-      -lineheight
-    }
-    let offset = get-left().far - anchor.x
+
+    let natural_position = anchor.y + dy - lineheight
+
     let width = get-left().width
-    let notebox = box(width: get-left().width, body)
+    let notebox = box(width: width, body)
+    let height = measure(notebox).height
+
+    let current = _note_extends_left.get().at(str(page), default: ())
+    let index = current.len()
+
+    _note_extends_left.update(old => {
+      let oldpage = old.at(str(page), default: ())
+      oldpage.push( (natural: natural_position, height: height) )
+      old.insert(str(page), oldpage)
+      old
+    })
+
+    let vadjust = dy - lineheight + _note_offset_left(str(page)).at(index, default: 0pt)
+    let hadjust = get-left().far - anchor.x
     box(
       place(
-        dx: offset,
-        dy: vadjust + dy,
+        dx: hadjust,
+        dy: vadjust,
         notebox,
       ),
     )
-    let new_descent = anchor.y + vadjust + measure(notebox).height + measure(v(dy)).height
-    // 8pt spacing between notes
-    context _set_note_descents(new_descent + 8pt, "left", str(page))
   }
 )
 
@@ -221,27 +250,34 @@
     let anchor = here().position()
     let pagewidth = page.width
     let page = here().page()
-    let prev_descent = _get_note_descents(_note_descents.get(), "right", str(page))
     let lineheight = measure(v(par.leading)).height
-    let vadjust = if prev_descent > anchor.y - lineheight {
-      prev_descent - anchor.y
-    } else {
-      -lineheight
-    }
-    let offset = pagewidth - anchor.x - get-right().far - get-right().width
+
+    let natural_position = anchor.y + dy - lineheight
+
     let width = get-right().width
-    let notebox = box(width: get-right().width, body)
+    let notebox = box(width: width, body)
+    let height = measure(notebox).height
+
+    let current = _note_extends_right.get().at(str(page), default: ())
+    let index = current.len()
+
+    _note_extends_right.update(old => {
+      let oldpage = old.at(str(page), default: ())
+      oldpage.push( (natural: natural_position, height: height) )
+      old.insert(str(page), oldpage)
+      old
+    })
+
+    let vadjust = dy - lineheight + _note_offset_right(str(page)).at(index, default: 0pt)
+    let hadjust = pagewidth - anchor.x - get-right().far - get-right().width
     box(
       width: 0pt,
       place(
-        dx: offset,
-        dy: vadjust + dy,
+        dx: hadjust,
+        dy: vadjust,
         notebox,
       ),
     )
-    let new_descent = anchor.y + vadjust + measure(notebox).height + measure(v(dy)).height
-    // 8pt spacing between notes
-    context _set_note_descents(new_descent + 8pt, "right", str(page))
   }
 )
 

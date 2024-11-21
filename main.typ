@@ -144,13 +144,19 @@ By default, the #link(label("marginalianote()"))[```typst #note[...]```] command
 By giving the argument ```typc reverse: true```, we obtain a note on the left/inner margin.#note(reverse: true)[Reversed.]
 If ```typc config.book = true```, the side will of course be adjusted automatically.
 
-If~#note[Note 1] we~#note[Note 2] place/*~#note[Note 3]*/ multiple/*~#note[Note 4]*/ notes/*~#note[Note 5]*/ in one line, they automatically adjust their positions (Up to a limit of apparently up to three. I am not sure why exactly this is, as the shifts should not have cyclical dependencies but it should be able to calculate them in-order).
+If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in one line, they automatically adjust their positions (Up to a limit of apparently up to three. I am not sure why exactly this is, as the shifts should not have cyclical dependencies but it should be able to calculate them in-order).
 However, a ```typc dy``` argument can be passed to shift them by that length vertically.
 
 == Markers
 The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set the configuration option ```typc flush-numbers: true```.
 Setting the argument ```typc numbered: false```, we obtain notes without icon/number.#note(numbered: false)[Like this.]
 To change the markers, you can override ```typc config.numbering```-function which is used to generate the markers.
+#note[
+  #context marginalia._note_extends_right.final() \
+  #context marginalia._note_offset_right("1") \
+  #context marginalia._note_offset_right("2") \
+  #context marginalia._note_offset_right("3")
+]
 
 It is recommended to reset the `notecounter` regularly, either per page:
 #block[
