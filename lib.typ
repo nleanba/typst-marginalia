@@ -5,13 +5,13 @@
 /// The counter used for the note icons.
 ///
 /// It is recommended to reset this counter regularly if the default symbols are used,
-/// as after eight notes it will start to number them.
+/// as after ten notes it will start to number them.
 ///#example(scale-preview: 100%, `notecounter.update(1)`)
 /// -> counter
 #let notecounter = counter("notecounter")
 
-// #let _notenumbering = ("●","○","◆","◇","■","□","▲","△")
-#let _notenumbering = ("◆", "●", "■", "▲", "◇", "○", "□", "△")
+#let _notenumbering = ("◆", "●", "■", "▲", "♥", "◇", "○", "□", "△", "♡")
+#let _notenumbering = ("●","○","◆","◇","■","□","▲","△", "♥", "♡")
 
 /// #internal[Mostly internal.]
 /// Format a counter like the note icons.
@@ -165,45 +165,65 @@
 
 
 #let _note_extends_left = state("_note_extends_left", ("1": ()))
-#let _note_offset_left(page) = {
-  let extends = _note_extends_left.final().at(page, default: ())
+#let _note_offset_left(page_num) = {
+  let extends = _note_extends_left.final().at(page_num, default: ())
   let offsets_down = ()
   let cur = 0pt
   for note in extends {
+    // 8pt spacing between nodes
     if cur <= note.natural {
-      // 8pt spacing between nodes
-      cur = note.natural + note.height + 8pt
       offsets_down.push(0pt)
+      cur = note.natural + note.height + 8pt
     } else {
       offsets_down.push(cur - note.natural)
       cur = cur + note.height + 8pt
     }
   }
 
-  // let max = page.height - _config.get().bottom
-  // let offsets_final = ()
-  offsets_down
+  let offsets_final_rev = ()
+  let max = page.height - page.margin.bottom
+  for (index, note) in extends.enumerate().rev() {
+    if max >= note.natural + offsets_down.at(index) + note.height {
+      offsets_final_rev.push(offsets_down.at(index))
+      max = note.natural + offsets_down.at(index) - 8pt
+    } else {
+      offsets_final_rev.push(max - note.natural - note.height)
+      max = max - note.height - 8pt
+    }
+  }
+
+  offsets_final_rev.rev()
 }
 
 #let _note_extends_right = state("_note_extends_right", ("1": ()))
-#let _note_offset_right(page) = {
-  let extends = _note_extends_right.final().at(page, default: ())
+#let _note_offset_right(page_num) = {
+  let extends = _note_extends_right.final().at(page_num, default: ())
   let offsets_down = ()
   let cur = 0pt
   for note in extends {
+    // 8pt spacing between nodes
     if cur <= note.natural {
-      // 8pt spacing between nodes
-      cur = note.natural + note.height + 8pt
       offsets_down.push(0pt)
+      cur = note.natural + note.height + 8pt
     } else {
       offsets_down.push(cur - note.natural)
       cur = cur + note.height + 8pt
     }
   }
 
-  // let max = page.height - _config.get().bottom
-  // let offsets_final = ()
-  offsets_down
+  let offsets_final_rev = ()
+  let max = page.height - _config.get().bottom
+  for (index, note) in extends.enumerate().rev() {
+    if max >= note.natural + offsets_down.at(index) + note.height {
+      offsets_final_rev.push(offsets_down.at(index))
+      max = note.natural + offsets_down.at(index) - 8pt
+    } else {
+      offsets_final_rev.push(max - note.natural - note.height)
+      max = max - note.height - 8pt
+    }
+  }
+
+  offsets_final_rev.rev()
 }
 
 // absolute left
@@ -282,8 +302,7 @@
 )
 
 /// Create a marginnote.
-/// Will adjust it's position downwards to avoid previously placed notes, to a limit.
-/// Typst starts to complain about the layout not converging at three notes that are in conflict, and the fourth note will overlap.
+/// Will adjust it's position downwards to avoid previously placed notes, and upwards to avoid extending past the bottom margin.
 ///
 /// - numbered (boolean): Whether to put a mark.
 /// - reverse (boolean): Whether to put it in the opposite (inner/left) margin.
