@@ -144,7 +144,7 @@ By default, the #link(label("marginalianote()"))[```typst #note[...]```] command
 By giving the argument ```typc reverse: true```, we obtain a note on the left/inner margin.#note(reverse: true)[Reversed.]
 If ```typc config.book = true```, the side will of course be adjusted automatically.
 
-If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy.] one~#note(dy:100pt)[This note was given ```typc 100pt``` dy.] line,#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] they automatically adjust their positions.
+If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:110pt)[This note was given ```typc 110pt``` dy.] they automatically adjust their positions.
 Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around.
 
 == Markers
@@ -196,12 +196,11 @@ or per heading:
   The command
   ```typst #wideblock[...]```
   can be used to wrap content in a wide block which spans into the margin-note-column.
-  It is a bit cluttered, but is possible to use notes in wide blocks:#note(reverse: true)[Voila], but make sure to set the ```typc reverse``` argument appropriately.//#note[Or ensure that the notes don't overlap the wide block some other way.]
+  It is a bit cluttered, but is possible to use notes in wide blocks:#note[Voila.]#note(reverse: true)[Wow!].
 ]
 
 #wideblock(reverse: true)[
-  ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.
-  #lorem(13)
+  ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.#note[Notes above a `wideblock` will shift upwards if neccessary.]
 ]
 
 #wideblock(double: true)[
@@ -292,12 +291,18 @@ The `wideblock` functionality was inspired by the one provided in the #link("htt
 
 Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which was used to produce the appendix.
 
+// On Page two:\
+// #context for (note, shift) in marginalia._note_extends_left.final().at("2", default: ()).zip(marginalia._note_offset_left("2")) [
+//   #note.natural + #shift
+//   is #note.height
+//   (#note.fix) \
+// ]
+
 // #pagebreak(to: "even", weak: true)
 // = Even Page
 // == Margin-Notes
 // Margin notes adjust themselves to even pages.#note[Ta-dah!]
 // Here, to get to the right margin, now the inner margin, we use reversed notes.#note(reverse: true)[Comme ça.]
-
 
 // == Wide Blocks
 

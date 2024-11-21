@@ -174,6 +174,9 @@
     if cur <= note.natural {
       offsets_down.push(0pt)
       cur = note.natural + note.height + 8pt
+    } else if note.fix {
+      offsets_down.push(0pt)
+      cur = note.natural + note.height + 8pt
     } else {
       offsets_down.push(cur - note.natural)
       cur = cur + note.height + 8pt
@@ -181,11 +184,14 @@
   }
 
   let offsets_final_rev = ()
-  let max = page.height - page.margin.bottom
+  let max = page.height - _config.get().bottom
   for (index, note) in extends.enumerate().rev() {
     if max >= note.natural + offsets_down.at(index) + note.height {
       offsets_final_rev.push(offsets_down.at(index))
       max = note.natural + offsets_down.at(index) - 8pt
+    } else if note.fix {
+      offsets_final_rev.push(0pt)
+      cur = note.natural - 8pt
     } else {
       offsets_final_rev.push(max - note.natural - note.height)
       max = max - note.height - 8pt
@@ -205,6 +211,9 @@
     if cur <= note.natural {
       offsets_down.push(0pt)
       cur = note.natural + note.height + 8pt
+    } else if note.fix {
+      offsets_down.push(0pt)
+      cur = note.natural + note.height + 8pt
     } else {
       offsets_down.push(cur - note.natural)
       cur = cur + note.height + 8pt
@@ -217,6 +226,9 @@
     if max >= note.natural + offsets_down.at(index) + note.height {
       offsets_final_rev.push(offsets_down.at(index))
       max = note.natural + offsets_down.at(index) - 8pt
+    } else if note.fix {
+      offsets_final_rev.push(0pt)
+      cur = note.natural - 8pt
     } else {
       offsets_final_rev.push(max - note.natural - note.height)
       max = max - note.height - 8pt
@@ -246,7 +258,7 @@
 
     _note_extends_left.update(old => {
       let oldpage = old.at(str(page), default: ())
-      oldpage.push( (natural: natural_position, height: height) )
+      oldpage.push( (natural: natural_position, height: height, fix: false) )
       old.insert(str(page), oldpage)
       old
     })
@@ -283,7 +295,7 @@
 
     _note_extends_right.update(old => {
       let oldpage = old.at(str(page), default: ())
-      oldpage.push( (natural: natural_position, height: height) )
+      oldpage.push( (natural: natural_position, height: height, fix: false) )
       old.insert(str(page), oldpage)
       old
     })
@@ -410,6 +422,35 @@
       } else {
         0pt
       }
+    }
+
+    let position = here().position().y
+    let page_num = str(here().page())
+    let left-margin = get-left()
+    let right-margin = get-right()
+    let linewidth = page.width - left-margin.far - left-margin.width - left-margin.sep - right-margin.far - right-margin.width - right-margin.sep
+    let height = measure(width: linewidth + left + right, body).height
+
+    if left != 0pt {
+      let current = _note_extends_left.get().at(page_num, default: ())
+      let index = current.len()
+      _note_extends_left.update(old => {
+        let oldpage = old.at(page_num, default: ())
+        oldpage.push( (natural: position, height: height, fix: true) )
+        old.insert(page_num, oldpage)
+        old
+      })
+    }
+
+    if right != 0pt {
+      let current = _note_extends_right.get().at(page_num, default: ())
+      let index = current.len()
+      _note_extends_right.update(old => {
+        let oldpage = old.at(page_num, default: ())
+        oldpage.push( (natural: position, height: height, fix: true) )
+        old.insert(page_num, oldpage)
+        old
+      })
     }
 
     pad(left: -left, right: -right, body)
