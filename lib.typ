@@ -75,8 +75,6 @@
 /// - outer (dictionary): Outside/right margins. Analogous to `inner`.
 /// - top (length): Top margin.
 /// - bottom (length): Bottom margin.
-///
-///     These are not used for any of the Marginalia-functionality, they are only used when passed to @@page-setup().
 /// - book (boolean): If ```typc true```, will use inside/outside margins, alternating on each page. If ```typc false```, will use left/right margins with all pages the same.
 /// - flush-numbers (boolean): Disallow note icons hanging into the whitespace.
 /// - numbering (str, function): Function or `numbering`-string to generate the note markers from the `notecounter`.

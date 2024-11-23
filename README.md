@@ -5,7 +5,7 @@
 Put something akin to the following at the start of your `.typ` file:
 
 ```typ
-#import "@preview/marginalia:0.1.0" as marginalia: note, wideblock
+#import "@preview/marginalia:0.1.1" as marginalia: note, wideblock
 #let config = (
   // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
   // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -29,7 +29,7 @@ pages. Notes are placed in the outside margin by default.
 
 Where you can then customize `config` to your preferences. Shown here (as
 comments) are the default values taken if the corresponding keys are unset.
-[Please refer to the PDF documentation for more details on the configuration.](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
+[Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
 
 ## Margin-Notes
 
@@ -45,11 +45,33 @@ putting `marginalia.notecounter.update(0)` into the code for your header.
 
 Provided via the `#wideblock[...]` command.
 
-- `#note(reverse: true)[...]` to extend into the inside margin instead.
-- `#note(double: true)[...]` to extend into both margins.
+- `#wideblock(reverse: true)[...]` to extend into the inside margin instead.
+- `#wideblock(double: true)[...]` to extend into both margins.
 
 Note: `reverse` and `double` are mutually exclusive.
 
-Note: It does not handle pagebreaks in `book: true` documents well.
+Note: Wideblocks do not handle pagebreaks in `book: true` documents well.
+
+## Figures
+
+You can use figures as normal, also within wideblocks.
+To get captions on the side, use
+```typ
+#set figure(gap: 0pt)
+#set figure.caption(position: top)
+#show figure.caption.where(position: top): note.with(numbered: false, dy: 1em)
+```
+
+For small figures, the package also provides a `notefigure` command which places the figure in the margin.
+```typ
+#marginalia.notefigure(
+  rect(width: 100%),
+  label: <aaa>,
+  caption: [A notefigure.],
+)
+```
+
+-------
+
 
 [![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/heads/main/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)

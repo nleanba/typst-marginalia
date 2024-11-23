@@ -95,16 +95,10 @@ _Write into the margins!_
 
 = Setup
 Put something akin to the following at the start of your `.typ` file:
-// #note[
-//   Alternatively, use
-// ```typ
-// #import "path_to_marginalia" as marginalia: note, wideblock
-// ```
-// ]
 #block[
   #set text(size: 0.84em)
   ```typst
-  #import "@preview/marginalia:0.1.0" as marginalia: note, wideblock
+  #import "@preview/marginalia:0.1.1" as marginalia: note, wideblock
   #let config = (
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
