@@ -54,6 +54,7 @@
     top: config.at("top", default: 2.5cm),
     bottom: config.at("bottom", default: 2.5cm),
     book: config.at("book", default: false),
+    clearance: config.at("clearance", default: 8pt),
     flush-numbers: config.at("flush-numbers", default: false),
     numbering: config.at("numbering", default: as-note),
   )
@@ -76,6 +77,7 @@
 /// - top (length): Top margin.
 /// - bottom (length): Bottom margin.
 /// - book (boolean): If ```typc true```, will use inside/outside margins, alternating on each page. If ```typc false```, will use left/right margins with all pages the same.
+/// - clearance (length): Minimal vertical distance between notes and to wide blocks.
 /// - flush-numbers (boolean): Disallow note icons hanging into the whitespace.
 /// - numbering (str, function): Function or `numbering`-string to generate the note markers from the `notecounter`.
 #let configure(
@@ -84,6 +86,7 @@
   top: 2.5cm,
   bottom: 2.5cm,
   book: false,
+  clearance: 8pt,
   flush-numbers: false,
   numbering: as-note,
 ) = { }
@@ -164,6 +167,7 @@
 
 #let _note_extends_left = state("_note_extends_left", ("1": ()))
 #let _note_offset_left(page_num) = {
+  let clearance = _config.get().clearance
   let extends = _note_extends_left.final().at(page_num, default: ())
   let offsets_down = ()
   let cur = 0pt
@@ -171,13 +175,13 @@
     // 8pt spacing between nodes
     if cur <= note.natural {
       offsets_down.push(0pt)
-      cur = note.natural + note.height + 8pt
+      cur = note.natural + note.height + clearance
     } else if note.fix {
       offsets_down.push(0pt)
-      cur = note.natural + note.height + 8pt
+      cur = note.natural + note.height + clearance
     } else {
       offsets_down.push(cur - note.natural)
-      cur = cur + note.height + 8pt
+      cur = cur + note.height + clearance
     }
   }
 
@@ -186,13 +190,13 @@
   for (index, note) in extends.enumerate().rev() {
     if max >= note.natural + offsets_down.at(index) + note.height {
       offsets_final_rev.push(offsets_down.at(index))
-      max = note.natural + offsets_down.at(index) - 8pt
+      max = note.natural + offsets_down.at(index) - clearance
     } else if note.fix {
       offsets_final_rev.push(0pt)
-      cur = note.natural - 8pt
+      max = note.natural - clearance
     } else {
       offsets_final_rev.push(max - note.natural - note.height)
-      max = max - note.height - 8pt
+      max = max - note.height - clearance
     }
   }
 
@@ -201,6 +205,7 @@
 
 #let _note_extends_right = state("_note_extends_right", ("1": ()))
 #let _note_offset_right(page_num) = {
+  let clearance = _config.get().clearance
   let extends = _note_extends_right.final().at(page_num, default: ())
   let offsets_down = ()
   let cur = 0pt
@@ -208,13 +213,13 @@
     // 8pt spacing between nodes
     if cur <= note.natural {
       offsets_down.push(0pt)
-      cur = note.natural + note.height + 8pt
+      cur = note.natural + note.height + clearance
     } else if note.fix {
       offsets_down.push(0pt)
-      cur = note.natural + note.height + 8pt
+      cur = note.natural + note.height + clearance
     } else {
       offsets_down.push(cur - note.natural)
-      cur = cur + note.height + 8pt
+      cur = cur + note.height + clearance
     }
   }
 
@@ -223,13 +228,13 @@
   for (index, note) in extends.enumerate().rev() {
     if max >= note.natural + offsets_down.at(index) + note.height {
       offsets_final_rev.push(offsets_down.at(index))
-      max = note.natural + offsets_down.at(index) - 8pt
+      max = note.natural + offsets_down.at(index) - clearance
     } else if note.fix {
       offsets_final_rev.push(0pt)
-      cur = note.natural - 8pt
+      max = note.natural - clearance
     } else {
       offsets_final_rev.push(max - note.natural - note.height)
-      max = max - note.height - 8pt
+      max = max - note.height - clearance
     }
   }
 
@@ -321,7 +326,7 @@
 /// - dy (length): Vertical offset of the note.
 /// - body (content):
 #let note(numbered: true, reverse: false, dy: 0pt, body) = {
-  set text(size: 9pt, style: "italic", weight: "regular")
+  set text(size: 0.8em, style: "italic", weight: "regular")
   if numbered {
     notecounter.step()
     let body = context if _config.get().flush-numbers {
@@ -329,7 +334,7 @@
       h(1.5pt)
       body
     } else {
-      set par(spacing: 6pt, leading: 4pt)
+      set par(spacing: 0.55em, leading: 0.4em)
       box(
         width: 0pt,
         {
@@ -393,7 +398,7 @@
   dy: 0pt - 100%,
   numbered: false,
   label: none,
-  gap: 6pt,
+  gap: 0.55em,
   caption: none,
   kind: auto,
   supplement: none,
@@ -405,7 +410,7 @@
   reverse: false,
   dy: 0pt - 100%,
   numbered: false,
-  gap: 6pt,
+  gap: 0.55em,
   label: none,
   ..figureargs,
 ) = (
@@ -437,7 +442,7 @@
     } else {
       get-right().width
     }
-    let height = measure(width: width, content).height + gap
+    let height = measure(width: width, content).height + gap.to-absolute()
     if numbered {
       h(1.5pt, weak: true)
       notecounter.display(_config.get().numbering)

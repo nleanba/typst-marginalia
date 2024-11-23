@@ -5,6 +5,7 @@
   outer: ( far: 16mm, width: 40mm, sep: 8mm ),
   top: 32mm + 1em, bottom: 16mm,
   book: true,
+  // clearance: 30pt,
   // flush-numbers: false,
   // numbering: "a",
 )
@@ -82,10 +83,10 @@
 #v(16mm)
 #block(
   text(size: 3em, weight: "black")[
-    Marginalia#note(numbered: false)[
-  #outline(indent: 2em, depth: 2)
-]
-  ],
+    Marginalia
+    #text(size: 11pt)[#note(numbered: false)[
+        #outline(indent: 2em, depth: 2)
+      ]]],
 )
 _Write into the margins!_
 #v(1em)
@@ -105,6 +106,7 @@ Put something akin to the following at the start of your `.typ` file:
     // top: 2.5cm,
     // bottom: 2.5cm,
     // book: false,
+    // clearance: 8pt,
     // flush-numbers: false,
     // numbering: /* numbering-function */,
   )
