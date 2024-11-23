@@ -11,7 +11,7 @@
 #let notecounter = counter("notecounter")
 
 #let _notenumbering = ("◆", "●", "■", "▲", "♥", "◇", "○", "□", "△", "♡")
-#let _notenumbering = ("●","○","◆","◇","■","□","▲","△", "♥", "♡")
+#let _notenumbering = ("●", "○", "◆", "◇", "■", "□", "▲", "△", "♥", "♡")
 
 /// #internal[Mostly internal.]
 /// Format a counter like the note icons.
@@ -242,6 +242,7 @@
 /// #internal()
 #let _note_left(dy: 0pt, body) = (
   context {
+    let dy = dy.to-absolute()
     let anchor = here().position()
     let pagewidth = page.width
     let page = here().page()
@@ -258,7 +259,7 @@
 
     _note_extends_left.update(old => {
       let oldpage = old.at(str(page), default: ())
-      oldpage.push( (natural: natural_position, height: height, fix: false) )
+      oldpage.push((natural: natural_position, height: height, fix: false))
       old.insert(str(page), oldpage)
       old
     })
@@ -279,6 +280,7 @@
 /// #internal()
 #let _note_right(dy: 0pt, body) = (
   context {
+    let dy = dy.to-absolute()
     let anchor = here().position()
     let pagewidth = page.width
     let page = here().page()
@@ -295,7 +297,7 @@
 
     _note_extends_right.update(old => {
       let oldpage = old.at(str(page), default: ())
-      oldpage.push( (natural: natural_position, height: height, fix: false) )
+      oldpage.push((natural: natural_position, height: height, fix: false))
       old.insert(str(page), oldpage)
       old
     })
@@ -361,6 +363,7 @@
       }
     })
   } else {
+    h(0pt, weak: true)
     box(context {
       if reverse or (_config.get().book and calc.even(here().page())) {
         _note_left(dy: dy, body)
@@ -370,6 +373,94 @@
     })
   }
 }
+
+/// Creates a figure in the margin.
+///
+/// // - content (content): The figure content, e.g.~an image. Pass-through to ```typ #figure()```, but used to adjust the vertical position.
+/// - content (content):
+/// - reverse (boolean): Put the notefigure in the opposite margin.
+/// - dy (relative length): How much to shift the note. ```typc 100%``` corresponds to the height of `content` + `gap`.
+/// - numbered (boolean): Whether to put a mark.
+/// - label (none, label): A label to attach to the figure.
+/// - caption (none, content): The caption. Pass-through to ```typ #figure()```.
+/// - gap (length): Pass-through to ```typ #figure()```, but used to adjust the vertical position.
+/// - kind (auto, str, function): Pass-through to ```typ #figure()```.
+/// - supplement (none,auto,content,function): Pass-through to ```typ #figure()```.
+/// - numbering (none,str,function): Pass-through to ```typ #figure()```.
+/// - outlined (boolean): Pass-through to ```typ #figure()```.
+/// -> content
+#let notefigure(
+  content,
+  reverse: false,
+  dy: 0pt - 100%,
+  numbered: false,
+  label: none,
+  gap: 6pt,
+  caption: none,
+  kind: auto,
+  supplement: none,
+  numbering: "1",
+  outlined: true,
+) = { }
+#let notefigure(
+  content,
+  reverse: false,
+  dy: 0pt - 100%,
+  numbered: false,
+  gap: 6pt,
+  label: none,
+  ..figureargs,
+) = (
+  context {
+    set figure.caption(position: bottom)
+    show figure.caption: it => {
+      set align(left)
+      if numbered {
+        context if _config.get().flush-numbers {
+          notecounter.display(_config.get().numbering)
+          h(1.5pt)
+        } else {
+          box(
+            width: 0pt,
+            {
+              h(-8pt)
+              h(1fr)
+              notecounter.display(_config.get().numbering)
+              h(1fr)
+            },
+          )
+          h(0pt, weak: true)
+        }
+      }
+      it
+    }
+    let width = if reverse or (_config.get().book and calc.even(here().page())) {
+      get-left().width
+    } else {
+      get-right().width
+    }
+    let height = measure(width: width, content).height + gap
+    if numbered {
+      h(1.5pt, weak: true)
+      notecounter.display(_config.get().numbering)
+    } else {
+      h(0pt, weak: true)
+    }
+    let dy = 0% + 0pt + dy
+    note(
+      reverse: reverse,
+      dy: dy.length + dy.ratio * height,
+      numbered: false,
+    )[
+      #figure(
+        content,
+        gap: gap,
+        placement: none,
+        ..figureargs,
+      ) #label
+    ]
+  }
+)
 
 /// Creates a block that extends into the outside/right margin.
 ///
@@ -436,7 +527,7 @@
       let index = current.len()
       _note_extends_left.update(old => {
         let oldpage = old.at(page_num, default: ())
-        oldpage.push( (natural: position, height: height, fix: true) )
+        oldpage.push((natural: position, height: height, fix: true))
         old.insert(page_num, oldpage)
         old
       })
@@ -447,7 +538,7 @@
       let index = current.len()
       _note_extends_right.update(old => {
         let oldpage = old.at(page_num, default: ())
-        oldpage.push( (natural: position, height: height, fix: true) )
+        oldpage.push((natural: position, height: height, fix: true))
         old.insert(page_num, oldpage)
         old
       })

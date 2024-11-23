@@ -1,7 +1,7 @@
 #import "lib.typ" as marginalia: note, wideblock
 
 #let config = (
-  inner: ( far: 16mm, width: 18mm, sep: 8mm ),
+  inner: ( far: 16mm, width: 20mm, sep: 8mm ),
   outer: ( far: 16mm, width: 40mm, sep: 8mm ),
   top: 32mm + 1em, bottom: 16mm,
   book: true,
@@ -200,12 +200,70 @@ or per heading:
 ]
 
 #wideblock(reverse: true)[
-  ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.#note[Notes above a `wideblock` will shift upwards if neccessary.]
+  ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.#note[Notes above a `wideblock` will shift upwards if necessary.]
 ]
 
 #wideblock(double: true)[
   ```typst #wideblock(double: true)[...]```: The `double` option makes it extend both ways.
   Note that setting both `reverse: true` and `double: true` will panic.
+]
+
+= Figures
+
+For small figures, you can place them in the margin with ```typc marginalia.notefigure```.
+#marginalia.notefigure(
+  rect(width: 100%, fill: gradient.linear(..color.map.mako)),
+  caption: [A notefigure.],
+)
+It accepts all arguments `figure` takes (except `placement` and `scope`), plus all arguments `note` takes. However, by default it has no marker, and to get a marker like other notes, you must pass ```typc numbered: true```, it will get a marker like other notes:
+#marginalia.notefigure(
+  rect(width: 100%, fill: gradient.linear(..color.map.turbo)),
+  numbered: true,
+  label: <markedfigure>,
+  caption: [A marked notefigure.],
+)
+
+Additionally, the `dy` argument now takes a relative length, where ```typc 100%``` is the height of the figure content + gap, but without the caption.
+By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the caption being aligned horizontally to the text.
+
+A label can be attached to the figure using the `label` argument.// C.f.~@markedfigure.
+
+For larger figures, use the following set and show rules:
+#block[
+  #set text(size: 0.84em)
+  ```typ
+  #set figure(gap: 0pt)
+  #set figure.caption(position: top)
+  #show figure.caption.where(position: top):
+                                note.with(numbered: false, dy: 1em)
+  ```
+]
+
+#set figure(gap: 0pt)
+#set figure.caption(position: top)
+#show figure.caption.where(position: top): note.with(numbered: false, dy: 1em)
+
+#figure(
+  rect(width: 100%, fill: gradient.linear(..color.map.inferno)),
+  caption: [A figure.],
+)
+#wideblock[
+  #figure(
+    rect(width: 100%, fill: gradient.linear(..color.map.cividis)),
+    caption: [A figure in a wideblock.],
+  )
+]
+#wideblock(reverse: true)[
+  #figure(
+    rect(width: 100%, fill: gradient.linear(..color.map.icefire)),
+    caption: [A figure in a wideblock.],
+  )
+]
+#wideblock(double: true)[
+  #figure(
+    rect(width: 100%, fill: gradient.linear(..color.map.spectral)),
+    caption: [A figure in a wideblock.],
+  )
 ]
 
 = Headers and Background
@@ -253,9 +311,6 @@ Here's how the headers in this document were made:
 And here's the code for the lines in the background:
 #note[
   Not that you should copy them, they're mostly here to showcase the columns and help me verify that everything gets placed in the right spot.
-]
-#note[
-  Also, this is a good place to show that the notes will shift upwards to fit within the page.
 ]
 #block[
   #set text(size: 0.84em)
