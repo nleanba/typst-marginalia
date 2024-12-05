@@ -170,7 +170,7 @@
   let clearance = _config.get().clearance
   let extends = _note_extends_left.final().at(page_num, default: ())
   let offsets_down = ()
-  let cur = 0pt
+  let cur = _config.get().top
   for note in extends {
     // 8pt spacing between nodes
     if cur <= note.natural {
@@ -193,7 +193,7 @@
       max = note.natural + offsets_down.at(index) - clearance
     } else if note.fix {
       offsets_final_rev.push(0pt)
-      max = note.natural - clearance
+      max = calc.min(note.natural - clearance, max)
     } else {
       offsets_final_rev.push(max - note.natural - note.height)
       max = max - note.height - clearance
@@ -208,7 +208,7 @@
   let clearance = _config.get().clearance
   let extends = _note_extends_right.final().at(page_num, default: ())
   let offsets_down = ()
-  let cur = 0pt
+  let cur = _config.get().top
   for note in extends {
     // 8pt spacing between nodes
     if cur <= note.natural {
@@ -231,7 +231,7 @@
       max = note.natural + offsets_down.at(index) - clearance
     } else if note.fix {
       offsets_final_rev.push(0pt)
-      max = note.natural - clearance
+      max = calc.min(note.natural - clearance, max)
     } else {
       offsets_final_rev.push(max - note.natural - note.height)
       max = max - note.height - clearance
@@ -249,13 +249,14 @@
     let anchor = here().position()
     let pagewidth = page.width
     let page = here().page()
-    let lineheight = measure(v(par.leading)).height
-
-    let natural_position = anchor.y + dy - lineheight
 
     let width = get-left().width
     let notebox = box(width: width, body)
     let height = measure(notebox).height
+
+    let lineheight = measure([X]).height
+    lineheight = calc.min(lineheight, height)
+    let natural_position = anchor.y + dy - lineheight
 
     let current = _note_extends_left.get().at(str(page), default: ())
     let index = current.len()
@@ -287,13 +288,14 @@
     let anchor = here().position()
     let pagewidth = page.width
     let page = here().page()
-    let lineheight = measure(v(par.leading)).height
-
-    let natural_position = anchor.y + dy - lineheight
 
     let width = get-right().width
     let notebox = box(width: width, body)
     let height = measure(notebox).height
+
+    let lineheight = measure([X]).height
+    lineheight = calc.min(lineheight, height)
+    let natural_position = anchor.y + dy - lineheight
 
     let current = _note_extends_right.get().at(str(page), default: ())
     let index = current.len()
@@ -326,15 +328,17 @@
 /// - dy (length): Vertical offset of the note.
 /// - body (content):
 #let note(numbered: true, reverse: false, dy: 0pt, body) = {
-  set text(size: 0.8em, style: "italic", weight: "regular")
   if numbered {
     notecounter.step()
     let body = context if _config.get().flush-numbers {
+      set par(spacing: 0.55em, leading: 0.4em, hanging-indent: 0pt)
+      set text(size: 0.8em, weight: "regular")
       notecounter.display(_config.get().numbering)
       h(1.5pt)
       body
     } else {
-      set par(spacing: 0.55em, leading: 0.4em)
+      set par(spacing: 0.55em, leading: 0.4em, hanging-indent: 0pt)
+      set text(size: 0.8em, weight: "regular")
       box(
         width: 0pt,
         {
@@ -367,6 +371,11 @@
     })
   } else {
     h(0pt, weak: true)
+    let body = {
+      set par(spacing: 0.55em, leading: 0.4em, hanging-indent: 0pt)
+      set text(size: 0.8em, weight: "regular")
+      body
+    }
     box(context {
       if reverse or (_config.get().book and calc.even(here().page())) {
         _note_left(dy: dy, body)
@@ -442,7 +451,7 @@
     } else {
       get-right().width
     }
-    let height = measure(width: width, content).height + gap.to-absolute()
+    let height = measure(width: width, content).height + measure(text(size: 0.8em, weight: "regular", v(gap))).height
     if numbered {
       h(1.5pt, weak: true)
       notecounter.display(_config.get().numbering)

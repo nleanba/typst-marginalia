@@ -3,7 +3,7 @@
 #let config = (
   inner: ( far: 16mm, width: 20mm, sep: 8mm ),
   outer: ( far: 16mm, width: 40mm, sep: 8mm ),
-  top: 32mm + 1em, bottom: 16mm,
+  top: 32mm + 11pt, bottom: 16mm,
   book: true,
   // clearance: 30pt,
   // flush-numbers: false,
@@ -136,12 +136,19 @@ By default, the #link(label("marginalianote()"))[```typst #note[...]```] command
   This is a note.
 
   They can contain any content, and will wrap within the note column.
+  // #note(dy: 11pt)[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
 ].
 By giving the argument ```typc reverse: true```, we obtain a note on the left/inner margin.#note(reverse: true)[Reversed.]
 If ```typc config.book = true```, the side will of course be adjusted automatically.
 
-If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:110pt)[This note was given ```typc 110pt``` dy.] they automatically adjust their positions.
+If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy.] they automatically adjust their positions.
 Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around.
+
+Notes will shift downwards to avoid previous notes, containing wideblocks, and the top page margin. Notes will shift upwards to avoid later notes and wideblocks, and the bottom page margin. However, if there is not enough space between two wideblocks or between wideblocks and the margins, there will be collisions.
+
+Currently, notes (and wideblocks) are not reordered,
+#note[This note lands below the previous one!]
+so two ```typ #note```s are placed in the same order vertically as they appear in the markup, even if the first is shifted with a `dy` such that the other would fit above it.
 
 == Markers
 The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set the configuration option ```typc flush-numbers: true```.
@@ -167,6 +174,8 @@ or per heading:
 // #note[
 //   Vertical offsets in this document:
 //   Right:\
+//   #context marginalia._note_extends_right.get().at("1") \
+//   #context marginalia._note_extends_right.final().at("1") \
 //   #context marginalia._note_offset_right("1") \
 //   #context marginalia._note_offset_right("2") \
 //   #context marginalia._note_offset_right("3") \
@@ -192,7 +201,8 @@ or per heading:
   The command
   ```typst #wideblock[...]```
   can be used to wrap content in a wide block which spans into the margin-note-column.
-  It is a bit cluttered, but is possible to use notes in wide blocks:#note[Voila.]#note(reverse: true)[Wow!].
+  It is possible to use notes in a wide block:#note[Voila.]#note(reverse: true)[Wow!].
+  They will automatically shift downwards to avoid colliding with the wideblock.
 ]
 
 #wideblock(reverse: true)[
@@ -201,7 +211,7 @@ or per heading:
 
 #wideblock(double: true)[
   ```typst #wideblock(double: true)[...]```: The `double` option makes it extend both ways.
-  Note that setting both `reverse: true` and `double: true` will panic.
+  Note that setting both `reverse: true` and `double: true` is disallowed and will panic.
 ]
 
 = Figures
@@ -221,6 +231,12 @@ It accepts all arguments `figure` takes (except `placement` and `scope`), plus a
 
 Additionally, the `dy` argument now takes a relative length, where ```typc 100%``` is the height of the figure content + gap, but without the caption.
 By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the caption being aligned horizontally to the text.
+#marginalia.notefigure(
+  dy: 0pt,
+  rect(width: 100%, fill: gradient.linear(..color.map.crest)),
+  numbered: true,
+  caption: [Aligned to top of figure with `dy: 0pt`.],
+)
 
 A label can be attached to the figure using the `label` argument.// C.f.~@markedfigure.
 
@@ -243,22 +259,35 @@ For larger figures, use the following set and show rules:
   rect(width: 100%, fill: gradient.linear(..color.map.inferno)),
   caption: [A figure.],
 )
+
+For wide figures, simply place a figure in a wideblock.
+The Caption gets placed beneath the figure automatically, courtesy of regular wide-block-avoidance.
+#block[
+  #set text(size: 0.84em)
+  ```typ
+  #wideblock[#figure(
+    image(...),
+    caption: [A figure in a wide block.]
+  )]
+  ```
+]
+// #pagebreak(weak: true)
 #wideblock[
   #figure(
     rect(width: 100%, fill: gradient.linear(..color.map.cividis)),
-    caption: [A figure in a wideblock.],
+    caption: [A figure in a wide block.],
   )
 ]
 #wideblock(reverse: true)[
   #figure(
-    rect(width: 100%, fill: gradient.linear(..color.map.icefire)),
-    caption: [A figure in a wideblock.],
+    rect(width: 100%, height: 5em, fill: gradient.linear(..color.map.icefire)),
+    caption: [A figure in a reversed wide block.],
   )
 ]
 #wideblock(double: true)[
   #figure(
     rect(width: 100%, fill: gradient.linear(..color.map.spectral)),
-    caption: [A figure in a wideblock.],
+    caption: [A figure in a double-wide block.],
   )
 ]
 
