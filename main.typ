@@ -85,7 +85,7 @@
   text(size: 3em, weight: "black")[
     Marginalia
     #text(size: 11pt)[#note(numbered: false)[
-        #outline(indent: 2em, depth: 2)
+        #outline(indent: 1em, depth: 2)
       ]]],
 )
 _Write into the margins!_
@@ -99,7 +99,7 @@ Put something akin to the following at the start of your `.typ` file:
 #block[
   #set text(size: 0.84em)
   ```typst
-  #import "@preview/marginalia:0.1.1" as marginalia: note, wideblock
+  #import "@preview/marginalia:0.1.2" as marginalia: note, wideblock
   #let config = (
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -121,8 +121,8 @@ Put something akin to the following at the start of your `.typ` file:
 
 Where you can then customize `config` to your preferences. Shown here (as comments) are the default values taken if the corresponding keys are unset.
 
-See the appendix for a more detailed explanation of the #link(label("marginaliaconfigure()"), [```typc configure()```])
-and #link(label("marginaliapage-setup()"), [```typc page-setup()```])
+See the appendix for a more detailed explanation of the #link(label("marginalia-configure()"), [```typc configure()```])
+and #link(label("marginalia-page-setup()"), [```typc page-setup()```])
 functions.
 
 
@@ -132,11 +132,11 @@ functions.
 // (or all pages ```typst #if book = false```)
 
 = Margin-Notes
-By default, the #link(label("marginalianote()"))[```typst #note[...]```] command places a note to the right/outer margin, like so:#note[
+By default, the #link(label("marginalia-note()"))[```typst #note[...]```] command places a note to the right/outer margin, like so:#note[
   This is a note.
 
   They can contain any content, and will wrap within the note column.
-  // #note(dy: 11pt)[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
+  // #note[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
 ].
 By giving the argument ```typc reverse: true```, we obtain a note on the left/inner margin.#note(reverse: true)[Reversed.]
 If ```typc config.book = true```, the side will of course be adjusted automatically.
@@ -206,7 +206,10 @@ or per heading:
 ]
 
 #wideblock(reverse: true)[
-  ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.#note[Notes above a `wideblock` will shift upwards if necessary.]
+  ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.
+  
+  This is analogous to the `reverse` option on notes.
+  #note[Notes above a `wideblock` will shift upwards if necessary.]
 ]
 
 #wideblock(double: true)[
@@ -363,6 +366,19 @@ And here's the code for the lines in the background:
   ```
 ]
 
+= Trobleshooting / Known Bugs
+
+- If the document needs multiple passes to figure out page-breaks,
+  #note[This can happen for example with outlines which barely fit/don't fit onto the page.]
+  it can break the note positioning.
+  - This can usually be resolved by placing a ```typ #pagebreak()``` or ```typ #pagebreak(weak: true)``` in an appropriat location.
+
+- Nested notes may or may not work.
+  #note[In this manual, for example, it works here, but not on the first page.#note[I don't know why... :(]]
+  In all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
+
+- If you encounter anything else which looks like a big to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on Github] if noone else has done so already.
+
 = Thanks
 Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
 which has served as a starting point and was very helpful in figuring out how to position margin-notes.
@@ -371,35 +387,6 @@ The `wideblock` functionality was inspired by the one provided in the #link("htt
 
 Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which was used to produce the appendix.
 
-// On Page two:\
-// #context for (note, shift) in marginalia._note_extends_left.final().at("2", default: ()).zip(marginalia._note_offset_left("2")) [
-//   #note.natural + #shift
-//   is #note.height
-//   (#note.fix) \
-// ]
-
-// #pagebreak(to: "even", weak: true)
-// = Even Page
-// == Margin-Notes
-// Margin notes adjust themselves to even pages.#note[Ta-dah!]
-// Here, to get to the right margin, now the inner margin, we use reversed notes.#note(reverse: true)[Comme ça.]
-
-// == Wide Blocks
-
-// #wideblock[
-//   ```typst #wideblock[...]```
-//   #lorem(20)
-// ]
-
-// #wideblock(reverse: true)[
-//   ```typst #wideblock(reverse: true)[...]```:
-//   #lorem(17)
-// ]
-
-// #wideblock(double: true)[
-//   ```typst #wideblock(double: true)[...]```:
-//   #lorem(24)
-// ]
 
 // no more book-style to allow for multipage wideblock
 #marginalia.configure(..config, book: false)
@@ -414,14 +401,16 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
   = Detailed Documentation of all Exported Symbols
   <appendix>
 
-  #import "@preview/tidy:0.3.0"
+  #import "@preview/tidy:0.4.1"
   #let docs = tidy.parse-module(
     read("lib.typ"),
     name: "marginalia",
-    preamble: "notecounter.update(1);",
+    // preamble: "notecounter.update(1);",
     scope: (
       notecounter: marginalia.notecounter,
-      as-note: marginalia.as-note,
+      note-numbering: marginalia.note-numbering,
+      note-markers: marginalia.note-markers,
+      note-markers-alternating: marginalia.note-markers-alternating,
       internal: (..text) => {
         let text = text.pos().at(0, default: [Internal.])
         note(numbered: false, text)
@@ -434,12 +423,14 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
 
   #tidy.show-module(
     docs,
+    // sort-functions: false,
     // style: tidy.styles.minimal,
     first-heading-level: 1,
-    show-outline: false,
+    // show-outline: false,
     omit-private-definitions: true,
-    omit-private-parameters: true,
+    omit-private-parameters: false,
     show-module-name: false,
+    break-param-descriptions: true,
     // omit-empty-param-descriptions: false,
   )
 ]

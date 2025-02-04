@@ -4,34 +4,51 @@
 /// #internal[Mostly internal.]
 /// The counter used for the note icons.
 ///
-/// It is recommended to reset this counter regularly if the default symbols are used,
-/// as after ten notes it will start to number them.
-///#example(scale-preview: 100%, `notecounter.update(1)`)
+/// If you use @note-numbering without @note-numbering.repeat, it is reccommended you reset this occasionally, e.g. per heading or per page.
+/// #example(scale-preview: 100%, ```typc notecounter.update(1)```)
 /// -> counter
 #let notecounter = counter("notecounter")
 
-#let _notenumbering = ("◆", "●", "■", "▲", "♥", "◇", "○", "□", "△", "♡")
-#let _notenumbering = ("●", "○", "◆", "◇", "■", "□", "▲", "△", "♥", "♡")
+/// Icons to use for note markers.
+/// 
+/// ```typc ("◆", "●", "■", "▲", "♥", "◇", "○", "□", "△", "♡")```
+#let note-markers = ("◆", "●", "■", "▲", "♥", "◇", "○", "□", "△", "♡")
+/// Icons to use for note markers, alternating filled/outlined.
+///
+/// ```typc ("●", "○", "◆", "◇", "■", "□", "▲", "△", "♥", "♡")```
+#let note-markers-alternating = ("●", "○", "◆", "◇", "■", "□", "▲", "△", "♥", "♡")
 
-/// #internal[Mostly internal.]
-/// Format a counter like the note icons.
-/// Default numbering for notes.
-///#example(`notecounter.display(as-note)`)
-///#example(```
-///let i = 1
-///while i < 12 {
-///  [ #as-note(i) ]
-///  i = i + 1
-///}
-///```)
-/// - ..counter (int):
+/// Format note marker
 /// -> content
-#let as-note(..counter) = { }
-#let as-note(.., last) = {
-  let symbol = if last > _notenumbering.len() or last <= 0 [ #(last - _notenumbering.len()) ] else {
-    _notenumbering.at(last - 1)
-  }
-  return text(weight: 900, font: "Inter", size: 6pt, style: "normal", fill: rgb(54%, 72%, 95%), symbol)
+#let note-numbering(
+  /// #example(```typ
+  /// #for i in array.range(1,15) [
+  ///   #note-numbering(markers: note-markers, i)
+  /// ]\
+  /// #for i in array.range(1,15) [
+  ///   #note-numbering(markers: note-markers-alternating, i)
+  /// ]
+  /// ```)
+  /// -> array(string)
+  markers: note-markers-alternating,
+  /// Whether to (```typc true```) loop over the icons, or (```typc false```) continue with numbers after icons run out.
+  /// #example(```typ
+  /// #for i in array.range(1,15) [
+  ///   #note-numbering(repeat: true, i)
+  /// ]\
+  /// #for i in array.range(1,15) [
+  ///   #note-numbering(repeat: false, i)
+  /// ]
+  /// ```)
+  /// -> boolean
+  repeat: true,
+  ..,
+  /// -> int
+  number
+) = {
+  let index = if repeat { calc.rem(number - 1, markers.len()) } else { number - 1 }
+  let symbol = if index < markers.len() { markers.at(index) } else { str(index + 1 - markers.len()) }
+  return text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), symbol)
 }
 
 ///#internal()
@@ -54,9 +71,9 @@
     top: config.at("top", default: 2.5cm),
     bottom: config.at("bottom", default: 2.5cm),
     book: config.at("book", default: false),
-    clearance: config.at("clearance", default: 8pt),
+    clearance: config.at("clearance", default: 12pt),
     flush-numbers: config.at("flush-numbers", default: false),
-    numbering: config.at("numbering", default: as-note),
+    numbering: config.at("numbering", default: note-numbering),
   )
 }
 
@@ -65,30 +82,38 @@
 /// This will update the marginalia config with the provided config options.
 ///
 /// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
-/// - inner (dictionary): Inside/left margins.
-///     - `far`: Distance between edge of page and margin (note) column.
-///     - `width`: Width of the margin column.
-///     - `sep`: Distance between margin column and main text column.
-///
-///     The page inside/left margin should equal `far` + `width` + `sep`.
-///
-///     If partial dictionary is given, it will be filled up with defaults.
-/// - outer (dictionary): Outside/right margins. Analogous to `inner`.
-/// - top (length): Top margin.
-/// - bottom (length): Bottom margin.
-/// - book (boolean): If ```typc true```, will use inside/outside margins, alternating on each page. If ```typc false```, will use left/right margins with all pages the same.
-/// - clearance (length): Minimal vertical distance between notes and to wide blocks.
-/// - flush-numbers (boolean): Disallow note icons hanging into the whitespace.
-/// - numbering (str, function): Function or `numbering`-string to generate the note markers from the `notecounter`.
 #let configure(
+  /// Inside/left margins.
+  ///     - `far`: Distance between edge of page and margin (note) column.
+  ///     - `width`: Width of the margin column.
+  ///     - `sep`: Distance between margin column and main text column.
+  ///
+  /// The page inside/left margin should equal `far` + `width` + `sep`.
+  ///
+  /// If partial dictionary is given, it will be filled up with defaults.
+  /// -> dictionary
   inner: (far: 5mm, width: 15mm, sep: 5mm),
+  /// Outside/right margins. Analogous to `inner`.
+  /// -> dictionary
   outer: (far: 5mm, width: 15mm, sep: 5mm),
+  /// Top margin.
+  /// -> length
   top: 2.5cm,
+  /// Bottom margin.
+  /// -> length
   bottom: 2.5cm,
+  /// If ```typc true```, will use inside/outside margins, alternating on each page. If ```typc false```, will use left/right margins with all pages the same.
+  /// -> boolean
   book: false,
+  /// Minimal vertical distance between notes and to wide blocks.
+  /// -> length
   clearance: 8pt,
+  /// Disallow note icons hanging into the whitespace.
+  /// -> boolean
   flush-numbers: false,
-  numbering: as-note,
+  /// Function or `numbering`-string to generate the note markers from the `notecounter`.
+  /// -> function | string
+  numbering: note-numbering,
 ) = { }
 #let configure(..config) = (
   context {
@@ -101,17 +126,20 @@
   }
 )
 
-/* Page setup helper */
-
+/// Page setup helper
+///
 /// This will generate a dictionary ```typc ( margin: .. )``` compatible with the passed config.
 /// This can then be spread into the page setup like so:
 ///```typ
 /// #set page( ..page-setup(..config) )```
 ///
-/// Takes the same options as @@configure().
-/// - ..config (dictionary): Missing entries are filled with package defaults. Note: missing entries are _not_ taken from the current marginalia config, as this would require context.
+/// Takes the same options as @configure.
 /// -> dictionary
-#let page-setup(..config) = {
+#let page-setup(
+  /// Missing entries are filled with package defaults. Note: missing entries are _not_ taken from the current marginalia config, as this would require context.
+  /// -> dictionary
+  ..config
+) = {
   let config = _fill_config(..config)
   if config.book {
     return (
@@ -322,23 +350,30 @@
 
 /// Create a marginnote.
 /// Will adjust it's position downwards to avoid previously placed notes, and upwards to avoid extending past the bottom margin.
-///
-/// - numbered (boolean): Whether to put a mark.
-/// - reverse (boolean): Whether to put it in the opposite (inner/left) margin.
-/// - dy (length): Vertical offset of the note.
-/// - body (content):
-#let note(numbered: true, reverse: false, dy: 0pt, body) = {
+#let note(
+  /// Whether to put a mark.
+  /// -> boolean
+  numbered: true,
+  /// Whether to put it in the opposite (inner/left) margin.
+  /// -> boolean
+  reverse: false,
+  /// Inital vertical offset of the note.
+  /// Note may get shifted still to avoid other notes.
+  /// -> length
+  dy: 0pt,
+  /// -> content
+  body
+) = {
+  set text(size: 7.5pt, style: "normal", weight: "regular")
   if numbered {
     notecounter.step()
     let body = context if _config.get().flush-numbers {
-      set par(spacing: 0.55em, leading: 0.4em, hanging-indent: 0pt)
-      set text(size: 0.8em, weight: "regular")
+      set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
       notecounter.display(_config.get().numbering)
       h(1.5pt)
       body
     } else {
-      set par(spacing: 0.55em, leading: 0.4em, hanging-indent: 0pt)
-      set text(size: 0.8em, weight: "regular")
+      set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
       box(
         width: 0pt,
         {
@@ -372,8 +407,7 @@
   } else {
     h(0pt, weak: true)
     let body = {
-      set par(spacing: 0.55em, leading: 0.4em, hanging-indent: 0pt)
-      set text(size: 0.8em, weight: "regular")
+      set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
       body
     }
     box(context {
@@ -387,40 +421,28 @@
 }
 
 /// Creates a figure in the margin.
-///
-/// // - content (content): The figure content, e.g.~an image. Pass-through to ```typ #figure()```, but used to adjust the vertical position.
-/// - content (content):
-/// - reverse (boolean): Put the notefigure in the opposite margin.
-/// - dy (relative length): How much to shift the note. ```typc 100%``` corresponds to the height of `content` + `gap`.
-/// - numbered (boolean): Whether to put a mark.
-/// - label (none, label): A label to attach to the figure.
-/// - caption (none, content): The caption. Pass-through to ```typ #figure()```.
-/// - gap (length): Pass-through to ```typ #figure()```, but used to adjust the vertical position.
-/// - kind (auto, str, function): Pass-through to ```typ #figure()```.
-/// - supplement (none,auto,content,function): Pass-through to ```typ #figure()```.
-/// - numbering (none,str,function): Pass-through to ```typ #figure()```.
-/// - outlined (boolean): Pass-through to ```typ #figure()```.
 /// -> content
 #let notefigure(
+  /// The figure content, e.g.~an image. Pass-through to ```typ #figure()```, but used to adjust the vertical position.
+  /// -> content
   content,
+  /// Put the notefigure in the opposite margin.
+  /// -> boolean
   reverse: false,
+  /// How much to shift the note. ```typc 100%``` corresponds to the height of `content` + `gap`.
+  /// -> relative length
   dy: 0pt - 100%,
+  /// Whether to put a mark.
+  /// -> boolean
   numbered: false,
-  label: none,
+  /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.
+  /// -> length
   gap: 0.55em,
-  caption: none,
-  kind: auto,
-  supplement: none,
-  numbering: "1",
-  outlined: true,
-) = { }
-#let notefigure(
-  content,
-  reverse: false,
-  dy: 0pt - 100%,
-  numbered: false,
-  gap: 0.55em,
+  /// A label to attach to the figure.
+  /// -> none | label
   label: none,
+  /// Pass-through to ```typ #figure()```.
+  /// -> arguments
   ..figureargs,
 ) = (
   context {
@@ -451,7 +473,7 @@
     } else {
       get-right().width
     }
-    let height = measure(width: width, content).height + measure(text(size: 0.8em, weight: "regular", v(gap))).height
+    let height = measure(width: width, content).height + measure(text(size: 7.5pt, v(gap))).height
     if numbered {
       h(1.5pt, weak: true)
       notecounter.display(_config.get().numbering)
@@ -485,12 +507,17 @@
 ///#set page(..page-setup(..config, book: false))
 ///#wideblock(reverse: true)[...]
 ///```
-///
-/// - reverse (boolean): Whether to extend into the inside/left margin instead.
-/// - double (boolean): Whether to extend into both margins. Cannot be combined with `reverse`.
-/// - body (content):
 /// -> content
-#let wideblock(reverse: false, double: false, body) = (
+#let wideblock(
+  /// Whether to extend into the inside/left margin instead.
+  /// -> boolean
+  reverse: false,
+  /// Whether to extend into both margins. Cannot be combined with `reverse`.
+  /// -> boolean
+  double: false,
+  /// -> content
+  body
+) = (
   context {
     if double and reverse {
       panic("Cannot be both reverse and double wide.")
