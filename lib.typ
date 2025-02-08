@@ -411,10 +411,18 @@
       body
     }
     box(context {
-      if reverse or (_config.get().book and calc.even(here().page())) {
-        _note_left(dy: dy, body)
+      if _config.get().book and calc.even(here().page()) {
+        if reverse {
+          _note_right(dy: dy, body)
+        } else {
+          _note_left(dy: dy, body)
+        }
       } else {
-        _note_right(dy: dy, body)
+        if reverse {
+          _note_left(dy: dy, body)
+        } else {
+          _note_right(dy: dy, body)
+        }
       }
     })
   }
