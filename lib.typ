@@ -481,7 +481,11 @@
     } else {
       get-right().width
     }
-    let height = measure(width: width, content).height + measure(text(size: 7.5pt, v(gap))).height
+    let height = measure(width: width, {
+      set text(size: 7.5pt, style: "normal", weight: "regular")
+      set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
+      content
+    }).height + measure(text(size: 7.5pt, v(gap))).height
     if numbered {
       h(1.5pt, weak: true)
       notecounter.display(_config.get().numbering)
