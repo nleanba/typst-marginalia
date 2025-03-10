@@ -345,7 +345,7 @@
 
 // absolute left
 /// #internal()
-#let _note_left(dy: 0pt, keep-order: false, body) = (
+#let _note_left(dy: 0pt, keep-order: false, shift: true, body) = (
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
@@ -365,7 +365,7 @@
 
     _note_extends_left.update(old => {
       let oldpage = old.at(str(page), default: ())
-      oldpage.push((natural: natural_position, height: height, shift: true, keep-order: keep-order))
+      oldpage.push((natural: natural_position, height: height, shift: shift, keep-order: keep-order))
       old.insert(str(page), oldpage)
       old
     })
@@ -384,7 +384,7 @@
 
 // absolute right
 /// #internal()
-#let _note_right(dy: 0pt, keep-order: false, body) = (
+#let _note_right(dy: 0pt, keep-order: false, shift: true, body) = (
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
@@ -404,7 +404,7 @@
 
     _note_extends_right.update(old => {
       let oldpage = old.at(str(page), default: ())
-      oldpage.push((natural: natural_position, height: height, shift: true, keep-order: keep-order))
+      oldpage.push((natural: natural_position, height: height, shift: shift, keep-order: keep-order))
       old.insert(str(page), oldpage)
       old
     })
@@ -441,10 +441,19 @@
   /// // -> boolean | auto
   /// -> boolean
   keep-order: false,
+  /// Whether the note may get shifted around to avoid other notes.
+  /// - ```typc true```: The note may shift to avoid other notes, wide-blocks and the top/bottom margins.
+  /// - ```typc false```: The note is placed exactly where it appears, and other notes may shift to avoid it.
+  /// - ```typc "avoid"```: The note is only shifted if shifting other notes is not sufficent to avoid a collision.
+  /// - ```typc "ignore"```: Like ```typc false```, but other notes do not try to avoid it.
+  /// - ```typc auto```: ```typc true``` if numbered, ```typc "avoid"``` otherwise.
+  /// -> boolean | auto | "avoid" | "ignore"
+  shift: auto,
   /// -> content
   body
 ) = {
   // let keep-order = if keep-order == auto { not numbered } else { keep-orders }
+  let shift = if shift == auto { if numbered { true } else { "avoid" } } else { shift }
   set text(size: 7.5pt, style: "normal", weight: "regular")
   if numbered {
     notecounter.step()
@@ -473,15 +482,15 @@
       notecounter.display(_config.get().numbering)
       if _config.get().book and calc.even(here().page()) {
         if reverse {
-          _note_right(dy: dy, keep-order: keep-order, body)
+          _note_right(dy: dy, keep-order: keep-order, shift: shift, body)
         } else {
-          _note_left(dy: dy, keep-order: keep-order, body)
+          _note_left(dy: dy, keep-order: keep-order, shift: shift, body)
         }
       } else {
         if reverse {
-          _note_left(dy: dy, keep-order: keep-order, body)
+          _note_left(dy: dy, keep-order: keep-order, shift: shift, body)
         } else {
-          _note_right(dy: dy, keep-order: keep-order, body)
+          _note_right(dy: dy, keep-order: keep-order, shift: shift, body)
         }
       }
     })
@@ -494,15 +503,15 @@
     box(context {
       if _config.get().book and calc.even(here().page()) {
         if reverse {
-          _note_right(dy: dy, keep-order: keep-order, body)
+          _note_right(dy: dy, keep-order: keep-order, shift: shift, body)
         } else {
-          _note_left(dy: dy, keep-order: keep-order, body)
+          _note_left(dy: dy, keep-order: keep-order, shift: shift, body)
         }
       } else {
         if reverse {
-          _note_left(dy: dy, keep-order: keep-order, body)
+          _note_left(dy: dy, keep-order: keep-order, shift: shift, body)
         } else {
-          _note_right(dy: dy, keep-order: keep-order, body)
+          _note_right(dy: dy, keep-order: keep-order, shift: shift, body)
         }
       }
     })

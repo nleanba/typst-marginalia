@@ -144,12 +144,13 @@ If ```typc config.book = true```, the side will of course be adjusted automatica
 If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy.] they automatically adjust their positions.
 Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around.
 
-Notes will shift downwards to avoid previous notes, containing wideblocks, and the top page margin. Notes will shift upwards to avoid later notes and wideblocks, and the bottom page margin. However, if there is not enough space between two wideblocks or between wideblocks and the margins, there will be collisions.
+Notes will shift downwards to avoid previous notes, containing wideblocks, and the top page margin. Notes will shift upwards to avoid later notes and wideblocks, and the bottom page margin. However, if there is not enough space between wideblocks and/or the margins, there will be collisions.
+It will attempt to move aone note below a wide-block if there is not enough space above, but if there are multiple notes that would need to be rearranged you must assist by manually setting `dy` such that their initial position is below the wideblock.
 
-#text(fill: red)[TODO: OUTDATED]
-Currently, notes (and wideblocks) are not reordered,
-#note[This note lands below the previous one!]
-so two ```typ #note```s are placed in the same order vertically as they appear in the markup, even if the first is shifted with a `dy` such that the other would fit above it.
+// #text(fill: red)[TODO: OUTDATED]
+// Currently, notes (and wideblocks) are not reordered,
+// #note[This note lands below the previous one!]
+// so two ```typ #note```s are placed in the same order vertically as they appear in the markup, even if the first is shifted with a `dy` such that the other would fit above it.
 
 #columns(3)[
   Margin notes also work from within most containers such as blocks or ```typ #column()```s.#note(keep-order: true)[#lorem(4)]
@@ -163,7 +164,8 @@ so two ```typ #note```s are placed in the same order vertically as they appear i
 
 == Markers
 The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set the configuration option ```typc flush-numbers: true```.
-Setting the argument ```typc numbered: false```, we obtain notes without icon/number.#note(numbered: false)[Like this.]
+Setting the argument ```typc numbered: false```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
+we obtain notes without icon/number:#note(numbered: false)[Like this.]
 
 To change the markers, you can override ```typc config.numbering```-function which is used to generate the markers.
 
