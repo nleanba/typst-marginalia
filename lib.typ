@@ -299,7 +299,7 @@
       } else {
         positions_d.push((key, position))
         empty = 0pt
-        cur = position + items.at(key).height + clearance
+        cur =  calc.max(position + items.at(key).height + clearance, cur)
       }
     } else {
       positions_d.push((key, cur))
@@ -333,6 +333,8 @@
   }
   result
 }
+
+// #let _parent-note = state("_marginalia_parent-note-natural", false)
 
 #let _note_extends_left = state("_note_extends_left", ("1": ()))
 #let _note_offset_left(page_num) = {
@@ -407,6 +409,14 @@
     let current = _note_extends_right.get().at(str(page), default: ())
     let index = current.len()
 
+    // let in-parent-offset = 0pt
+    // let parent = _parent-note.get()
+    // if parent {
+    //   let parent-pos = current.last().natural
+    //   in-parent-offset = natural_position - parent-pos
+    //   natural_position = parent-pos
+    // }
+
     _note_extends_right.update(old => {
       let oldpage = old.at(str(page), default: ())
       oldpage.push((natural: natural_position, height: height, shift: shift, keep-order: keep-order))
@@ -414,16 +424,35 @@
       old
     })
 
-    let vadjust = dy - lineheight + _note_offset_right(str(page)).at(str(index), default: 0pt)
+    let vadjust = dy - lineheight + _note_offset_right(str(page)).at(str(index), default: 0pt)// - in-parent-offset
     let hadjust = pagewidth - anchor.x - get-right().far - get-right().width
+
+    // if parent {
+    //   box(
+    //     width: 0pt,
+    //     place(
+    //       dx: hadjust,
+    //       dy: vadjust,
+    //       {
+    //         notebox
+    //       }
+    //     )
+    //   )
+    // } else {
     box(
       width: 0pt,
       place(
         dx: hadjust,
         dy: vadjust,
-        notebox,
+        {
+          //_parent-note.update(true)
+          // [#parent]
+          notebox
+          //_parent-note.update(false)
+        }
       ),
     )
+    // }
   }
 )
 

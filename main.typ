@@ -56,8 +56,29 @@
     let leftm = marginalia.get-left()
     let rightm = marginalia.get-right()
     place(
+      top,
+      dy: marginalia._config.get().top,
+      line(length: 100%, stroke: luma(90%)),
+    )
+    place(
+      top,
+      dy: marginalia._config.get().top - page.header-ascent,
+      line(length: 100%, stroke: luma(90%)),
+    )
+    place(
+      bottom,
+      dy: -marginalia._config.get().bottom,
+      line(length: 100%, stroke: luma(90%)),
+    )
+    place(
       dx: leftm.far,
-      rect(width: leftm.width, height: 100%, stroke: (x: luma(90%))),
+      rect(width: leftm.width, height: 100%, stroke: (x: luma(90%)), inset: 0pt, {
+        // place(
+        //   top,
+        //   dy: marginalia._config.get().top,
+        //   line(length: 100%, stroke: luma(90%)),
+        // )
+      }),
     )
     place(
       dx: leftm.far + leftm.width + leftm.sep,
@@ -90,6 +111,7 @@
 )
 _Write into the margins!_
 #v(1em)
+// #place(top, note(numbered: false, outline(indent: 1em, depth: 2)))
 
 #show heading.where(level: 1): set heading(numbering: "1.1")
 #show heading.where(level: 2): set heading(numbering: "1.1")
@@ -136,7 +158,7 @@ By default, the #link(label("marginalia-note()"))[```typst #note[...]```] comman
   This is a note.
 
   They can contain any content, and will wrap within the note column.
-  // #note[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
+  // #note(dy: -14em)[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
 ].
 By giving the argument ```typc reverse: true```, we obtain a note on the left/inner margin.#note(reverse: true)[Reversed.]
 If ```typc config.book = true```, the side will of course be adjusted automatically.
@@ -309,7 +331,35 @@ The Caption gets placed beneath the figure automatically, courtesy of regular wi
   )
 ]
 
-= Headers and Background
+= Other Tidbits
+== Absolute Placement
+You can place notes in absolute positions realtive to the page using `place`:
+#block[
+  #set text(size: 0.84em)
+  ```typ
+  #place(top, note(numbered: false, reverse: true)[Top])
+  #place(bottom, note(numbered: false, reverse: true)[Bottom])
+  ```
+]
+#place(top, note(numbered: false, reverse: true)[Top])
+#place(bottom, note(numbered: false, reverse: true)[Bottom])
+
+To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if you dont mind overlaps.)
+#block[
+  #set text(size: 0.84em)
+  ```typ
+  #place(top, note(numbered: false, shift: false)[Top (No Shift)])
+  #place(bottom, note(numbered: false, shift: false)[
+    Bottom (No Shift)
+  ])
+  ```
+]
+#place(top, note(numbered: false, shift: false)[Top (No Shift)])
+#place(bottom, note(numbered: false, shift: false)[Bottom (No Shift)])
+
+Be aware that notes are aligned to their first baseline, so you may want to adjust your `dy` by one line-height.
+
+== Headers and Background
 This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the respective config option.
 In your documents, consider removing this check and simplifying the ```typc if``` a bit.
 #note[Also, please don't ```typc .update()``` the `marginalia._config` directly, this can easily break the notes.]
@@ -362,6 +412,21 @@ And here's the code for the lines in the background:
     let leftm = marginalia.get-left()
     let rightm = marginalia.get-right()
     place(
+      top,
+      dy: marginalia._config.get().top,
+      line(length: 100%, stroke: luma(90%)),
+    )
+    place(
+      top,
+      dy: marginalia._config.get().top - page.header-ascent,
+      line(length: 100%, stroke: luma(90%)),
+    )
+    place(
+      bottom,
+      dy: -marginalia._config.get().bottom,
+      line(length: 100%, stroke: luma(90%)),
+    )
+    place(
       dx: leftm.far,
       rect(width: leftm.width, height: 100%,
         stroke: (x: luma(90%))))
@@ -390,15 +455,15 @@ And here's the code for the lines in the background:
 
 - Nested notes may or may not work.
   #note[
-    #text(fill: red)[TO-DO: OUTDATED]
-    In this manual, for example, it works here, but not on the first page.
-    // #note[I don't know why... :(]
+    In this manual, for example, it works fine here,
+    #note[Probably because there aren't many other notes around.]
+    but not on the first page.
   ]
-  In all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
+  In nearly all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
 
 - If `book` is `true`, wideblocks that break across pages are broken. Sadly there doesn't seem to be a way to detect and react to page-breaks from within a `block`, so I don't know how to fix this.
 
-- If you encounter anything else which looks like a big to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on Github] if no-one else has done so already.
+- If you encounter anything else which looks like a bug to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on Github] if no-one else has done so already.
 
 = Thanks
 Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
