@@ -141,7 +141,7 @@ By default, the #link(label("marginalia-note()"))[```typst #note[...]```] comman
 By giving the argument ```typc reverse: true```, we obtain a note on the left/inner margin.#note(reverse: true)[Reversed.]
 If ```typc config.book = true```, the side will of course be adjusted automatically.
 
-If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy.] they automatically adjust their positions.
+If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy and was shifted less than that to stay on the page.] they automatically adjust their positions.
 Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around.
 
 Notes will shift downwards to avoid previous notes, containing wideblocks, and the top page margin. Notes will shift upwards to avoid later notes and wideblocks, and the bottom page margin. However, if there is not enough space between wideblocks and/or the margins, there will be collisions.
@@ -168,24 +168,25 @@ Setting the argument ```typc numbered: false```,#note[Unnumbered notes ```typc "
 we obtain notes without icon/number:#note(numbered: false)[Like this.]
 
 To change the markers, you can override ```typc config.numbering```-function which is used to generate the markers.
-
-#text(fill: red)[TODO: OUTDATED]
-It is recommended to reset the `notecounter` regularly, either per page:
-#block[
-  #set text(size: 0.84em)
-  ```typ
-  #set page(header: { marginalia.notecounter.update(0) })
-  ```
-]
-or per heading:
-#block[
-  #set text(size: 0.84em)
-  ```typ
-  #show heading.where(level: 1): it =>
-    { marginalia.notecounter.update(0); it }
-  ```
-]
-// #note[
+//
+// #text(fill: red)[TODO: OUTDATED]
+// It is recommended to reset the `notecounter` regularly, either per page:
+// #block[
+//   #set text(size: 0.84em)
+//   ```typ
+//   #set page(header: { marginalia.notecounter.update(0) })
+//   ```
+// ]
+// or per heading:
+// #block[
+//   #set text(size: 0.84em)
+//   ```typ
+//   #show heading.where(level: 1): it =>
+//     { marginalia.notecounter.update(0); it }
+//   ```
+// ]
+//
+// #note(shift: "ignore")[
 //   Vertical offsets in this document:
 //   Right:\
 //   #context marginalia._note_extends_right.get().at("1") \
@@ -217,6 +218,7 @@ or per heading:
   can be used to wrap content in a wide block which spans into the margin-note-column.
   It is possible to use notes in a wide block:#note[Voila.]#note(reverse: true)[Wow!].
   They will automatically shift downwards to avoid colliding with the wideblock.
+  #note(dy: -5em)[Unless they are given a `dy` argument moving them above the block.]
 ]
 
 #wideblock(reverse: true)[
@@ -405,124 +407,65 @@ The `wideblock` functionality was inspired by the one provided in the #link("htt
 
 Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which was used to produce the appendix.
 
-// #pagebreak()
-// = Testing
-// Ignore this page.
+#pagebreak()
+= Testing
+Ignore this page.
 
-// #{
-//   let render-offsets(page, items) = {
-//     let offsets = marginalia._calculate-offsets(page, items, 5pt)
-//     block(height: page.height, width: 100%, stroke: 1pt + black, inset: 0pt, {
-//       place(top, dy: page.top, line(length: 100%, stroke: 1pt + green))
-//       for key in items.keys() {
-//         place(top+left, dy: items.at(key).natural, rect(width: 50%, height: items.at(key).height, fill: blue.transparentize(70%), {
-//           key
-//           if items.at(key).shift != true [S: #items.at(key).shift ]
-//           if items.at(key).reorder [ R]
-//           }))
+#{
+  let render-offsets(page, items) = {
+    let offsets = marginalia._calculate-offsets(page, items, 5pt)
+    block(height: page.height, width: 100%, stroke: 1pt + black, inset: 0pt, {
+      place(top, dy: page.top, line(length: 100%, stroke: 1pt + green))
+      for key in items.keys() {
+        place(top+left, dy: items.at(key).natural, rect(width: 50%, height: items.at(key).height, fill: blue.transparentize(70%), {
+          key
+          if items.at(key).shift != true [ S: #items.at(key).shift]
+          if items.at(key).keep-order [ O]
+          }))
 
-//         place(top+right, dy: items.at(key).natural + offsets.at(key), rect(width: 50%, height: items.at(key).height, fill: red.transparentize(70%), {
-//           if items.at(key).shift != true [S: #items.at(key).shift ]
-//           if items.at(key).reorder [R ]
-//           key
-//           }))
-//       }
-//       place(bottom, dy: -page.bottom, line(length: 100%, stroke: 1pt + green))
-//     })
-//   }
+        place(top+right, dy: items.at(key).natural + offsets.at(key), rect(width: 50%, height: items.at(key).height, fill: red.transparentize(70%), {
+          if items.at(key).shift != true [S: #items.at(key).shift ]
+          if items.at(key).keep-order [O ]
+          key
+          }))
+      }
+      place(bottom, dy: -page.bottom, line(length: 100%, stroke: 1pt + green))
+    })
+  }
 
-//   let page = (height: 150pt, top: 10pt, bottom: 10pt)
-//   grid(columns: 2, gutter: 10pt,
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
-//     "2": (natural: 67pt, height: 20pt, shift: false, reorder: true),
-//     "3": (natural: 62pt, height: 20pt, shift: true, reorder: false),
-//     "4": (natural: 72pt, height: 20pt, shift: true, reorder: false),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
-//     "2": (natural: 67pt, height: 20pt, shift: true, reorder: false),
-//     "3": (natural: 62pt, height: 20pt, shift: false, reorder: true),
-//     "4": (natural: 72pt, height: 20pt, shift: true, reorder: false),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
-//     "2": (natural: 52pt, height: 20pt, shift: true, reorder: false),
-//     "3": (natural: 67pt, height: 20pt, shift: "avoid", reorder: false),
-//     "4": (natural: 77pt, height: 20pt, shift: true, reorder: false),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
-//     "2": (natural: 20pt, height: 20pt, shift: true, reorder: false),
-//     "3": (natural: 52pt, height: 20pt, shift: "avoid", reorder: false),
-//     "4": (natural: 62pt, height: 20pt, shift: true, reorder: false),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
-//     "2": (natural: 62pt, height: 20pt, shift: true, reorder: false),
-//     "3": (natural: 52pt, height: 20pt, shift: "avoid", reorder: true),
-//     "4": (natural: 69pt, height: 20pt, shift: true, reorder: false),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
-//     "2": (natural: 12pt, height: 20pt, shift: true, reorder: false),
-//     "3": (natural: 52pt, height: 20pt, shift: false, reorder: true),
-//     "4": (natural: 62pt, height: 20pt, shift: true, reorder: false),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
-//     "2": (natural: 45pt, height: 20pt, shift: "avoid", reorder: false),
-//     "3": (natural: 50pt, height: 20pt, shift: true, reorder: false),
-//     "4": (natural: 85pt, height: 50pt, shift: true, reorder: false),
-//   )),
-//   )
-
-//   pagebreak()
-//   grid(columns: 2, gutter: 10pt,
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
-//     "2": (natural: 67pt, height: 20pt, shift: false, reorder: true),
-//     "3": (natural: 62pt, height: 20pt, shift: true, reorder: true),
-//     "4": (natural: 72pt, height: 20pt, shift: true, reorder: true),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
-//     "2": (natural: 67pt, height: 20pt, shift: true, reorder: true),
-//     "3": (natural: 62pt, height: 20pt, shift: false, reorder: true),
-//     "4": (natural: 72pt, height: 20pt, shift: true, reorder: true),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
-//     "2": (natural: 52pt, height: 20pt, shift: true, reorder: true),
-//     "3": (natural: 67pt, height: 20pt, shift: "avoid", reorder: true),
-//     "4": (natural: 77pt, height: 20pt, shift: true, reorder: true),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
-//     "2": (natural: 20pt, height: 20pt, shift: true, reorder: true),
-//     "3": (natural: 52pt, height: 20pt, shift: "avoid", reorder: true),
-//     "4": (natural: 62pt, height: 20pt, shift: true, reorder: true),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
-//     "2": (natural: 62pt, height: 20pt, shift: true, reorder: true),
-//     "3": (natural: 52pt, height: 20pt, shift: "avoid", reorder: true),
-//     "4": (natural: 69pt, height: 20pt, shift: true, reorder: true),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
-//     "2": (natural: 12pt, height: 20pt, shift: true, reorder: true),
-//     "3": (natural: 52pt, height: 20pt, shift: false, reorder: true),
-//     "4": (natural: 62pt, height: 20pt, shift: true, reorder: true),
-//   )),
-//   render-offsets(page, (
-//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
-//     "2": (natural: 45pt, height: 20pt, shift: "avoid", reorder: true),
-//     "3": (natural: 50pt, height: 20pt, shift: true, reorder: true),
-//     "4": (natural: 85pt, height: 50pt, shift: true, reorder: true),
-//   )),
-//   )
-// }
+  let page = (height: 150pt, top: 10pt, bottom: 10pt)
+  grid(columns: 2, gutter: 10pt,
+    render-offsets(page, (
+      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
+      "2": (natural: 67pt, height: 20pt, shift: true, keep-order: false),
+      "3": (natural: 57pt, height: 20pt, shift: true, keep-order: false),
+      "4": (natural: 77pt, height: 20pt, shift: true, keep-order: false),
+    )),
+    render-offsets(page, (
+      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
+      "2": (natural: 67pt, height: 20pt, shift: false, keep-order: false),
+      "3": (natural: 57pt, height: 20pt, shift: true, keep-order: false),
+      "4": (natural: 77pt, height: 20pt, shift: true, keep-order: false),
+    )),
+    render-offsets(page, (
+      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
+      "2": (natural: 67pt, height: 20pt, shift: "avoid", keep-order: false),
+      "3": (natural: 57pt, height: 20pt, shift: true, keep-order: false),
+      "4": (natural: 77pt, height: 20pt, shift: true, keep-order: false),
+    )),
+    render-offsets(page, (
+      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
+      "2": (natural: 67pt, height: 20pt, shift: "ignore", keep-order: false),
+      "3": (natural: 57pt, height: 20pt, shift: true, keep-order: false),
+      "4": (natural: 77pt, height: 20pt, shift: true, keep-order: false),
+    )),
+    render-offsets(page, (
+      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
+      "2": (natural: 50pt, height: 20pt, shift: false, keep-order: false),
+      "3": (natural: 62pt, height: 20pt, shift: "avoid", keep-order: false),
+    )),
+  )
+}
 
 
 // no more book-style to allow for multipage wideblock

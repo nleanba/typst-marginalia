@@ -270,7 +270,11 @@
     let fault = cur - position
     if cur <= position {
       positions_d.push((key, position))
-      empty += position - cur
+      if items.at(key).shift == false {
+        empty = 0pt
+      } else {
+        empty += position - cur
+      }
       cur = position + items.at(key).height + clearance
     } else if items.at(key).shift == "avoid" {
       if fault <= empty {
@@ -281,7 +285,7 @@
       } else {
         positions_d.push((key, position + fault - empty))
         cur = position + fault - empty + items.at(key).height + clearance
-        empty -= fault
+        empty = 0pt
       }
     } else if items.at(key).shift == false {
       // check if we can swap with previous
@@ -300,6 +304,7 @@
     } else {
       positions_d.push((key, cur))
       // empty += 0pt
+        empty = 0pt
       cur = cur + items.at(key).height + clearance
     }
   }
