@@ -193,6 +193,142 @@
 }
 
 
+/// #internal[Mostly internal.]
+/// Calculates positions for notes.
+///
+/// Return type is of the form `(<index/id>: offset)`
+/// -> dictionary
+#let _calculate-offsets(
+  /// Of the form
+  /// ```typc
+  /// (
+  ///   height: length, // total page height
+  ///   top: length,    // top margin
+  ///   bottom: length, // bottom margin
+  /// )
+  /// ```
+  /// -> dictionary
+  page,
+  /// Of the form `(<index/id>: item)` where items have the form
+  /// ```typc
+  /// (
+  ///   natural: length,    // initial vertical position of item, relative to page
+  ///   height: length,     // vertical space needed for item
+  ///   clearance: length,  // vertical padding required.
+  ///                       // may be collapsed at top & bottom of page, and above separators
+  ///   shift: boolean | "ignore" | "avoid", // whether the item may be moved about. `auto` = move only if neccessary
+  ///   reorder: boolean,   // if true, may be reordered. if false, order relative to other `false` items is kept
+  /// )
+  /// ```
+  /// -> dictionary
+  items,
+  /// -> length
+  clearance,
+) = {
+  // sorting
+  let ignore = ()
+  let reoderable = ()
+  let nonreoderable = ()
+  for (key, item) in items.pairs() {
+    if item.shift == "ignore" {
+      ignore.push(key)
+    } else if item.reorder == true {
+      reoderable.push((key, item.natural))
+    } else {
+      nonreoderable.push((key, item.natural))
+    }
+  }
+  reoderable = reoderable.sorted(key: ((_,pos)) => pos)
+
+  let positions = ()
+
+  let index_r = 0
+  let index_n = 0
+  while index_r < reoderable.len() and index_n < nonreoderable.len() {
+    if reoderable.at(index_r).at(1) < nonreoderable.at(index_n).at(1) {
+      positions.push(reoderable.at(index_r))
+      index_r += 1
+    } else {
+      positions.push(nonreoderable.at(index_n))
+      index_n += 1
+    }
+  }
+  while index_r < reoderable.len() {
+    positions.push(reoderable.at(index_r))
+    index_r += 1
+  }
+  while index_n < nonreoderable.len() {
+    positions.push(nonreoderable.at(index_n))
+    index_n += 1
+  }
+
+  // shift down
+  let cur = page.top
+  let empty = 0pt
+  let positions_d = ()
+  for (key, position) in positions {
+    let fault = cur - position
+    if cur <= position {
+      positions_d.push((key, position))
+      empty += position - cur
+      cur = position + items.at(key).height + clearance
+    } else if items.at(key).shift == "avoid" {
+      if fault <= empty {
+        // can stay
+        positions_d.push((key, position))
+        empty -= fault // ?
+        cur = position + items.at(key).height + clearance
+      } else {
+        positions_d.push((key, position + fault - empty))
+        cur = position + fault - empty + items.at(key).height + clearance
+        empty -= fault
+      }
+    } else if items.at(key).shift == false {
+      // check if we can swap with previous
+      if positions_d.len() > 0 and fault > empty and items.at(positions_d.last().at(0)).shift != false and (items.at(key).reorder or items.at(positions_d.last().at(0)).reorder) {
+        let (prev, _) = positions_d.pop()
+        positions_d.push((key, position))
+        empty = 0pt
+        cur = position + items.at(key).height + clearance
+        positions_d.push((prev, cur))
+        cur = cur + items.at(prev).height + clearance
+      } else {
+        positions_d.push((key, position))
+        empty = 0pt
+        cur = position + items.at(key).height + clearance
+      }
+    } else {
+      positions_d.push((key, cur))
+      // empty += 0pt
+      cur = cur + items.at(key).height + clearance
+    }
+  }
+
+  let max = page.height - page.bottom
+  let positions = ()
+  for (key, position) in positions_d.rev() {
+    if max > position + items.at(key).height {
+      positions.push((key, position))
+      max = position - clearance
+    } else if items.at(key).shift == false {
+      positions.push((key, position))
+      max = calc.min(position - clearance, max)
+    } else {
+      positions.push((key, max - items.at(key).height))
+      max = max - items.at(key).height - clearance
+    }
+  }
+
+  let result = (:)
+  for (key, position) in positions.rev() {
+    result.insert(key, position - items.at(key).natural)
+  }
+  for key in ignore {
+    result.insert(key, 0pt)
+  }
+  result
+}
+
 #let _note_extends_left = state("_note_extends_left", ("1": ()))
 #let _note_offset_left(page_num) = {
   let clearance = _config.get().clearance

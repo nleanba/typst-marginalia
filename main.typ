@@ -387,6 +387,125 @@ The `wideblock` functionality was inspired by the one provided in the #link("htt
 
 Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which was used to produce the appendix.
 
+// #pagebreak()
+// = Testing
+// Ignore this page.
+
+// #{
+//   let render-offsets(page, items) = {
+//     let offsets = marginalia._calculate-offsets(page, items, 5pt)
+//     block(height: page.height, width: 100%, stroke: 1pt + black, inset: 0pt, {
+//       place(top, dy: page.top, line(length: 100%, stroke: 1pt + green))
+//       for key in items.keys() {
+//         place(top+left, dy: items.at(key).natural, rect(width: 50%, height: items.at(key).height, fill: blue.transparentize(70%), {
+//           key
+//           if items.at(key).shift != true [S: #items.at(key).shift ]
+//           if items.at(key).reorder [ R]
+//           }))
+
+//         place(top+right, dy: items.at(key).natural + offsets.at(key), rect(width: 50%, height: items.at(key).height, fill: red.transparentize(70%), {
+//           if items.at(key).shift != true [S: #items.at(key).shift ]
+//           if items.at(key).reorder [R ]
+//           key
+//           }))
+//       }
+//       place(bottom, dy: -page.bottom, line(length: 100%, stroke: 1pt + green))
+//     })
+//   }
+
+//   let page = (height: 150pt, top: 10pt, bottom: 10pt)
+//   grid(columns: 2, gutter: 10pt,
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
+//     "2": (natural: 67pt, height: 20pt, shift: false, reorder: true),
+//     "3": (natural: 62pt, height: 20pt, shift: true, reorder: false),
+//     "4": (natural: 72pt, height: 20pt, shift: true, reorder: false),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
+//     "2": (natural: 67pt, height: 20pt, shift: true, reorder: false),
+//     "3": (natural: 62pt, height: 20pt, shift: false, reorder: true),
+//     "4": (natural: 72pt, height: 20pt, shift: true, reorder: false),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
+//     "2": (natural: 52pt, height: 20pt, shift: true, reorder: false),
+//     "3": (natural: 67pt, height: 20pt, shift: "avoid", reorder: false),
+//     "4": (natural: 77pt, height: 20pt, shift: true, reorder: false),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
+//     "2": (natural: 20pt, height: 20pt, shift: true, reorder: false),
+//     "3": (natural: 52pt, height: 20pt, shift: "avoid", reorder: false),
+//     "4": (natural: 62pt, height: 20pt, shift: true, reorder: false),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
+//     "2": (natural: 62pt, height: 20pt, shift: true, reorder: false),
+//     "3": (natural: 52pt, height: 20pt, shift: "avoid", reorder: true),
+//     "4": (natural: 69pt, height: 20pt, shift: true, reorder: false),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
+//     "2": (natural: 12pt, height: 20pt, shift: true, reorder: false),
+//     "3": (natural: 52pt, height: 20pt, shift: false, reorder: true),
+//     "4": (natural: 62pt, height: 20pt, shift: true, reorder: false),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: false),
+//     "2": (natural: 45pt, height: 20pt, shift: "avoid", reorder: false),
+//     "3": (natural: 50pt, height: 20pt, shift: true, reorder: false),
+//     "4": (natural: 85pt, height: 50pt, shift: true, reorder: false),
+//   )),
+//   )
+
+//   pagebreak()
+//   grid(columns: 2, gutter: 10pt,
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
+//     "2": (natural: 67pt, height: 20pt, shift: false, reorder: true),
+//     "3": (natural: 62pt, height: 20pt, shift: true, reorder: true),
+//     "4": (natural: 72pt, height: 20pt, shift: true, reorder: true),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
+//     "2": (natural: 67pt, height: 20pt, shift: true, reorder: true),
+//     "3": (natural: 62pt, height: 20pt, shift: false, reorder: true),
+//     "4": (natural: 72pt, height: 20pt, shift: true, reorder: true),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
+//     "2": (natural: 52pt, height: 20pt, shift: true, reorder: true),
+//     "3": (natural: 67pt, height: 20pt, shift: "avoid", reorder: true),
+//     "4": (natural: 77pt, height: 20pt, shift: true, reorder: true),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
+//     "2": (natural: 20pt, height: 20pt, shift: true, reorder: true),
+//     "3": (natural: 52pt, height: 20pt, shift: "avoid", reorder: true),
+//     "4": (natural: 62pt, height: 20pt, shift: true, reorder: true),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
+//     "2": (natural: 62pt, height: 20pt, shift: true, reorder: true),
+//     "3": (natural: 52pt, height: 20pt, shift: "avoid", reorder: true),
+//     "4": (natural: 69pt, height: 20pt, shift: true, reorder: true),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
+//     "2": (natural: 12pt, height: 20pt, shift: true, reorder: true),
+//     "3": (natural: 52pt, height: 20pt, shift: false, reorder: true),
+//     "4": (natural: 62pt, height: 20pt, shift: true, reorder: true),
+//   )),
+//   render-offsets(page, (
+//     "1": (natural: 5pt, height: 20pt, shift: true, reorder: true),
+//     "2": (natural: 45pt, height: 20pt, shift: "avoid", reorder: true),
+//     "3": (natural: 50pt, height: 20pt, shift: true, reorder: true),
+//     "4": (natural: 85pt, height: 50pt, shift: true, reorder: true),
+//   )),
+//   )
+// }
+
 
 // no more book-style to allow for multipage wideblock
 #marginalia.configure(..config, book: false)
@@ -411,6 +530,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
       note-numbering: marginalia.note-numbering,
       note-markers: marginalia.note-markers,
       note-markers-alternating: marginalia.note-markers-alternating,
+      marginalia: marginalia,
       internal: (..text) => {
         let text = text.pos().at(0, default: [Internal.])
         note(numbered: false, text)
