@@ -142,7 +142,7 @@ By giving the argument ```typc reverse: true```, we obtain a note on the left/in
 If ```typc config.book = true```, the side will of course be adjusted automatically.
 
 If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy and was shifted less than that to stay on the page.] they automatically adjust their positions.
-Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around.
+Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around, unless configured otherwise via the #link(label("marginalia-note.shift"))[```typc shift```] parameter of ```typ #note()```.
 
 Notes will shift downwards to avoid previous notes, containing wideblocks, and the top page margin. Notes will shift upwards to avoid later notes and wideblocks, and the bottom page margin. However, if there is not enough space between wideblocks and/or the margins, there will be collisions.
 It will attempt to move one note below a wide-block if there is not enough space above, but if there are multiple notes that would need to be rearranged you must assist by manually setting `dy` such that their initial position is below the wideblock.
@@ -223,8 +223,7 @@ To change the markers, you can override ```typc config.numbering```-function whi
 
 #wideblock(reverse: true)[
   ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.
-  
-  This is analogous to the `reverse` option on notes.
+  This is analogous to the `reverse` option on notes and allows placing notes in their usual column.
   #note[Notes above a `wideblock` will shift upwards if necessary.]
 ]
 
@@ -397,11 +396,14 @@ And here's the code for the lines in the background:
   ]
   In all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
 
+- If `book` is `true`, wideblocks that break across pages are broken. Sadly there doesn't seem to be a way to detect and react to page-breaks from within a `block`, so I don't know how to fix this.
+
 - If you encounter anything else which looks like a big to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on Github] if no-one else has done so already.
 
 = Thanks
 Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
 which has served as a starting point and was very helpful in figuring out how to position margin-notes.
+Also check out #link("https://typst.app/universe/package/marge/")[marge] by Eric Biedert which helped motivate me to polish this package to not look bad in comparison.
 
 The `wideblock` functionality was inspired by the one provided in the #link("https://typst.app/universe/package/tufte-memo")[tufte-memo] template.
 

@@ -303,8 +303,8 @@
       }
     } else {
       positions_d.push((key, cur))
-      // empty += 0pt
-        empty = 0pt
+      empty += 0pt
+      // empty = 0pt
       cur = cur + items.at(key).height + clearance
     }
   }
