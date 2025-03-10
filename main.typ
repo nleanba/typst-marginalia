@@ -145,7 +145,7 @@ If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] not
 Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around.
 
 Notes will shift downwards to avoid previous notes, containing wideblocks, and the top page margin. Notes will shift upwards to avoid later notes and wideblocks, and the bottom page margin. However, if there is not enough space between wideblocks and/or the margins, there will be collisions.
-It will attempt to move aone note below a wide-block if there is not enough space above, but if there are multiple notes that would need to be rearranged you must assist by manually setting `dy` such that their initial position is below the wideblock.
+It will attempt to move one note below a wide-block if there is not enough space above, but if there are multiple notes that would need to be rearranged you must assist by manually setting `dy` such that their initial position is below the wideblock.
 
 // #text(fill: red)[TODO: OUTDATED]
 // Currently, notes (and wideblocks) are not reordered,
@@ -382,22 +382,22 @@ And here's the code for the lines in the background:
   ```
 ]
 
-= Trobleshooting / Known Bugs
+= Troubleshooting / Known Bugs
 
 - If the document needs multiple passes to figure out page-breaks,
   #note[This can happen for example with outlines which barely fit/don't fit onto the page.]
   it can break the note positioning.
-  - This can usually be resolved by placing a ```typ #pagebreak()``` or ```typ #pagebreak(weak: true)``` in an appropriat location.
+  - This can usually be resolved by placing a ```typ #pagebreak()``` or ```typ #pagebreak(weak: true)``` in an appropriate location.
 
 - Nested notes may or may not work.
   #note[
-    #text(fill: red)[TODO: OUTDATED]
+    #text(fill: red)[TO-DO: OUTDATED]
     In this manual, for example, it works here, but not on the first page.
     // #note[I don't know why... :(]
   ]
   In all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
 
-- If you encounter anything else which looks like a big to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on Github] if noone else has done so already.
+- If you encounter anything else which looks like a big to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on Github] if no-one else has done so already.
 
 = Thanks
 Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
@@ -406,66 +406,6 @@ which has served as a starting point and was very helpful in figuring out how to
 The `wideblock` functionality was inspired by the one provided in the #link("https://typst.app/universe/package/tufte-memo")[tufte-memo] template.
 
 Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which was used to produce the appendix.
-
-#pagebreak()
-= Testing
-Ignore this page.
-
-#{
-  let render-offsets(page, items) = {
-    let offsets = marginalia._calculate-offsets(page, items, 5pt)
-    block(height: page.height, width: 100%, stroke: 1pt + black, inset: 0pt, {
-      place(top, dy: page.top, line(length: 100%, stroke: 1pt + green))
-      for key in items.keys() {
-        place(top+left, dy: items.at(key).natural, rect(width: 50%, height: items.at(key).height, fill: blue.transparentize(70%), {
-          key
-          if items.at(key).shift != true [ S: #items.at(key).shift]
-          if items.at(key).keep-order [ O]
-          }))
-
-        place(top+right, dy: items.at(key).natural + offsets.at(key), rect(width: 50%, height: items.at(key).height, fill: red.transparentize(70%), {
-          if items.at(key).shift != true [S: #items.at(key).shift ]
-          if items.at(key).keep-order [O ]
-          key
-          }))
-      }
-      place(bottom, dy: -page.bottom, line(length: 100%, stroke: 1pt + green))
-    })
-  }
-
-  let page = (height: 150pt, top: 10pt, bottom: 10pt)
-  grid(columns: 2, gutter: 10pt,
-    render-offsets(page, (
-      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
-      "2": (natural: 67pt, height: 20pt, shift: true, keep-order: false),
-      "3": (natural: 57pt, height: 20pt, shift: true, keep-order: false),
-      "4": (natural: 77pt, height: 20pt, shift: true, keep-order: false),
-    )),
-    render-offsets(page, (
-      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
-      "2": (natural: 67pt, height: 20pt, shift: false, keep-order: false),
-      "3": (natural: 57pt, height: 20pt, shift: true, keep-order: false),
-      "4": (natural: 77pt, height: 20pt, shift: true, keep-order: false),
-    )),
-    render-offsets(page, (
-      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
-      "2": (natural: 67pt, height: 20pt, shift: "avoid", keep-order: false),
-      "3": (natural: 57pt, height: 20pt, shift: true, keep-order: false),
-      "4": (natural: 77pt, height: 20pt, shift: true, keep-order: false),
-    )),
-    render-offsets(page, (
-      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
-      "2": (natural: 67pt, height: 20pt, shift: "ignore", keep-order: false),
-      "3": (natural: 57pt, height: 20pt, shift: true, keep-order: false),
-      "4": (natural: 77pt, height: 20pt, shift: true, keep-order: false),
-    )),
-    render-offsets(page, (
-      "1": (natural: 5pt, height: 20pt, shift: true, keep-order: false),
-      "2": (natural: 50pt, height: 20pt, shift: false, keep-order: false),
-      "3": (natural: 62pt, height: 20pt, shift: "avoid", keep-order: false),
-    )),
-  )
-}
 
 
 // no more book-style to allow for multipage wideblock
