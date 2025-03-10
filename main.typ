@@ -146,9 +146,20 @@ Additionally, a ```typc dy``` argument can be passed to shift their initial posi
 
 Notes will shift downwards to avoid previous notes, containing wideblocks, and the top page margin. Notes will shift upwards to avoid later notes and wideblocks, and the bottom page margin. However, if there is not enough space between two wideblocks or between wideblocks and the margins, there will be collisions.
 
+#text(fill: red)[TODO: OUTDATED]
 Currently, notes (and wideblocks) are not reordered,
 #note[This note lands below the previous one!]
 so two ```typ #note```s are placed in the same order vertically as they appear in the markup, even if the first is shifted with a `dy` such that the other would fit above it.
+
+#columns(3)[
+  Margin notes also work from within most containers such as blocks or ```typ #column()```s.#note(keep-order: true)[#lorem(4)]
+  #colbreak()
+  Blah blah.#note[Note from second column.]
+  To force the notes to appear in the margin in the same order as they appear in the text,
+  #colbreak()
+  use ```typ #note(keep-order: true)[]```#note(keep-order: true)[Like so. The lorem-ipsum note was also placed with `keep-order`.]
+  for _all_ notes whose relative order is important.
+]
 
 == Markers
 The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set the configuration option ```typc flush-numbers: true```.
@@ -156,6 +167,7 @@ Setting the argument ```typc numbered: false```, we obtain notes without icon/nu
 
 To change the markers, you can override ```typc config.numbering```-function which is used to generate the markers.
 
+#text(fill: red)[TODO: OUTDATED]
 It is recommended to reset the `notecounter` regularly, either per page:
 #block[
   #set text(size: 0.84em)
@@ -374,7 +386,11 @@ And here's the code for the lines in the background:
   - This can usually be resolved by placing a ```typ #pagebreak()``` or ```typ #pagebreak(weak: true)``` in an appropriat location.
 
 - Nested notes may or may not work.
-  #note[In this manual, for example, it works here, but not on the first page.#note[I don't know why... :(]]
+  #note[
+    #text(fill: red)[TODO: OUTDATED]
+    In this manual, for example, it works here, but not on the first page.
+    // #note[I don't know why... :(]
+  ]
   In all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
 
 - If you encounter anything else which looks like a big to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on Github] if noone else has done so already.

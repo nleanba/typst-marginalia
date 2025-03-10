@@ -217,7 +217,7 @@
   ///   clearance: length,  // vertical padding required.
   ///                       // may be collapsed at top & bottom of page, and above separators
   ///   shift: boolean | "ignore" | "avoid", // whether the item may be moved about. `auto` = move only if neccessary
-  ///   reorder: boolean,   // if true, may be reordered. if false, order relative to other `false` items is kept
+  ///   keep-order: boolean,   // if false, may be reordered. if true, order relative to other `false` items is kept
   /// )
   /// ```
   /// -> dictionary
@@ -232,7 +232,7 @@
   for (key, item) in items.pairs() {
     if item.shift == "ignore" {
       ignore.push(key)
-    } else if item.reorder == true {
+    } else if item.keep-order == false {
       reoderable.push((key, item.natural))
     } else {
       nonreoderable.push((key, item.natural))
@@ -285,7 +285,7 @@
       }
     } else if items.at(key).shift == false {
       // check if we can swap with previous
-      if positions_d.len() > 0 and fault > empty and items.at(positions_d.last().at(0)).shift != false and (items.at(key).reorder or items.at(positions_d.last().at(0)).reorder) {
+      if positions_d.len() > 0 and fault > empty and items.at(positions_d.last().at(0)).shift != false and ((not items.at(key).keep-order) or (not items.at(positions_d.last().at(0)).keep-order)) {
         let (prev, _) = positions_d.pop()
         positions_d.push((key, position))
         empty = 0pt
@@ -331,83 +331,21 @@
 
 #let _note_extends_left = state("_note_extends_left", ("1": ()))
 #let _note_offset_left(page_num) = {
-  let clearance = _config.get().clearance
-  let extends = _note_extends_left.final().at(page_num, default: ())
-  let offsets_down = ()
-  let cur = _config.get().top
-  for note in extends {
-    // 8pt spacing between nodes
-    if cur <= note.natural {
-      offsets_down.push(0pt)
-      cur = note.natural + note.height + clearance
-    } else if note.fix {
-      offsets_down.push(0pt)
-      cur = note.natural + note.height + clearance
-    } else {
-      offsets_down.push(cur - note.natural)
-      cur = cur + note.height + clearance
-    }
-  }
-
-  let offsets_final_rev = ()
-  let max = page.height - _config.get().bottom
-  for (index, note) in extends.enumerate().rev() {
-    if max >= note.natural + offsets_down.at(index) + note.height {
-      offsets_final_rev.push(offsets_down.at(index))
-      max = note.natural + offsets_down.at(index) - clearance
-    } else if note.fix {
-      offsets_final_rev.push(0pt)
-      max = calc.min(note.natural - clearance, max)
-    } else {
-      offsets_final_rev.push(max - note.natural - note.height)
-      max = max - note.height - clearance
-    }
-  }
-
-  offsets_final_rev.rev()
+  let page = (height: page.height, bottom: _config.get().bottom, top: _config.get().top)
+  let items = _note_extends_left.final().at(page_num, default: ()).enumerate().map(((key, item)) => (str(key), item)).to-dict()
+  _calculate-offsets(page, items, _config.get().clearance)
 }
 
 #let _note_extends_right = state("_note_extends_right", ("1": ()))
 #let _note_offset_right(page_num) = {
-  let clearance = _config.get().clearance
-  let extends = _note_extends_right.final().at(page_num, default: ())
-  let offsets_down = ()
-  let cur = _config.get().top
-  for note in extends {
-    // 8pt spacing between nodes
-    if cur <= note.natural {
-      offsets_down.push(0pt)
-      cur = note.natural + note.height + clearance
-    } else if note.fix {
-      offsets_down.push(0pt)
-      cur = note.natural + note.height + clearance
-    } else {
-      offsets_down.push(cur - note.natural)
-      cur = cur + note.height + clearance
-    }
-  }
-
-  let offsets_final_rev = ()
-  let max = page.height - _config.get().bottom
-  for (index, note) in extends.enumerate().rev() {
-    if max >= note.natural + offsets_down.at(index) + note.height {
-      offsets_final_rev.push(offsets_down.at(index))
-      max = note.natural + offsets_down.at(index) - clearance
-    } else if note.fix {
-      offsets_final_rev.push(0pt)
-      max = calc.min(note.natural - clearance, max)
-    } else {
-      offsets_final_rev.push(max - note.natural - note.height)
-      max = max - note.height - clearance
-    }
-  }
-
-  offsets_final_rev.rev()
+  let page = (height: page.height, bottom: _config.get().bottom, top: _config.get().top)
+  let items = _note_extends_right.final().at(page_num, default: ()).enumerate().map(((key, item)) => (str(key), item)).to-dict()
+  _calculate-offsets(page, items, _config.get().clearance)
 }
 
 // absolute left
 /// #internal()
-#let _note_left(dy: 0pt, body) = (
+#let _note_left(dy: 0pt, keep-order: false, body) = (
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
@@ -427,12 +365,12 @@
 
     _note_extends_left.update(old => {
       let oldpage = old.at(str(page), default: ())
-      oldpage.push((natural: natural_position, height: height, fix: false))
+      oldpage.push((natural: natural_position, height: height, shift: true, keep-order: keep-order))
       old.insert(str(page), oldpage)
       old
     })
 
-    let vadjust = dy - lineheight + _note_offset_left(str(page)).at(index, default: 0pt)
+    let vadjust = dy - lineheight + _note_offset_left(str(page)).at(str(index), default: 0pt)
     let hadjust = get-left().far - anchor.x
     box(
       place(
@@ -446,7 +384,7 @@
 
 // absolute right
 /// #internal()
-#let _note_right(dy: 0pt, body) = (
+#let _note_right(dy: 0pt, keep-order: false, body) = (
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
@@ -466,12 +404,12 @@
 
     _note_extends_right.update(old => {
       let oldpage = old.at(str(page), default: ())
-      oldpage.push((natural: natural_position, height: height, fix: false))
+      oldpage.push((natural: natural_position, height: height, shift: true, keep-order: keep-order))
       old.insert(str(page), oldpage)
       old
     })
 
-    let vadjust = dy - lineheight + _note_offset_right(str(page)).at(index, default: 0pt)
+    let vadjust = dy - lineheight + _note_offset_right(str(page)).at(str(index), default: 0pt)
     let hadjust = pagewidth - anchor.x - get-right().far - get-right().width
     box(
       width: 0pt,
@@ -497,9 +435,16 @@
   /// Note may get shifted still to avoid other notes.
   /// -> length
   dy: 0pt,
+  /// Notes with ```typc keep-order: true``` are not re-ordered relative to one another.
+  /// 
+  /// // If ```typc auto```, defaults to false unless ```typc numbered: false``` is set.
+  /// // -> boolean | auto
+  /// -> boolean
+  keep-order: false,
   /// -> content
   body
 ) = {
+  // let keep-order = if keep-order == auto { not numbered } else { keep-orders }
   set text(size: 7.5pt, style: "normal", weight: "regular")
   if numbered {
     notecounter.step()
@@ -528,15 +473,15 @@
       notecounter.display(_config.get().numbering)
       if _config.get().book and calc.even(here().page()) {
         if reverse {
-          _note_right(dy: dy, body)
+          _note_right(dy: dy, keep-order: keep-order, body)
         } else {
-          _note_left(dy: dy, body)
+          _note_left(dy: dy, keep-order: keep-order, body)
         }
       } else {
         if reverse {
-          _note_left(dy: dy, body)
+          _note_left(dy: dy, keep-order: keep-order, body)
         } else {
-          _note_right(dy: dy, body)
+          _note_right(dy: dy, keep-order: keep-order, body)
         }
       }
     })
@@ -549,15 +494,15 @@
     box(context {
       if _config.get().book and calc.even(here().page()) {
         if reverse {
-          _note_right(dy: dy, body)
+          _note_right(dy: dy, keep-order: keep-order, body)
         } else {
-          _note_left(dy: dy, body)
+          _note_left(dy: dy, keep-order: keep-order, body)
         }
       } else {
         if reverse {
-          _note_left(dy: dy, body)
+          _note_left(dy: dy, keep-order: keep-order, body)
         } else {
-          _note_right(dy: dy, body)
+          _note_right(dy: dy, keep-order: keep-order, body)
         }
       }
     })
@@ -714,7 +659,7 @@
       let index = current.len()
       _note_extends_left.update(old => {
         let oldpage = old.at(page_num, default: ())
-        oldpage.push((natural: position, height: height, fix: true))
+        oldpage.push((natural: position, height: height, shift: false, keep-order: false))
         old.insert(page_num, oldpage)
         old
       })
@@ -725,7 +670,7 @@
       let index = current.len()
       _note_extends_right.update(old => {
         let oldpage = old.at(page_num, default: ())
-        oldpage.push((natural: position, height: height, fix: true))
+        oldpage.push((natural: position, height: height, shift: false, keep-order: false))
         old.insert(page_num, oldpage)
         old
       })
