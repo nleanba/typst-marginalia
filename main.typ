@@ -97,8 +97,9 @@
   },
 )
 
-#set par(justify: true)
-#set text(fill: luma(30))
+#set par(justify: true, linebreaks: "optimized")
+#set text(fill: luma(30), size: 10pt)
+#show raw: set text(font: ("IBM Plex Mono", "DejaVu Sans Mono"))
 #show link: underline
 
 #v(16mm)
@@ -119,7 +120,7 @@ _Write into the margins!_
 = Setup
 Put something akin to the following at the start of your `.typ` file:
 #block[
-  #set text(size: 0.84em)
+  // #set text(size: 0.84em)
   ```typst
   #import "@preview/marginalia:0.1.2" as marginalia: note, wideblock
   #let config = (
@@ -174,13 +175,14 @@ It will attempt to move one note below a wide-block if there is not enough space
 // #note[This note lands below the previous one!]
 // so two ```typ #note```s are placed in the same order vertically as they appear in the markup, even if the first is shifted with a `dy` such that the other would fit above it.
 
+#pagebreak(weak: true)
 #columns(3)[
   Margin notes also work from within most containers such as blocks or ```typ #column()```s.#note(keep-order: true)[#lorem(4)]
   #colbreak()
   Blah blah.#note[Note from second column.]
-  To force the notes to appear in the margin in the same order as they appear in the text,
+  To force the notes to appear in the margin in the same order as they appear in the text, use
   #colbreak()
-  use ```typ #note(keep-order: true)[]```#note(keep-order: true)[Like so. The lorem-ipsum note was also placed with `keep-order`.]
+  ```typ #note(keep-order: true)[]```#note(keep-order: true)[Like so. The lorem-ipsum note was also placed with `keep-order`.]
   for _all_ notes whose relative order is important.
 ]
 
@@ -282,7 +284,7 @@ A label can be attached to the figure using the `label` argument.// C.f.~@marked
 
 For larger figures, use the following set and show rules:
 #block[
-  #set text(size: 0.84em)
+  // #set text(size: 0.84em)
   ```typ
   #set figure(gap: 0pt)
   #set figure.caption(position: top)
@@ -303,7 +305,7 @@ For larger figures, use the following set and show rules:
 For wide figures, simply place a figure in a wideblock.
 The Caption gets placed beneath the figure automatically, courtesy of regular wide-block-avoidance.
 #block[
-  #set text(size: 0.84em)
+  // #set text(size: 0.84em)
   ```typ
   #wideblock[#figure(
     image(...),
@@ -335,7 +337,7 @@ The Caption gets placed beneath the figure automatically, courtesy of regular wi
 == Absolute Placement
 You can place notes in absolute positions realtive to the page using `place`:
 #block[
-  #set text(size: 0.84em)
+  // #set text(size: 0.84em)
   ```typ
   #place(top, note(numbered: false, reverse: true)[Top])
   #place(bottom, note(numbered: false, reverse: true)[Bottom])
@@ -346,7 +348,7 @@ You can place notes in absolute positions realtive to the page using `place`:
 
 To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if you dont mind overlaps.)
 #block[
-  #set text(size: 0.84em)
+  // #set text(size: 0.84em)
   ```typ
   #place(top, note(numbered: false, shift: false)[Top (No Shift)])
   #place(bottom, note(numbered: false, shift: false)[
@@ -367,7 +369,7 @@ In your documents, consider removing this check and simplifying the ```typc if``
 
 Here's how the headers in this document were made:
 #block[
-  #set text(size: 0.84em)
+  // #set text(size: 0.84em)
   ```typst
   #set page(header: context {
     marginalia.notecounter.update(0)
@@ -405,43 +407,26 @@ And here's the code for the lines in the background:
 #note[
   Not that you should copy them, they're mostly here to showcase the columns and help me verify that everything gets placed in the right spot.
 ]
-#block[
-  #set text(size: 0.84em)
+#wideblock(reverse: true)[
+  // #set text(size: 0.84em)
   ```typst
   #set page(background: context {
     let leftm = marginalia.get-left()
     let rightm = marginalia.get-right()
-    place(
-      top,
-      dy: marginalia._config.get().top,
-      line(length: 100%, stroke: luma(90%)),
-    )
-    place(
-      top,
-      dy: marginalia._config.get().top - page.header-ascent,
-      line(length: 100%, stroke: luma(90%)),
-    )
-    place(
-      bottom,
-      dy: -marginalia._config.get().bottom,
-      line(length: 100%, stroke: luma(90%)),
-    )
-    place(
-      dx: leftm.far,
-      rect(width: leftm.width, height: 100%,
-        stroke: (x: luma(90%))))
-    place(
-      dx: leftm.far + leftm.width + leftm.sep,
-      rect(width: 10pt, height: 100%,
-        stroke: (left: luma(90%))))
-    place(right,
-      dx: -rightm.far,
-      rect(width: rightm.width, height: 100%,
-        stroke: (x: luma(90%))))
-    place(right,
-      dx: -rightm.far - rightm.width - rightm.sep,
-      rect(width: 10pt, height: 100%,
-        stroke: (right: luma(90%))))
+    place(top, dy: marginalia._config.get().top,
+          line(length: 100%, stroke: luma(90%)))
+    place(top, dy: marginalia._config.get().top - page.header-ascent,
+          line(length: 100%, stroke: luma(90%)))
+    place(bottom, dy: -marginalia._config.get().bottom,
+          line(length: 100%, stroke: luma(90%)))
+    place(dx: leftm.far,
+          rect(width: leftm.width, height: 100%, stroke: (x: luma(90%))))
+    place(dx: leftm.far + leftm.width + leftm.sep,
+          rect(width: 10pt, height: 100%, stroke: (left: luma(90%))))
+    place(right, dx: -rightm.far,
+          rect(width: rightm.width, height: 100%, stroke: (x: luma(90%))))
+    place(right, dx: -rightm.far - rightm.width - rightm.sep,
+          rect(width: 10pt, height: 100%, stroke: (right: luma(90%))))
   })
   ```
 ]
@@ -488,7 +473,8 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
   = Detailed Documentation of all Exported Symbols
   <appendix>
 
-  #import "@preview/tidy:0.4.1"
+  #import "@preview/tidy:0.4.2"
+  #import "tidy-style.typ" as style
   #let docs = tidy.parse-module(
     read("lib.typ"),
     name: "marginalia",
@@ -512,13 +498,13 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
   #tidy.show-module(
     docs,
     // sort-functions: false,
-    // style: tidy.styles.minimal,
+    style: style,
     first-heading-level: 1,
     // show-outline: false,
     omit-private-definitions: true,
-    omit-private-parameters: false,
+    // omit-private-parameters: false,
     show-module-name: false,
-    break-param-descriptions: true,
+    // break-param-descriptions: true,
     // omit-empty-param-descriptions: false,
   )
 ]
