@@ -98,7 +98,7 @@
 )
 
 #set par(justify: true)
-#set text(fill: luma(30))
+#set text(fill: luma(30), size: 11pt)
 #show link: underline
 
 #v(16mm)
@@ -359,6 +359,17 @@ To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if y
 
 Be aware that notes are aligned to their first baseline, so you may want to adjust your `dy` by one line-height.
 
+#pagebreak()
+== Sync
+
+#lorem(5)#note[A #lorem(10)]
+#lorem(5)#note[B #lorem(10)]
+#lorem(5)#note[C #lorem(10)]
+#marginalia.sync()
+
+#lorem(5)#note[a #lorem(10)]
+
+
 == Headers and Background
 This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the respective config option.
 In your documents, consider removing this check and simplifying the ```typc if``` a bit.
@@ -468,7 +479,7 @@ And here's the code for the lines in the background:
 = Thanks
 Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
 which has served as a starting point and was very helpful in figuring out how to position margin-notes.
-Also check out #link("https://typst.app/universe/package/marge/")[marge] by Eric Biedert which helped motivate me to polish this package to not look bad in comparison.
+// Also check out #link("https://typst.app/universe/package/marge/")[marge] by Eric Biedert which helped motivate me to polish this package to not look bad in comparison.
 
 The `wideblock` functionality was inspired by the one provided in the #link("https://typst.app/universe/package/tufte-memo")[tufte-memo] template.
 

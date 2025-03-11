@@ -216,7 +216,7 @@
   ///   height: length,     // vertical space needed for item
   ///   clearance: length,  // vertical padding required.
   ///                       // may be collapsed at top & bottom of page, and above separators
-  ///   shift: boolean | "ignore" | "avoid", // whether the item may be moved about. `auto` = move only if neccessary
+  ///   shift: boolean | "ignore" | "avoid" | "sync", // whether the item may be moved about. `auto` = move only if neccessary
   ///   keep-order: boolean,   // if false, may be reordered. if true, order relative to other `false` items is kept
   /// )
   /// ```
@@ -276,7 +276,7 @@
         empty += position - cur
       }
       cur = position + items.at(key).height + clearance
-    } else if items.at(key).shift == "avoid" {
+    } else if items.at(key).shift == "avoid" or items.at(key).shift == "sync" {
       if fault <= empty {
         // can stay
         positions_d.push((key, position))
@@ -315,7 +315,7 @@
     if max > position + items.at(key).height {
       positions.push((key, position))
       max = position - clearance
-    } else if items.at(key).shift == false {
+    } else if items.at(key).shift == false or items.at(key).shift == "sync" {
       positions.push((key, position))
       max = calc.min(position - clearance, max)
     } else {
@@ -456,6 +456,63 @@
   }
 )
 
+/// Synchronize margin columns and main body text.
+/// -> content
+#let sync(
+  /// -> boolean
+  inside: true,
+  /// -> boolean
+  outside: true,
+) = {
+  context {
+    let anchor = here().position()
+    let page = here().page()
+
+    let clearance  =_config.get().clearance
+    let natural_position = anchor.y + clearance
+
+    let left = false
+    let right = false
+
+    if _config.get().book and calc.even(page) {
+      right = inside
+      left = outside
+    } else {
+      right = outside
+      left = inside
+    }
+
+    let vadjust = 0pt
+
+    if right {
+      let index = _note_extends_right.get().at(str(page), default: ()).len()
+      _note_extends_right.update(old => {
+        let oldpage = old.at(str(page), default: ())
+        oldpage.push((natural: natural_position, height: 0pt, shift: "sync", keep-order: true))
+        old.insert(str(page), oldpage)
+        old
+      })
+      vadjust += _note_offset_right(str(page)).at(str(index), default: 0pt)
+    }
+
+    if left {
+      let index = _note_extends_left.get().at(str(page), default: ()).len()
+      _note_extends_left.update(old => {
+        let oldpage = old.at(str(page), default: ())
+        oldpage.push((natural: natural_position, height: 0pt, shift: "sync", keep-order: true))
+        old.insert(str(page), oldpage)
+        old
+      })
+      vadjust += _note_offset_left(str(page)).at(str(index), default: 0pt)
+    }
+
+    if vadjust > clearance { vadjust -= clearance }
+
+    // [_Sync by #(vadjust)_]
+    block(spacing: 0pt, width: 100%, fill: red.transparentize(50%), height: vadjust, outset: (top: 1pt))
+  }
+}
+
 /// Create a marginnote.
 /// Will adjust it's position downwards to avoid previously placed notes, and upwards to avoid extending past the bottom margin.
 #let note(
@@ -481,7 +538,8 @@
   /// - ```typc "avoid"```: The note is only shifted if shifting other notes is not sufficent to avoid a collision.
   /// - ```typc "ignore"```: Like ```typc false```, but other notes do not try to avoid it.
   /// - ```typc auto```: ```typc true``` if numbered, ```typc "avoid"``` otherwise.
-  /// -> boolean | auto | "avoid" | "ignore"
+  /// - ```typc "sync"```: Like ```typc "avoid"```, but it will refuse to move upwards. Used for @sync().
+  /// -> boolean | auto | "avoid" | "ignore" | "sync"
   shift: auto,
   /// -> content
   body
