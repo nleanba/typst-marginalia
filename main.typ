@@ -7,7 +7,8 @@
   book: true,
   // clearance: 30pt,
   // flush-numbers: false,
-  // numbering: "a",
+  // numbering: (..i) => super(numbering("a", ..i)),
+  // numbering: marginalia.note-numbering.with(repeat: false, markers: ())
 )
 
 #marginalia.configure(..config)
@@ -15,7 +16,7 @@
   ..marginalia.page-setup(..config),
   header-ascent: 16mm,
   header: context {
-    marginalia.notecounter.update(0)
+    // marginalia.notecounter.update(0)
     let book = marginalia._config.get().book
     let leftm = marginalia.get-left()
     let rightm = marginalia.get-right()
@@ -260,22 +261,23 @@ To change the markers, you can override ```typc config.numbering```-function whi
 
 For small figures, you can place them in the margin with ```typc marginalia.notefigure```.
 #marginalia.notefigure(
-  rect(width: 100%, fill: gradient.linear(..color.map.mako)),
+  rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.mako)),
   caption: [A notefigure.],
 )
 It accepts all arguments `figure` takes (except `placement` and `scope`), plus all arguments `note` takes. However, by default it has no marker, and to get a marker like other notes, you must pass ```typc numbered: true```, it will get a marker like other notes:
 #marginalia.notefigure(
-  rect(width: 100%, fill: gradient.linear(..color.map.turbo)),
+  rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.turbo)),
   numbered: true,
   label: <markedfigure>,
   caption: [A marked notefigure.],
 )
 
-Additionally, the `dy` argument now takes a relative length, where ```typc 100%``` is the height of the figure content + gap, but without the caption.
+Additionally, the `dy` argument now takes a relative length, where ```typc 100%``` is the distance between the top of the figure content and the first baseline of the caption.
+//height of the figure content + gap, but without the caption.
 By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the caption being aligned horizontally to the text.
 #marginalia.notefigure(
   dy: 0pt,
-  rect(width: 100%, fill: gradient.linear(..color.map.crest)),
+  rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.crest)),
   numbered: true,
   caption: [Aligned to top of figure with `dy: 0pt`.],
 )
@@ -289,7 +291,7 @@ For larger figures, use the following set and show rules:
   #set figure(gap: 0pt)
   #set figure.caption(position: top)
   #show figure.caption.where(position: top):
-                                note.with(numbered: false, dy: 1em)
+    note.with(numbered: false, dy: 1em)
   ```
 ]
 
@@ -307,13 +309,13 @@ The Caption gets placed beneath the figure automatically, courtesy of regular wi
 #block[
   // #set text(size: 0.84em)
   ```typ
-  #wideblock[#figure(
+  #wideblock(figure(
     image(...),
     caption: [A figure in a wide block.]
-  )]
+  ))
   ```
 ]
-// #pagebreak(weak: true)
+#pagebreak(weak: true)
 #wideblock[
   #figure(
     rect(width: 100%, fill: gradient.linear(..color.map.cividis)),
@@ -335,7 +337,7 @@ The Caption gets placed beneath the figure automatically, courtesy of regular wi
 
 = Other Tidbits
 == Absolute Placement
-You can place notes in absolute positions realtive to the page using `place`:
+You can place notes in absolute positions relative to the page using `place`:
 #block[
   // #set text(size: 0.84em)
   ```typ
@@ -346,20 +348,25 @@ You can place notes in absolute positions realtive to the page using `place`:
 #place(top, note(numbered: false, reverse: true)[Top])
 #place(bottom, note(numbered: false, reverse: true)[Bottom])
 
-To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if you dont mind overlaps.)
+To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if you don't mind overlaps.)
 #block[
   // #set text(size: 0.84em)
   ```typ
-  #place(top, note(numbered: false, shift: false)[Top (No Shift)])
+  #place(top, note(numbered: false, shift: false)[
+    Top (no shift)
+  ])
   #place(bottom, note(numbered: false, shift: false)[
-    Bottom (No Shift)
+    Bottom (no shift)
   ])
   ```
 ]
-#place(top, note(numbered: false, shift: false)[Top (No Shift)])
-#place(bottom, note(numbered: false, shift: false)[Bottom (No Shift)])
+#place(top, note(numbered: false, shift: false)[Top (no shift)])
+#place(bottom, note(numbered: false, shift: false)[Bottom (no shift)])
 
-Be aware that notes are aligned to their first baseline, so you may want to adjust your `dy` by one line-height.
+By default, notes are aligned to their first baseline.
+To align the top of the note instead, set #link(label("marginalia-note.align-baseline"))[```typc align-baseline```] to ```typc false```.
+#place(top, note(numbered: false, shift: false, align-baseline: false)[Top (no shift + no baseline align])
+#place(bottom, note(numbered: false, shift: false, align-baseline: false)[Bottom (no shift + no baseline align)])
 
 == Headers and Background
 This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the respective config option.
@@ -431,6 +438,7 @@ And here's the code for the lines in the background:
   ```
 ]
 
+#pagebreak(weak: true)
 = Troubleshooting / Known Bugs
 
 - If the document needs multiple passes to figure out page-breaks,
@@ -449,7 +457,7 @@ And here's the code for the lines in the background:
 
 - If `book` is `true`, wideblocks that break across pages are broken. Sadly there doesn't seem to be a way to detect and react to page-breaks from within a `block`, so I don't know how to fix this.
 
-- If you encounter anything else which looks like a bug to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on Github] if no-one else has done so already.
+- If you encounter anything else which looks like a bug to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on GitHub] if no-one else has done so already.
 
 = Thanks
 Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,

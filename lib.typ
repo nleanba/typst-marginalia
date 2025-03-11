@@ -112,6 +112,11 @@
   /// -> boolean
   flush-numbers: false,
   /// Function or `numbering`-string to generate the note markers from the `notecounter`.
+  /// 
+  /// Examples:
+  /// - ```typc (..i) => super(numbering("1", ..i))``` for superscript numbers
+  /// - ```typc (..i) => super(numbering("a", ..i))``` for superscript letters
+  /// - ```typc marginalia.note-numbering.with(repeat: false, markers: ())``` for small blue numbers
   /// -> function | string
   numbering: note-numbering,
 ) = { }
@@ -245,7 +250,7 @@
   let index_r = 0
   let index_n = 0
   while index_r < reoderable.len() and index_n < nonreoderable.len() {
-    if reoderable.at(index_r).at(1) < nonreoderable.at(index_n).at(1) {
+    if reoderable.at(index_r).at(1) <= nonreoderable.at(index_n).at(1) {
       positions.push(reoderable.at(index_r))
       index_r += 1
     } else {
@@ -253,13 +258,13 @@
       index_n += 1
     }
   }
-  while index_r < reoderable.len() {
-    positions.push(reoderable.at(index_r))
-    index_r += 1
-  }
   while index_n < nonreoderable.len() {
     positions.push(nonreoderable.at(index_n))
     index_n += 1
+  }
+  while index_r < reoderable.len() {
+    positions.push(reoderable.at(index_r))
+    index_r += 1
   }
 
   // shift down
@@ -291,9 +296,10 @@
       // check if we can swap with previous
       if positions_d.len() > 0 and fault > empty and items.at(positions_d.last().at(0)).shift != false and ((not items.at(key).keep-order) or (not items.at(positions_d.last().at(0)).keep-order)) {
         let (prev, _) = positions_d.pop()
+        let x  =cur
         positions_d.push((key, position))
         empty = 0pt
-        cur = position + items.at(key).height + clearance
+        cur = calc.max(position + items.at(key).height + clearance, cur)
         positions_d.push((prev, cur))
         cur = cur + items.at(prev).height + clearance
       } else {
@@ -352,7 +358,7 @@
 
 // absolute left
 /// #internal()
-#let _note_left(dy: 0pt, keep-order: false, shift: true, body) = (
+#let _note_left(dy: 0pt, keep-order: false, shift: true, align-baseline: true, body) = (
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
@@ -363,8 +369,7 @@
     let notebox = box(width: width, body)
     let height = measure(notebox).height
 
-    let lineheight = measure([X]).height
-    lineheight = calc.min(lineheight, height)
+    let lineheight = if align-baseline { calc.min(measure(sym.zws).height, height) } else { 0pt }
     let natural_position = anchor.y + dy - lineheight
 
     let current = _note_extends_left.get().at(str(page), default: ())
@@ -391,7 +396,7 @@
 
 // absolute right
 /// #internal()
-#let _note_right(dy: 0pt, keep-order: false, shift: true, body) = (
+#let _note_right(dy: 0pt, keep-order: false, shift: true, align-baseline: true, body) = (
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
@@ -402,8 +407,7 @@
     let notebox = box(width: width, body)
     let height = measure(notebox).height
 
-    let lineheight = measure([X]).height
-    lineheight = calc.min(lineheight, height)
+    let lineheight = if align-baseline { calc.min(measure(sym.zws).height, height) } else { 0pt }
     let natural_position = anchor.y + dy - lineheight
 
     let current = _note_extends_right.get().at(str(page), default: ())
@@ -483,20 +487,25 @@
   /// - ```typc auto```: ```typc true``` if numbered, ```typc "avoid"``` otherwise.
   /// -> boolean | auto | "avoid" | "ignore"
   shift: auto,
+  /// Whether to align the baselines or not.
+  /// - If ```typc false```, the top of the note is aligned with the main-text baseline.
+  /// -> boolean
+  align-baseline: true,
   /// -> content
   body
 ) = {
   // let keep-order = if keep-order == auto { not numbered } else { keep-orders }
   let shift = if shift == auto { if numbered { true } else { "avoid" } } else { shift }
-  set text(size: 7.5pt, style: "normal", weight: "regular")
   if numbered {
     notecounter.step()
     let body = context if _config.get().flush-numbers {
+      set text(size: 7.5pt, style: "normal", weight: "regular")
       set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
       notecounter.display(_config.get().numbering)
       h(1.5pt)
       body
     } else {
+      set text(size: 7.5pt, style: "normal", weight: "regular")
       set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
       place(
         dx: -8pt,
@@ -516,36 +525,37 @@
       notecounter.display(_config.get().numbering)
       if _config.get().book and calc.even(here().page()) {
         if reverse {
-          _note_right(dy: dy, keep-order: keep-order, shift: shift, body)
+          _note_right(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
         } else {
-          _note_left(dy: dy, keep-order: keep-order, shift: shift, body)
+          _note_left(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
         }
       } else {
         if reverse {
-          _note_left(dy: dy, keep-order: keep-order, shift: shift, body)
+          _note_left(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
         } else {
-          _note_right(dy: dy, keep-order: keep-order, shift: shift, body)
+          _note_right(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
         }
       }
     })
   } else {
     h(0pt, weak: true)
     let body = {
+      set text(size: 7.5pt, style: "normal", weight: "regular")
       set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
       body
     }
     box(context {
       if _config.get().book and calc.even(here().page()) {
         if reverse {
-          _note_right(dy: dy, keep-order: keep-order, shift: shift, body)
+          _note_right(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
         } else {
-          _note_left(dy: dy, keep-order: keep-order, shift: shift, body)
+          _note_left(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
         }
       } else {
         if reverse {
-          _note_left(dy: dy, keep-order: keep-order, shift: shift, body)
+          _note_left(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
         } else {
-          _note_right(dy: dy, keep-order: keep-order, shift: shift, body)
+          _note_right(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
         }
       }
     })
@@ -608,7 +618,7 @@
       set text(size: 7.5pt, style: "normal", weight: "regular")
       set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
       content
-    }).height + measure(text(size: 7.5pt, v(gap))).height
+    }).height + measure(text(size: 7.5pt, v(gap))).height + measure(text(size: 7.5pt, sym.zws)).height
     if numbered {
       h(1.5pt, weak: true)
       notecounter.step()
@@ -621,6 +631,7 @@
       reverse: reverse,
       dy: dy.length + dy.ratio * height,
       numbered: false,
+      align-baseline: false,
     )[
       #figure(
         content,
