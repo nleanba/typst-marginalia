@@ -108,7 +108,7 @@
   /// Minimal vertical distance between notes and to wide blocks.
   /// -> length
   clearance: 8pt,
-  /// Disallow note icons hanging into the whitespace.
+  /// Disallow note markers hanging into the whitespace.
   /// -> boolean
   flush-numbers: false,
   /// Function or `numbering`-string to generate the note markers from the `notecounter`.
@@ -498,14 +498,14 @@
       body
     } else {
       set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
-      box(
-        width: 0pt,
-        {
-          h(-8pt)
+      place(
+        dx: -8pt,
+        box(width: 8pt, {
           h(1fr)
+          sym.zws
           notecounter.display(_config.get().numbering)
           h(1fr)
-        },
+        })
       )
       h(0pt, weak: true)
       body
@@ -586,16 +586,15 @@
           notecounter.display(_config.get().numbering)
           h(1.5pt)
         } else {
-          box(
-            width: 0pt,
-            {
-              h(-8pt)
+          place(
+            dx: -8pt,
+            box(width: 8pt, {
               h(1fr)
+              sym.zws
               notecounter.display(_config.get().numbering)
               h(1fr)
-            },
+            })
           )
-          h(0pt, weak: true)
         }
       }
       it
@@ -612,7 +611,8 @@
     }).height + measure(text(size: 7.5pt, v(gap))).height
     if numbered {
       h(1.5pt, weak: true)
-      notecounter.display(_config.get().numbering)
+      notecounter.step()
+      context { notecounter.display(_config.get().numbering) }
     } else {
       h(0pt, weak: true)
     }

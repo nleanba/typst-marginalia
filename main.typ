@@ -443,6 +443,7 @@ And here's the code for the lines in the background:
     In this manual, for example, it works fine here,
     #note[Probably because there aren't many other notes around.]
     but not on the first page.
+    #note(reverse: true)[Notes on the other side are usually fine though.]
   ]
   In nearly all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
 
@@ -453,7 +454,7 @@ And here's the code for the lines in the background:
 = Thanks
 Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
 which has served as a starting point and was very helpful in figuring out how to position margin-notes.
-Also check out #link("https://typst.app/universe/package/marge/")[marge] by Eric Biedert which helped motivate me to polish this package to not look bad in comparison.
+// Also check out #link("https://typst.app/universe/package/marge/")[marge] by Eric Biedert which helped motivate me to polish this package to not look bad in comparison.
 
 The `wideblock` functionality was inspired by the one provided in the #link("https://typst.app/universe/package/tufte-memo")[tufte-memo] template.
 
