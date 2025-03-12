@@ -59,21 +59,21 @@
     place(
       top,
       dy: marginalia._config.get().top,
-      line(length: 100%, stroke: luma(90%)),
+      line(length: 100%, stroke: 0.5pt + luma(90%)),
     )
     place(
       top,
       dy: marginalia._config.get().top - page.header-ascent,
-      line(length: 100%, stroke: luma(90%)),
+      line(length: 100%, stroke: 0.5pt + luma(90%)),
     )
     place(
       bottom,
       dy: -marginalia._config.get().bottom,
-      line(length: 100%, stroke: luma(90%)),
+      line(length: 100%, stroke: 0.5pt + luma(90%)),
     )
     place(
       dx: leftm.far,
-      rect(width: leftm.width, height: 100%, stroke: (x: luma(90%)), inset: 0pt, {
+      rect(width: leftm.width, height: 100%, stroke: (x: 0.5pt + luma(90%)), inset: 0pt, {
         // place(
         //   top,
         //   dy: marginalia._config.get().top,
@@ -83,17 +83,17 @@
     )
     place(
       dx: leftm.far + leftm.width + leftm.sep,
-      rect(width: 10pt, height: 100%, stroke: (left: luma(90%))),
+      rect(width: 10pt, height: 100%, stroke: (left: 0.5pt + luma(90%))),
     )
     place(
       right,
       dx: -rightm.far,
-      rect(width: rightm.width, height: 100%, stroke: (x: luma(90%))),
+      rect(width: rightm.width, height: 100%, stroke: (x: 0.5pt + luma(90%))),
     )
     place(
       right,
       dx: -rightm.far - rightm.width - rightm.sep,
-      rect(width: 10pt, height: 100%, stroke: (right: luma(90%))),
+      rect(width: 10pt, height: 100%, stroke: (right: 0.5pt + luma(90%))),
     )
   },
 )
@@ -160,7 +160,7 @@ By default, the #link(label("marginalia-note()"))[```typst #note[...]```] comman
   This is a note.
 
   They can contain any content, and will wrap within the note column.
-  // #note(dy: -14em)[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
+  // #note(dy: -1em)[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
 ].
 By giving the argument ```typc reverse: true```, we obtain a note on the left/inner margin.#note(reverse: true)[Reversed.]
 If ```typc config.book = true```, the side will of course be adjusted automatically.
@@ -193,6 +193,19 @@ Setting the argument ```typc numbered: false```,#note[Unnumbered notes ```typc "
 we obtain notes without icon/number:#note(numbered: false)[Like this.]
 
 To change the markers, you can override ```typc config.numbering```-function which is used to generate the markers.
+
+== Styling
+Both #link(label("marginalia-note()"))[```typc note()```] and #link(label("marginalia-notefigure()"))[```typc notefigure()```]
+accept a `text-style` and `par-style` parameter:
+- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(reverse: true, text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(5)]
+- ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(reverse: true, par-style: (spacing: 20pt, leading: -2pt))[
+    #lorem(4)
+
+    #lorem(4)
+  ]
+
+The default options here are meant to be as close as possible to the stock footnote style.
+
 //
 // #text(fill: red)[TODO: OUTDATED]
 // It is recommended to reset the `notecounter` regularly, either per page:
@@ -241,14 +254,20 @@ To change the markers, you can override ```typc config.numbering```-function whi
   The command
   ```typst #wideblock[...]```
   can be used to wrap content in a wide block which spans into the margin-note-column.
+
+  Note: when using an asyymetric page layout with `book: true`, wideblocks which span across pagebreaks are messy, because there is no way for the wideblock to detect the pagebreak and adjust ist position after it.
+
   It is possible to use notes in a wide block:#note[Voila.]#note(reverse: true)[Wow!].
   They will automatically shift downwards to avoid colliding with the wideblock.
-  #note(dy: -5em)[Unless they are given a `dy` argument moving them above the block.]
+  #note(dy: -8em)[Unless they are given a `dy` argument moving them above the block.]
 ]
 
 #wideblock(reverse: true)[
   ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.
   This is analogous to the `reverse` option on notes and allows placing notes in their usual column.
+
+  In this manual, a reverse wideblock is used to set the appendix to make it take up fewer pages.
+  This is also why the appendix is no longer using `book: true`.
   #note[Notes above a `wideblock` will shift upwards if necessary.]
 ]
 
@@ -259,12 +278,13 @@ To change the markers, you can override ```typc config.numbering```-function whi
 
 = Figures
 
+== Notefigures
 For small figures, you can place them in the margin with ```typc marginalia.notefigure```.
 #marginalia.notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.mako)),
   caption: [A notefigure.],
 )
-It accepts all arguments `figure` takes (except `placement` and `scope`), plus all arguments `note` takes. However, by default it has no marker, and to get a marker like other notes, you must pass ```typc numbered: true```, it will get a marker like other notes:
+It accepts all arguments `figure` takes (except `placement` and `scope`), plus all arguments `note` takes (except `align-baseline`). However, by default it has no marker, and to get a marker like other notes, you must pass ```typc numbered: true```, it will get a marker like other notes:
 #marginalia.notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.turbo)),
   numbered: true,
@@ -284,6 +304,7 @@ By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the c
 
 A label can be attached to the figure using the `label` argument.// C.f.~@markedfigure.
 
+== Large Figures
 For larger figures, use the following set and show rules:
 #block[
   // #set text(size: 0.84em)
@@ -315,7 +336,7 @@ The Caption gets placed beneath the figure automatically, courtesy of regular wi
   ))
   ```
 ]
-#pagebreak(weak: true)
+// #pagebreak(weak: true)
 #wideblock[
   #figure(
     rect(width: 100%, fill: gradient.linear(..color.map.cividis)),
@@ -448,12 +469,14 @@ And here's the code for the lines in the background:
 
 - Nested notes may or may not work.
   #note[
-    In this manual, for example, it works fine here,
+    In this manual, for example, it works fine (with warnings) here,
     #note[Probably because there aren't many other notes around.]
     but not on the first page.
     #note(reverse: true)[Notes on the other side are usually fine though.]
   ]
   In nearly all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
+  - Just use multiple paragraphs in one note, or place multiple notes in the main text instead.
+  - If really neccessary, use `shift: "ignore"` on the nested notes and manually set `dy`.
 
 - If `book` is `true`, wideblocks that break across pages are broken. Sadly there doesn't seem to be a way to detect and react to page-breaks from within a `block`, so I don't know how to fix this.
 

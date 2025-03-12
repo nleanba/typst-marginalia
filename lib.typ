@@ -358,7 +358,7 @@
 
 // absolute left
 /// #internal()
-#let _note_left(dy: 0pt, keep-order: false, shift: true, align-baseline: true, body) = (
+#let _note_left(dy: 0pt, keep-order: false, shift: true, body) = (
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
@@ -368,9 +368,7 @@
     let width = get-left().width
     let notebox = box(width: width, body)
     let height = measure(notebox).height
-
-    let lineheight = if align-baseline { calc.min(measure(sym.zws).height, height) } else { 0pt }
-    let natural_position = anchor.y + dy - lineheight
+    let natural_position = anchor.y + dy
 
     let current = _note_extends_left.get().at(str(page), default: ())
     let index = current.len()
@@ -382,7 +380,7 @@
       old
     })
 
-    let vadjust = dy - lineheight + _note_offset_left(str(page)).at(str(index), default: 0pt)
+    let vadjust = dy + _note_offset_left(str(page)).at(str(index), default: 0pt)
     let hadjust = get-left().far - anchor.x
     box(
       place(
@@ -396,7 +394,7 @@
 
 // absolute right
 /// #internal()
-#let _note_right(dy: 0pt, keep-order: false, shift: true, align-baseline: true, body) = (
+#let _note_right(dy: 0pt, keep-order: false, shift: true, body) = (
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
@@ -406,9 +404,7 @@
     let width = get-right().width
     let notebox = box(width: width, body)
     let height = measure(notebox).height
-
-    let lineheight = if align-baseline { calc.min(measure(sym.zws).height, height) } else { 0pt }
-    let natural_position = anchor.y + dy - lineheight
+    let natural_position = anchor.y + dy
 
     let current = _note_extends_right.get().at(str(page), default: ())
     let index = current.len()
@@ -428,7 +424,7 @@
       old
     })
 
-    let vadjust = dy - lineheight + _note_offset_right(str(page)).at(str(index), default: 0pt)// - in-parent-offset
+    let vadjust = dy + _note_offset_right(str(page)).at(str(index), default: 0pt)// - in-parent-offset
     let hadjust = pagewidth - anchor.x - get-right().far - get-right().width
 
     // if parent {
@@ -491,6 +487,12 @@
   /// - ```typc auto```: ```typc true``` if numbered, ```typc "avoid"``` otherwise.
   /// -> boolean | auto | "avoid" | "ignore"
   shift: auto,
+  /// Will be used to ```typc set``` the text style.
+  /// -> dictionary
+  text-style: (size: 0.85em, style: "normal", weight: "regular"),
+  /// Will be used to ```typc set``` the par style.
+  /// -> dictionary
+  par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// -> content
   body
 ) = {
@@ -499,14 +501,14 @@
   if numbered {
     notecounter.step()
     let body = context if _config.get().flush-numbers {
-      set text(size: 7.5pt, style: "normal", weight: "regular")
-      set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
+      set text(..text-style)
+      set par(..par-style)
       notecounter.display(_config.get().numbering)
       h(1.5pt)
       body
     } else {
-      set text(size: 7.5pt, style: "normal", weight: "regular")
-      set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
+      set text(..text-style)
+      set par(..par-style)
       place(
         dx: -8pt,
         box(width: 8pt, {
@@ -523,39 +525,41 @@
     box(context {
       h(1.5pt, weak: true)
       notecounter.display(_config.get().numbering)
+      let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
       if _config.get().book and calc.even(here().page()) {
         if reverse {
-          _note_right(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
+          _note_right(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
         } else {
-          _note_left(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
+          _note_left(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
         }
       } else {
         if reverse {
-          _note_left(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
+          _note_left(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
         } else {
-          _note_right(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
+          _note_right(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
         }
       }
     })
   } else {
     h(0pt, weak: true)
     let body = {
-      set text(size: 7.5pt, style: "normal", weight: "regular")
-      set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
+      set text(..text-style)
+      set par(..par-style)
       body
     }
     box(context {
+      let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
       if _config.get().book and calc.even(here().page()) {
         if reverse {
-          _note_right(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
+          _note_right(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
         } else {
-          _note_left(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
+          _note_left(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
         }
       } else {
         if reverse {
-          _note_left(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
+          _note_left(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
         } else {
-          _note_right(dy: dy, keep-order: keep-order, shift: shift, align-baseline: align-baseline, body)
+          _note_right(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
         }
       }
     })
@@ -564,7 +568,7 @@
 
 /// Creates a figure in the margin.
 /// 
-/// Parameters `numbered`, `reverse`, `keep-order`, and `shift` work the same as for @note.
+/// Parameters `numbered`, `reverse`, `keep-order`, `shift`, `text-style` and `par-style` work the same as for @note.
 /// 
 /// -> content
 #let notefigure(
@@ -585,6 +589,11 @@
   // Same as @note.shift.
   /// -> boolean | auto | "avoid" | "ignore"
   shift: auto,
+  // Will be used to ```typc set``` the text style.
+  /// -> dictionary
+  text-style: (size: 0.85em, style: "normal", weight: "regular"),
+  /// -> dictionary
+  par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.
   /// -> length
   gap: 0.55em,
@@ -628,10 +637,10 @@
       get-right().width
     }
     let height = measure(width: width, {
-      set text(size: 7.5pt, style: "normal", weight: "regular")
-      set par(spacing: 0.8em, leading: 0.4em, hanging-indent: 0pt)
+      set text(..text-style)
+      set par(..par-style)
       content
-    }).height + measure(text(size: 7.5pt, v(gap))).height + measure(text(size: 7.5pt, sym.zws)).height
+    }).height + measure(text(..text-style, v(gap))).height + measure(text(..text-style, sym.zws)).height
     if numbered {
       h(1.5pt, weak: true)
       notecounter.step()
@@ -645,9 +654,11 @@
       numbered: false,
       reverse: reverse,
       dy: dy.length + dy.ratio * height,
+      align-baseline: false,
       keep-order: keep-order,
       shift: shift,
-      align-baseline: false,
+      text-style: text-style,
+      par-style: par-style,
     )[
       #figure(
         content,
