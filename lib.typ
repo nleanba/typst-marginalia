@@ -473,6 +473,10 @@
   /// Note may get shifted still to avoid other notes.
   /// -> length
   dy: 0pt,
+  /// Whether to align the baselines or not.
+  /// - If ```typc false```, the top of the note is aligned with the main-text baseline.
+  /// -> boolean
+  align-baseline: true,
   /// Notes with ```typc keep-order: true``` are not re-ordered relative to one another.
   /// 
   /// // If ```typc auto```, defaults to false unless ```typc numbered: false``` is set.
@@ -487,10 +491,6 @@
   /// - ```typc auto```: ```typc true``` if numbered, ```typc "avoid"``` otherwise.
   /// -> boolean | auto | "avoid" | "ignore"
   shift: auto,
-  /// Whether to align the baselines or not.
-  /// - If ```typc false```, the top of the note is aligned with the main-text baseline.
-  /// -> boolean
-  align-baseline: true,
   /// -> content
   body
 ) = {
@@ -563,27 +563,40 @@
 }
 
 /// Creates a figure in the margin.
+/// 
+/// Parameters `numbered`, `reverse`, `keep-order`, and `shift` work the same as for @note.
+/// 
 /// -> content
 #let notefigure(
-  /// The figure content, e.g.~an image. Pass-through to ```typ #figure()```, but used to adjust the vertical position.
-  /// -> content
-  content,
-  /// Put the notefigure in the opposite margin.
-  /// -> boolean
-  reverse: false,
-  /// How much to shift the note. ```typc 100%``` corresponds to the height of `content` + `gap`.
-  /// -> relative length
-  dy: 0pt - 100%,
-  /// Whether to put a mark.
+  // Same as @note.numbered
   /// -> boolean
   numbered: false,
+  // Same as @note.reverse
+  /// -> boolean
+  reverse: false,
+  /// How much to shift the note. ```typc 100%``` corresponds to the height of `content` + `gap` + the first baseline.
+  /// 
+  /// Thus ```typc dy: 0pt - 100%``` aligns the text and caption baselines.
+  /// -> relative length
+  dy: 0pt - 100%,
+  //  Same as @note.keep-order
+  /// -> boolean
+  keep-order: false,
+  // Same as @note.shift.
+  /// -> boolean | auto | "avoid" | "ignore"
+  shift: auto,
   /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.
   /// -> length
   gap: 0.55em,
   /// A label to attach to the figure.
   /// -> none | label
   label: none,
+  /// The figure content, e.g.~an image. Pass-through to ```typ #figure()```, but used to adjust the vertical position.
+  /// -> content
+  content,
   /// Pass-through to ```typ #figure()```.
+  /// 
+  /// (E.g. `caption`)
   /// -> arguments
   ..figureargs,
 ) = (
@@ -627,10 +640,13 @@
       h(0pt, weak: true)
     }
     let dy = 0% + 0pt + dy
+    let shift = if shift == auto { if numbered { true } else { "avoid" } } else { shift }
     note(
+      numbered: false,
       reverse: reverse,
       dy: dy.length + dy.ratio * height,
-      numbered: false,
+      keep-order: keep-order,
+      shift: shift,
       align-baseline: false,
     )[
       #figure(
