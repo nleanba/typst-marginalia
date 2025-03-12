@@ -73,7 +73,15 @@ For small figures, the package also provides a `notefigure` command which places
 )
 ```
 
--------
-
+## Manual
 
 [![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/heads/main/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
+[Full Manual →](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
+
+<!-- [![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/tags/v0.2.0/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/v0.2.0/main.pdf)
+[Full Manual →](https://github.com/nleanba/typst-marginalia/blob/v0.2.0/Marginalia.pdf) -->
+
+## Feedback
+Have you encountered a bug? [Please report it as an issue in my github repository.](https://github.com/nleanba/typst-marginalia/issues)
+
+Has this package been useful to you? [I am always happy when someone gives me a ~~sticker~~ star⭐](https://github.com/nleanba/typst-marginalia)
