@@ -10,7 +10,7 @@
 #let notecounter = counter("notecounter")
 
 /// Icons to use for note markers.
-/// 
+///
 /// ```typc ("◆", "●", "■", "▲", "♥", "◇", "○", "□", "△", "♡")```
 #let note-markers = ("◆", "●", "■", "▲", "♥", "◇", "○", "□", "△", "♡")
 /// Icons to use for note markers, alternating filled/outlined.
@@ -44,7 +44,7 @@
   repeat: true,
   ..,
   /// -> int
-  number
+  number,
 ) = {
   let index = if repeat { calc.rem(number - 1, markers.len()) } else { number - 1 }
   let symbol = if index < markers.len() { markers.at(index) } else { str(index + 1 - markers.len()) }
@@ -112,7 +112,7 @@
   /// -> boolean
   flush-numbers: false,
   /// Function or `numbering`-string to generate the note markers from the `notecounter`.
-  /// 
+  ///
   /// Examples:
   /// - ```typc (..i) => super(numbering("1", ..i))``` for superscript numbers
   /// - ```typc (..i) => super(numbering("a", ..i))``` for superscript letters
@@ -143,7 +143,7 @@
 #let page-setup(
   /// Missing entries are filled with package defaults. Note: missing entries are _not_ taken from the current marginalia config, as this would require context.
   /// -> dictionary
-  ..config
+  ..config,
 ) = {
   let config = _fill_config(..config)
   if config.book {
@@ -243,7 +243,7 @@
       nonreoderable.push((key, item.natural))
     }
   }
-  reoderable = reoderable.sorted(key: ((_,pos)) => pos)
+  reoderable = reoderable.sorted(key: ((_, pos)) => pos)
 
   let positions = ()
 
@@ -294,9 +294,14 @@
       }
     } else if items.at(key).shift == false {
       // check if we can swap with previous
-      if positions_d.len() > 0 and fault > empty and items.at(positions_d.last().at(0)).shift != false and ((not items.at(key).keep-order) or (not items.at(positions_d.last().at(0)).keep-order)) {
+      if (
+        positions_d.len() > 0
+          and fault > empty
+          and items.at(positions_d.last().at(0)).shift != false
+          and ((not items.at(key).keep-order) or (not items.at(positions_d.last().at(0)).keep-order))
+      ) {
         let (prev, _) = positions_d.pop()
-        let x  =cur
+        let x = cur
         positions_d.push((key, position))
         empty = 0pt
         cur = calc.max(position + items.at(key).height + clearance, cur)
@@ -305,7 +310,7 @@
       } else {
         positions_d.push((key, position))
         empty = 0pt
-        cur =  calc.max(position + items.at(key).height + clearance, cur)
+        cur = calc.max(position + items.at(key).height + clearance, cur)
       }
     } else {
       positions_d.push((key, cur))
@@ -345,14 +350,24 @@
 #let _note_extends_left = state("_note_extends_left", ("1": ()))
 #let _note_offset_left(page_num) = {
   let page = (height: page.height, bottom: _config.get().bottom, top: _config.get().top)
-  let items = _note_extends_left.final().at(page_num, default: ()).enumerate().map(((key, item)) => (str(key), item)).to-dict()
+  let items = _note_extends_left
+    .final()
+    .at(page_num, default: ())
+    .enumerate()
+    .map(((key, item)) => (str(key), item))
+    .to-dict()
   _calculate-offsets(page, items, _config.get().clearance)
 }
 
 #let _note_extends_right = state("_note_extends_right", ("1": ()))
 #let _note_offset_right(page_num) = {
   let page = (height: page.height, bottom: _config.get().bottom, top: _config.get().top)
-  let items = _note_extends_right.final().at(page_num, default: ()).enumerate().map(((key, item)) => (str(key), item)).to-dict()
+  let items = _note_extends_right
+    .final()
+    .at(page_num, default: ())
+    .enumerate()
+    .map(((key, item)) => (str(key), item))
+    .to-dict()
   _calculate-offsets(page, items, _config.get().clearance)
 }
 
@@ -424,7 +439,7 @@
       old
     })
 
-    let vadjust = dy + _note_offset_right(str(page)).at(str(index), default: 0pt)// - in-parent-offset
+    let vadjust = dy + _note_offset_right(str(page)).at(str(index), default: 0pt) // - in-parent-offset
     let hadjust = pagewidth - anchor.x - get-right().far - get-right().width
 
     // if parent {
@@ -449,7 +464,7 @@
           // [#parent]
           notebox
           //_parent-note.update(false)
-        }
+        },
       ),
     )
     // }
@@ -474,7 +489,7 @@
   /// -> boolean
   align-baseline: true,
   /// Notes with ```typc keep-order: true``` are not re-ordered relative to one another.
-  /// 
+  ///
   /// // If ```typc auto```, defaults to false unless ```typc numbered: false``` is set.
   /// // -> boolean | auto
   /// -> boolean
@@ -494,7 +509,7 @@
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// -> content
-  body
+  body,
 ) = {
   // let keep-order = if keep-order == auto { not numbered } else { keep-orders }
   let shift = if shift == auto { if numbered { true } else { "avoid" } } else { shift }
@@ -511,12 +526,15 @@
       set par(..par-style)
       place(
         dx: -8pt,
-        box(width: 8pt, {
-          h(1fr)
-          sym.zws
-          notecounter.display(_config.get().numbering)
-          h(1fr)
-        })
+        box(
+          width: 8pt,
+          {
+            h(1fr)
+            sym.zws
+            notecounter.display(_config.get().numbering)
+            h(1fr)
+          },
+        ),
       )
       h(0pt, weak: true)
       body
@@ -567,9 +585,9 @@
 }
 
 /// Creates a figure in the margin.
-/// 
+///
 /// Parameters `numbered`, `reverse`, `keep-order`, `shift`, `text-style` and `par-style` work the same as for @note.
-/// 
+///
 /// -> content
 #let notefigure(
   // Same as @note.numbered
@@ -579,7 +597,7 @@
   /// -> boolean
   reverse: false,
   /// How much to shift the note. ```typc 100%``` corresponds to the height of `content` + `gap` + the first baseline.
-  /// 
+  ///
   /// Thus ```typc dy: 0pt - 100%``` aligns the text and caption baselines.
   /// -> relative length
   dy: 0pt - 100%,
@@ -604,7 +622,7 @@
   /// -> content
   content,
   /// Pass-through to ```typ #figure()```.
-  /// 
+  ///
   /// (E.g. `caption`)
   /// -> arguments
   ..figureargs,
@@ -620,12 +638,15 @@
         } else {
           place(
             dx: -8pt,
-            box(width: 8pt, {
-              h(1fr)
-              sym.zws
-              notecounter.display(_config.get().numbering)
-              h(1fr)
-            })
+            box(
+              width: 8pt,
+              {
+                h(1fr)
+                sym.zws
+                notecounter.display(_config.get().numbering)
+                h(1fr)
+              },
+            ),
           )
         }
       }
@@ -636,11 +657,18 @@
     } else {
       get-right().width
     }
-    let height = measure(width: width, {
-      set text(..text-style)
-      set par(..par-style)
-      content
-    }).height + measure(text(..text-style, v(gap))).height + measure(text(..text-style, sym.zws)).height
+    let height = (
+      measure(
+        width: width,
+        {
+          set text(..text-style)
+          set par(..par-style)
+          content
+        },
+      ).height
+        + measure(text(..text-style, v(gap))).height
+        + measure(text(..text-style, sym.zws)).height
+    )
     if numbered {
       h(1.5pt, weak: true)
       notecounter.step()
@@ -690,7 +718,7 @@
   /// -> boolean
   double: false,
   /// -> content
-  body
+  body,
 ) = (
   context {
     if double and reverse {
@@ -732,7 +760,15 @@
     let page_num = str(here().page())
     let left-margin = get-left()
     let right-margin = get-right()
-    let linewidth = page.width - left-margin.far - left-margin.width - left-margin.sep - right-margin.far - right-margin.width - right-margin.sep
+    let linewidth = (
+      page.width
+        - left-margin.far
+        - left-margin.width
+        - left-margin.sep
+        - right-margin.far
+        - right-margin.width
+        - right-margin.sep
+    )
     let height = measure(width: linewidth + left + right, body).height
 
     if left != 0pt {

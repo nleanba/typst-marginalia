@@ -1,9 +1,10 @@
 #import "lib.typ" as marginalia: note, wideblock
 
 #let config = (
-  inner: ( far: 16mm, width: 20mm, sep: 8mm ),
-  outer: ( far: 16mm, width: 40mm, sep: 8mm ),
-  top: 32mm + 11pt, bottom: 16mm,
+  inner: (far: 16mm, width: 20mm, sep: 8mm),
+  outer: (far: 16mm, width: 40mm, sep: 8mm),
+  top: 32mm + 11pt,
+  bottom: 16mm,
   book: true,
   // clearance: 30pt,
   // flush-numbers: false,
@@ -12,6 +13,10 @@
 )
 
 #marginalia.configure(..config)
+
+// testing html
+// #show: everything => context {
+//   if target() == "paged" {
 #set page(
   ..marginalia.page-setup(..config),
   header-ascent: 16mm,
@@ -73,13 +78,19 @@
     )
     place(
       dx: leftm.far,
-      rect(width: leftm.width, height: 100%, stroke: (x: 0.5pt + luma(90%)), inset: 0pt, {
-        // place(
-        //   top,
-        //   dy: marginalia._config.get().top,
-        //   line(length: 100%, stroke: luma(90%)),
-        // )
-      }),
+      rect(
+        width: leftm.width,
+        height: 100%,
+        stroke: (x: 0.5pt + luma(90%)),
+        inset: 0pt,
+        {
+          // place(
+          //   top,
+          //   dy: marginalia._config.get().top,
+          //   line(length: 100%, stroke: luma(90%)),
+          // )
+        },
+      ),
     )
     place(
       dx: leftm.far + leftm.width + leftm.sep,
@@ -97,6 +108,13 @@
     )
   },
 )
+//     everything
+//   } else {
+//     everything
+//   }
+// }
+
+#show heading.where(level: 1): set block(above: 36pt, below: 12pt)
 
 #set par(justify: true, linebreaks: "optimized")
 #set text(fill: luma(30), size: 10pt)
@@ -107,13 +125,12 @@
 #block(
   text(size: 3em, weight: "black")[
     Marginalia
-    #text(size: 11pt)[#note(numbered: false)[
+    #text(size: 10pt)[#note(numbered: false)[
         #outline(indent: 1em, depth: 2)
       ]]],
 )
 _Write into the margins!_
 #v(1em)
-// #place(top, note(numbered: false, outline(indent: 1em, depth: 2)))
 
 #show heading.where(level: 1): set heading(numbering: "1.1")
 #show heading.where(level: 2): set heading(numbering: "1.1")
@@ -168,7 +185,7 @@ If ```typc config.book = true```, the side will of course be adjusted automatica
 If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy and was shifted less than that to stay on the page.] they automatically adjust their positions.
 Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around, unless configured otherwise via the #link(label("marginalia-note.shift"))[```typc shift```] parameter of ```typ #note()```.
 
-Notes will shift downwards to avoid previous notes, containing wideblocks, and the top page margin. Notes will shift upwards to avoid later notes and wideblocks, and the bottom page margin. However, if there is not enough space between wideblocks and/or the margins, there will be collisions.
+Notes will shift vertically to avoid other notes, wideblocks, and the top page margin.
 It will attempt to move one note below a wide-block if there is not enough space above, but if there are multiple notes that would need to be rearranged you must assist by manually setting `dy` such that their initial position is below the wideblock.
 
 // #text(fill: red)[TODO: OUTDATED]
@@ -176,7 +193,7 @@ It will attempt to move one note below a wide-block if there is not enough space
 // #note[This note lands below the previous one!]
 // so two ```typ #note```s are placed in the same order vertically as they appear in the markup, even if the first is shifted with a `dy` such that the other would fit above it.
 
-#pagebreak(weak: true)
+// #pagebreak(weak: true)
 #columns(3)[
   Margin notes also work from within most containers such as blocks or ```typ #column()```s.#note(keep-order: true)[#lorem(4)]
   #colbreak()
@@ -276,6 +293,7 @@ The default options here are meant to be as close as possible to the stock footn
   Note that setting both `reverse: true` and `double: true` is disallowed and will panic.
 ]
 
+// #pagebreak(weak: true)
 = Figures
 
 == Notefigures
@@ -386,8 +404,8 @@ To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if y
 
 By default, notes are aligned to their first baseline.
 To align the top of the note instead, set #link(label("marginalia-note.align-baseline"))[```typc align-baseline```] to ```typc false```.
-#place(top, note(numbered: false, shift: false, align-baseline: false)[Top (no shift + no baseline align])
-#place(bottom, note(numbered: false, shift: false, align-baseline: false)[Bottom (no shift + no baseline align)])
+#place(top, note(numbered: false, shift: false, align-baseline: false)[Top (no shift, no baseline align)])
+#place(bottom, note(numbered: false, shift: false, align-baseline: false)[Bottom (no shift, no baseline al.)])
 
 == Headers and Background
 This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the respective config option.
@@ -483,7 +501,7 @@ And here's the code for the lines in the background:
 - If you encounter anything else which looks like a bug to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on GitHub] if no-one else has done so already.
 
 = Thanks
-Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
+Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,#footnote[Huh]
 which has served as a starting point and was very helpful in figuring out how to position margin-notes.
 // Also check out #link("https://typst.app/universe/package/marge/")[marge] by Eric Biedert which helped motivate me to polish this package to not look bad in comparison.
 
@@ -492,14 +510,15 @@ The `wideblock` functionality was inspired by the one provided in the #link("htt
 Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which was used to produce the appendix.
 
 
+// testing html
+// #context { if target() == "paged" [
+
 // no more book-style to allow for multipage wideblock
 #marginalia.configure(..config, book: false)
-#set page(
-  ..marginalia.page-setup(..config, book: false),
-)
+#set page(..marginalia.page-setup(..config, book: false))
 #context counter(heading).update(0)
 #show heading.where(level: 1): set heading(numbering: "A.1", supplement: "Appendix")
-#show heading.where(level: 2): set heading(numbering: "A.1", supplement: "Appendix")//, outlined: false)
+#show heading.where(level: 2): set heading(numbering: "A.1", supplement: "Appendix", outlined: false)
 
 #wideblock(reverse: true)[
   = Detailed Documentation of all Exported Symbols
