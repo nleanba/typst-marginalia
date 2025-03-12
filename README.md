@@ -5,7 +5,7 @@
 Put something akin to the following at the start of your `.typ` file:
 
 ```typ
-#import "@preview/marginalia:0.1.1" as marginalia: note, wideblock
+#import "@preview/marginalia:0.1.3" as marginalia: note, wideblock
 #let config = (
   // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
   // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -38,9 +38,10 @@ Provided via the `#note[...]` command.
 
 - `#note(reverse: true)[...]` to put it on the inside margin.
 - `#note(numbered: false)[...]` to remove the marker.
+- `#note(shift: false)[...]` to force exact position of the note.
+- `#note(shift: "ignore")[...]` to force exact position of the note and disable collision.
+- ..and more
 
-Note: it is recommended to reset the counter for the markers regularly, e.g. by
-putting `marginalia.notecounter.update(0)` into the code for your header.
 
 ## Wide Blocks
 

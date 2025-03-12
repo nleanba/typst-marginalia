@@ -121,6 +121,13 @@
 #show raw: set text(font: ("IBM Plex Mono", "DejaVu Sans Mono"))
 #show link: underline
 
+#let codeblock(code) = {
+  wideblock(reverse: true, {
+    // #set text(size: 0.84em)
+    block(stroke: 0.5pt + luma(90%), fill: white, width: 100%, inset: (y: 5pt), code)
+  })
+}
+
 #v(16mm)
 #block(
   text(size: 3em, weight: "black")[
@@ -137,10 +144,9 @@ _Write into the margins!_
 
 = Setup
 Put something akin to the following at the start of your `.typ` file:
-#block[
-  // #set text(size: 0.84em)
+#codeblock[
   ```typst
-  #import "@preview/marginalia:0.1.2" as marginalia: note, wideblock
+  #import "@preview/marginalia:0.1.3" as marginalia: note, wideblock
   #let config = (
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -324,13 +330,11 @@ A label can be attached to the figure using the `label` argument.// C.f.~@marked
 
 == Large Figures
 For larger figures, use the following set and show rules:
-#block[
-  // #set text(size: 0.84em)
+#codeblock[
   ```typ
   #set figure(gap: 0pt)
   #set figure.caption(position: top)
-  #show figure.caption.where(position: top):
-    note.with(numbered: false, dy: 1em)
+  #show figure.caption.where(position: top): note.with(numbered:false, dy:1em)
   ```
 ]
 
@@ -344,14 +348,10 @@ For larger figures, use the following set and show rules:
 )
 
 For wide figures, simply place a figure in a wideblock.
-The Caption gets placed beneath the figure automatically, courtesy of regular wide-block-avoidance.
-#block[
-  // #set text(size: 0.84em)
+The caption gets placed beneath the figure automatically, courtesy of regular wide-block-avoidance.
+#codeblock[
   ```typ
-  #wideblock(figure(
-    image(...),
-    caption: [A figure in a wide block.]
-  ))
+  #wideblock(figure(image(..), caption: [A figure in a wide block.]))
   ```
 ]
 // #pagebreak(weak: true)
@@ -377,8 +377,7 @@ The Caption gets placed beneath the figure automatically, courtesy of regular wi
 = Other Tidbits
 == Absolute Placement
 You can place notes in absolute positions relative to the page using `place`:
-#block[
-  // #set text(size: 0.84em)
+#codeblock[
   ```typ
   #place(top, note(numbered: false, reverse: true)[Top])
   #place(bottom, note(numbered: false, reverse: true)[Bottom])
@@ -388,15 +387,11 @@ You can place notes in absolute positions relative to the page using `place`:
 #place(bottom, note(numbered: false, reverse: true)[Bottom])
 
 To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if you don't mind overlaps.)
-#block[
+#codeblock[
   // #set text(size: 0.84em)
   ```typ
-  #place(top, note(numbered: false, shift: false)[
-    Top (no shift)
-  ])
-  #place(bottom, note(numbered: false, shift: false)[
-    Bottom (no shift)
-  ])
+  #place(top, note(numbered: false, shift: false)[Top (no shift)])
+  #place(bottom, note(numbered: false, shift: false)[Bottom (no shift)])
   ```
 ]
 #place(top, note(numbered: false, shift: false)[Top (no shift)])
@@ -414,7 +409,7 @@ In your documents, consider removing this check and simplifying the ```typc if``
 
 
 Here's how the headers in this document were made:
-#block[
+#codeblock[
   // #set text(size: 0.84em)
   ```typst
   #set page(header: context {
@@ -453,7 +448,7 @@ And here's the code for the lines in the background:
 #note[
   Not that you should copy them, they're mostly here to showcase the columns and help me verify that everything gets placed in the right spot.
 ]
-#wideblock(reverse: true)[
+#codeblock[
   // #set text(size: 0.84em)
   ```typst
   #set page(background: context {
@@ -501,7 +496,7 @@ And here's the code for the lines in the background:
 - If you encounter anything else which looks like a bug to you, please #link("https://github.com/nleanba/typst-marginalia/issues")[create an "issue" on GitHub] if no-one else has done so already.
 
 = Thanks
-Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,#footnote[Huh]
+Many thanks go to Nathan Jessurun for their #link("https://typst.app/universe/package/drafting")[drafting] package,
 which has served as a starting point and was very helpful in figuring out how to position margin-notes.
 // Also check out #link("https://typst.app/universe/package/marge/")[marge] by Eric Biedert which helped motivate me to polish this package to not look bad in comparison.
 

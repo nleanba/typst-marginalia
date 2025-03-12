@@ -1,5 +1,15 @@
 #import "@preview/tidy:0.4.2": styles
-#import "lib.typ": note
+#import "lib.typ": note, wideblock
+
+// #let codeblock(code) = {
+//   wideblock(
+//     reverse: true,
+//     {
+//       // #set text(size: 0.84em)
+//       block(stroke: 0.5pt + luma(90%), fill: white, width: 100%, inset: (y: 5pt), code)
+//     },
+//   )
+// }
 
 #let show-outline(module-doc, style-args: (:)) = {
   let prefix = module-doc.label-prefix
@@ -30,7 +40,14 @@
   styles.default.show-type(type, style-args: style-args)
 }
 #let show-function(fn, style-args) = {
+  // codeblock(
   styles.default.show-function(fn, style-args)
+  // )
+}
+#let show-variable(var, style-args) = {
+  // codeblock(
+  styles.default.show-variable(var, style-args)
+  // )
 }
 #let show-parameter-list(fn, style-args: (:)) = {
   pad(
@@ -111,7 +128,9 @@
   layout(size => {
     let title = {
       let display-name = if show-default { name } else { sym.angle.l + name + sym.angle.r }
-      [#box(heading(level: style-args.first-heading-level + 3, raw(display-name)))#if function-name != none and style-args.enable-cross-references { label(function-name + "." + name.trim(".")) }]
+      [#box(heading(level: style-args.first-heading-level + 3, raw(display-name)))#if (
+          function-name != none and style-args.enable-cross-references
+        ) { label(function-name + "." + name.trim(".")) }]
       if show-default {
         raw(": ")
         raw(lang: "typc", default)
