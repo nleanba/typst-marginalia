@@ -536,7 +536,6 @@
           },
         ),
       )
-      h(0pt, weak: true)
       body
     }
     h(0pt, weak: true)
