@@ -82,6 +82,15 @@
 /// This will update the marginalia config with the provided config options.
 ///
 /// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
+/// 
+/// The shown default values are for the first usage of this function.
+/// On later calls, unspecified options are kept from the previous configuration state:
+///   ```typc
+///   configure(clearance: 5pt)
+///   configure(book: true)
+///   ```
+///   is equivalent to
+///   ```typc configure(clearance: 5pt, book: true)```.
 #let configure(
   /// Inside/left margins.
   ///     - `far`: Distance between edge of page and margin (note) column.
@@ -102,12 +111,13 @@
   /// Bottom margin.
   /// -> length
   bottom: 2.5cm,
-  /// If ```typc true```, will use inside/outside margins, alternating on each page. If ```typc false```, will use left/right margins with all pages the same.
+  ///- If ```typc true```, will use inside/outside margins, alternating on each page.
+  ///- If ```typc false```, will use left/right margins with all pages the same.
   /// -> boolean
   book: false,
   /// Minimal vertical distance between notes and to wide blocks.
   /// -> length
-  clearance: 8pt,
+  clearance: 12pt,
   /// Disallow note markers hanging into the whitespace.
   /// -> boolean
   flush-numbers: false,
