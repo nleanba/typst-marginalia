@@ -270,6 +270,7 @@
   // shift down
   let cur = page.top
   let empty = 0pt
+  let prev-shift-avoid = false
   let positions_d = ()
   for (key, position) in positions {
     let fault = cur - position
@@ -283,10 +284,15 @@
       cur = position + items.at(key).height + clearance
     } else if items.at(key).shift == "avoid" {
       if fault <= empty {
-        // can stay
-        positions_d.push((key, position))
-        empty -= fault // ?
-        cur = position + items.at(key).height + clearance
+        if prev-shift-avoid {
+          positions_d.push((key, cur))
+          cur = cur + items.at(key).height + clearance
+        } else {
+          // can stay
+          positions_d.push((key, position))
+          empty -= fault // ?
+          cur = position + items.at(key).height + clearance
+        }
       } else {
         positions_d.push((key, position + fault - empty))
         cur = position + fault - empty + items.at(key).height + clearance
@@ -318,6 +324,7 @@
       // empty = 0pt
       cur = cur + items.at(key).height + clearance
     }
+    prev-shift-avoid = items.at(key).shift == "avoid"
   }
 
   let max = page.height - page.bottom
