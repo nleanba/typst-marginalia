@@ -10,6 +10,7 @@
   // flush-numbers: false,
   // numbering: (..i) => super(numbering("a", ..i)),
   // numbering: marginalia.note-numbering.with(repeat: false, markers: ())
+  // numbering: marginalia.note-numbering.with(repeat: false)
 )
 
 #marginalia.configure(..config)
@@ -122,10 +123,13 @@
 #show link: underline
 
 #let codeblock(code) = {
-  wideblock(reverse: true, {
-    // #set text(size: 0.84em)
-    block(stroke: 0.5pt + luma(90%), fill: white, width: 100%, inset: (y: 5pt), code)
-  })
+  wideblock(
+    reverse: true,
+    {
+      // #set text(size: 0.84em)
+      block(stroke: 0.5pt + luma(90%), fill: white, width: 100%, inset: (y: 5pt), code)
+    },
+  )
 }
 
 #v(16mm)
@@ -212,6 +216,13 @@ It will attempt to move one note below a wide-block if there is not enough space
 
 == Markers
 The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set the configuration option ```typc flush-numbers: true```.
+#marginalia.configure(flush-numbers: true)
+#note[
+  This note is sandwiched between two calls to
+  ```typc configure()```.// toggling `flush-numbers`.
+]
+#marginalia.configure(flush-numbers: false)
+
 Setting the argument ```typc numbered: false```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
 we obtain notes without icon/number:#note(numbered: false)[Like this.]
 
@@ -229,55 +240,43 @@ accept a `text-style` and `par-style` parameter:
 
 The default options here are meant to be as close as possible to the stock footnote style.
 
-To add a block around the notes, simply create wrapper-functions as desired,
-as notes can contain block-level content without messing up the placement of the markers.
+#let note-with-separator = marginalia.note.with(
+  block-style: (
+    stroke: (top: (thickness: 0.5pt, dash: "dotted")),
+    outset: (top: 6pt /* clearance is 12pt */),
+    width: 100%,
+  ),
+)
+#let note-with-wide-background = marginalia.note.with(
+  block-style: (fill: oklch(90%, 0.06, 140deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt),
+)
+#let note-with-background = marginalia.note.with(
+  block-style: (fill: oklch(90%, 0.06, 140deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt),
+)
+To style the block containing the note body, use the `block-style` argument.
 
-#let note-with-separator(..args, body) = marginalia.note(
-    ..args,
-    block(stroke: (top: (thickness: 0.5pt, dash: "dotted")), outset: (top: 6pt /* clearance is 12pt */), width: 100%, body)
-  )
-Example for dotted separator lines:
-#note-with-separator(keep-order: true)[This is a note with a dotted stroke above.]
-#note-with-separator(numbered: false, keep-order: true)[So is this.]
-#codeblock(```typ
-  #let note-with-separator(..args, body) = marginalia.note(
-    ..args,
-    block(
-      stroke: (top: (thickness: 0.5pt, dash: "dotted")),
-      outset: (top: 6pt /* clearance is 12pt */),
-      width: 100%,
-      body)
-  )
-  ```)
+- ```typc block-style: (stroke: (top: (thickness: 0.5pt, dash: "dotted")), outset: (top: 6pt /* clearance is 12pt */), width: 100%)``` gives:
+  #note-with-separator(keep-order: true)[This is a note with a dotted stroke above.]
+  #note-with-separator(numbered: false, keep-order: true, shift: true)[So is this.]
+- ```typc block-style: (fill: oklch(90%, 0.06, 140deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt)``` gives:
+  #marginalia.configure(flush-numbers: true)
+  #note-with-background(keep-order: true)[This is a note with a green background and `flush-numbers: true`.]
+  #note-with-background(numbered: false, keep-order: true, shift: true)[So is this.]
+  #marginalia.configure(flush-numbers: false)
 
-#let note-with-wide-background(..args, body) = marginalia.note(
-    ..args,
-    block(fill: oklch(90.26%, 0.058, 140.43deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt, body)
-  )
-#let note-with-background(..args, body) = marginalia.note(
-    ..args,
-    block(fill: oklch(90.26%, 0.058, 140.43deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt, body)
-  )
-Examples for backgrounds:
-#note-with-background(keep-order: true)[This is a note with a green background.]#note-with-background(numbered: false, keep-order: true)[So is this.]
-#note-with-wide-background(keep-order: true)[This is a note with a wide green background.]#note-with-wide-background(numbered: false,keep-order: true, shift: true)[So is this.]
-#codeblock(```typ
-  #let note-with-wide-background(..args, body) = marginalia.note(
-    ..args,
-    block(
-      fill: oklch(90.26%, 0.058, 140.43deg),
-      outset: (left: 10pt, rest: 4pt),
-      width: 100%, radius: 4pt,
-      body)
-  )
-  #let note-with-background(..args, body) = marginalia.note(
-    ..args,
-    block(fill: oklch(90.26%, 0.058, 140.43deg),
-    inset: (x: 4pt), outset: (y: 4pt),
-    width: 100%, radius: 4pt,
-    body)
-  )
-  ```)
+- ```typc block-style: (fill: oklch(90%, 0.06, 140deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt)``` gives:
+  #note-with-wide-background(keep-order: true)[This is a note with a wide green background.]
+  #note-with-wide-background(numbered: false, keep-order: true, shift: true)[So is this.]
+
+
+// #codeblock(```typ
+// #let note-with-wide-background = marginalia.note.with(
+//     block-style: (fill: oklch(90.26%, 0.058, 140.43deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt)
+//   )
+// #let note-with-background = marginalia.note.with(
+//     block-style: (fill: oklch(90.26%, 0.058, 140.43deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt)
+//   )
+// ```)
 
 //
 // #text(fill: red)[TODO: OUTDATED]
@@ -522,7 +521,7 @@ And here's the code for the lines in the background:
   ```
 ]
 
-#pagebreak(weak: true)
+// #pagebreak(weak: true)
 = Troubleshooting / Known Bugs
 
 - If the document needs multiple passes to figure out page-breaks,
@@ -540,6 +539,8 @@ And here's the code for the lines in the background:
   In nearly all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
   - Just use multiple paragraphs in one note, or place multiple notes in the main text instead.
   - If really neccessary, use `shift: "ignore"` on the nested notes and manually set `dy`.
+
+- `notefigure`s ignore `flush-numbers: true`, because it is not easily possible for this package to insert the marker _into_ the caption#note[Which is a block-level element] without a newline.
 
 - If `book` is `true`, wideblocks that break across pages are broken. Sadly there doesn't seem to be a way to detect and react to page-breaks from within a `block`, so I don't know how to fix this.
 

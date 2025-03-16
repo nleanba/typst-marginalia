@@ -82,7 +82,7 @@
 /// This will update the marginalia config with the provided config options.
 ///
 /// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
-/// 
+///
 /// The shown default values are for the first usage of this function.
 /// On later calls, unspecified options are kept from the previous configuration state:
 ///   ```typc
@@ -525,79 +525,77 @@
   /// Will be used to ```typc set``` the par style.
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
+  /// Will be passed to the `block` containing the note body.
+  /// -> dictionary
+  block-style: (
+    width: 100%,
+  ),
   /// -> content
   body,
 ) = {
   // let keep-order = if keep-order == auto { not numbered } else { keep-orders }
   let shift = if shift == auto { if numbered { true } else { "avoid" } } else { shift }
-  if numbered {
-    notecounter.step()
-    let body = context if _config.get().flush-numbers {
-      set text(..text-style)
-      set par(..par-style)
-      notecounter.display(_config.get().numbering)
-      h(1.5pt)
-      body
+
+  if numbered { notecounter.step() }
+
+  context {
+    let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
+    let dy = dy - lineheight
+
+    let note-fn = if _config.get().book and calc.even(here().page()) {
+      if reverse { _note_right } else { _note_left }
     } else {
-      set text(..text-style)
-      set par(..par-style)
-      body
-      place(
-        top + left,
-        dx: -8pt,
-        box(
-          width: 8pt,
-          {
-            h(1fr)
-            sym.zws
-            notecounter.display(_config.get().numbering)
-            h(1fr)
-          },
-        ),
-      )
+      if reverse { _note_left } else { _note_right }
     }
-    body = align(top, body)
-    h(0pt, weak: true)
-    box(context {
-      h(1.5pt, weak: true)
-      notecounter.display(_config.get().numbering)
-      let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
-      if _config.get().book and calc.even(here().page()) {
-        if reverse {
-          _note_right(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
-        } else {
-          _note_left(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
-        }
+
+    let body = if numbered {
+      if _config.get().flush-numbers {
+        box({
+          notecounter.display(_config.get().numbering)
+          h(2pt)
+        })
+        h(0pt, weak: true)
+        body
       } else {
-        if reverse {
-          _note_left(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
-        } else {
-          _note_right(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
-        }
+        body
+        place(
+          top + left,
+          dx: -8pt,
+          box(
+            width: 8pt,
+            {
+              h(1fr)
+              sym.zws
+              notecounter.display(_config.get().numbering)
+              h(1fr)
+            },
+          ),
+        )
       }
-    })
-  } else {
-    h(0pt, weak: true)
-    let body = align(top, {
-      set text(..text-style)
-      set par(..par-style)
+    } else {
       body
-    })
-    box(context {
-      let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
-      if _config.get().book and calc.even(here().page()) {
-        if reverse {
-          _note_right(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
-        } else {
-          _note_left(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
-        }
-      } else {
-        if reverse {
-          _note_left(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
-        } else {
-          _note_right(dy: dy - lineheight, keep-order: keep-order, shift: shift, body)
-        }
+    }
+
+    let body = align(
+      top,
+      block(
+        width: 100%,
+        ..block-style,
+        {
+          set text(..text-style)
+          set par(..par-style)
+          body
+        },
+      ),
+    )
+
+    h(0pt, weak: true)
+    box({
+      if numbered {
+        h(1.5pt, weak: true)
+        notecounter.display(_config.get().numbering)
       }
+      note-fn(dy: dy, keep-order: keep-order, shift: shift, body)
     })
   }
 }
