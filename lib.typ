@@ -555,6 +555,7 @@
       )
       body
     }
+    body = align(top, body)
     h(0pt, weak: true)
     box(context {
       h(1.5pt, weak: true)
@@ -576,11 +577,11 @@
     })
   } else {
     h(0pt, weak: true)
-    let body = {
+    let body = align(top, {
       set text(..text-style)
       set par(..par-style)
       body
-    }
+    })
     box(context {
       let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
       if _config.get().book and calc.even(here().page()) {
