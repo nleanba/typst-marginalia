@@ -82,6 +82,15 @@
 /// This will update the marginalia config with the provided config options.
 ///
 /// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
+/// 
+/// The shown default values are for the first usage of this function.
+/// On later calls, unspecified options are kept from the previous configuration state:
+///   ```typc
+///   configure(clearance: 5pt)
+///   configure(book: true)
+///   ```
+///   is equivalent to
+///   ```typc configure(clearance: 5pt, book: true)```.
 #let configure(
   /// Inside/left margins.
   ///     - `far`: Distance between edge of page and margin (note) column.
@@ -102,12 +111,13 @@
   /// Bottom margin.
   /// -> length
   bottom: 2.5cm,
-  /// If ```typc true```, will use inside/outside margins, alternating on each page. If ```typc false```, will use left/right margins with all pages the same.
+  ///- If ```typc true```, will use inside/outside margins, alternating on each page.
+  ///- If ```typc false```, will use left/right margins with all pages the same.
   /// -> boolean
   book: false,
   /// Minimal vertical distance between notes and to wide blocks.
   /// -> length
-  clearance: 8pt,
+  clearance: 12pt,
   /// Disallow note markers hanging into the whitespace.
   /// -> boolean
   flush-numbers: false,
@@ -270,6 +280,7 @@
   // shift down
   let cur = page.top
   let empty = 0pt
+  let prev-shift-avoid = false
   let positions_d = ()
   for (key, position) in positions {
     let fault = cur - position
@@ -283,10 +294,15 @@
       cur = position + items.at(key).height + clearance
     } else if items.at(key).shift == "avoid" {
       if fault <= empty {
-        // can stay
-        positions_d.push((key, position))
-        empty -= fault // ?
-        cur = position + items.at(key).height + clearance
+        if prev-shift-avoid {
+          positions_d.push((key, cur))
+          cur = cur + items.at(key).height + clearance
+        } else {
+          // can stay
+          positions_d.push((key, position))
+          empty -= fault // ?
+          cur = position + items.at(key).height + clearance
+        }
       } else {
         positions_d.push((key, position + fault - empty))
         cur = position + fault - empty + items.at(key).height + clearance
@@ -318,6 +334,7 @@
       // empty = 0pt
       cur = cur + items.at(key).height + clearance
     }
+    prev-shift-avoid = items.at(key).shift == "avoid"
   }
 
   let max = page.height - page.bottom

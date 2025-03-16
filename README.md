@@ -12,7 +12,7 @@ Put something akin to the following at the start of your `.typ` file:
   // top: 2.5cm,
   // bottom: 2.5cm,
   // book: false,
-  // clearance: 8pt,
+  // clearance: 12pt,
   // flush-numbers: false,
   // numbering: /* numbering-function */,
 )
