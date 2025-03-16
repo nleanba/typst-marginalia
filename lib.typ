@@ -541,7 +541,9 @@
     } else {
       set text(..text-style)
       set par(..par-style)
+      body
       place(
+        top + left,
         dx: -8pt,
         box(
           width: 8pt,
@@ -553,7 +555,6 @@
           },
         ),
       )
-      body
     }
     body = align(top, body)
     h(0pt, weak: true)

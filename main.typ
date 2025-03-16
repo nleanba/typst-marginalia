@@ -229,6 +229,56 @@ accept a `text-style` and `par-style` parameter:
 
 The default options here are meant to be as close as possible to the stock footnote style.
 
+To add a block around the notes, simply create wrapper-functions as desired,
+as notes can contain block-level content without messing up the placement of the markers.
+
+#let note-with-separator(..args, body) = marginalia.note(
+    ..args,
+    block(stroke: (top: (thickness: 0.5pt, dash: "dotted")), outset: (top: 6pt /* clearance is 12pt */), width: 100%, body)
+  )
+Example for dotted separator lines:
+#note-with-separator(keep-order: true)[This is a note with a dotted stroke above.]
+#note-with-separator(numbered: false, keep-order: true)[So is this.]
+#codeblock(```typ
+  #let note-with-separator(..args, body) = marginalia.note(
+    ..args,
+    block(
+      stroke: (top: (thickness: 0.5pt, dash: "dotted")),
+      outset: (top: 6pt /* clearance is 12pt */),
+      width: 100%,
+      body)
+  )
+  ```)
+
+#let note-with-wide-background(..args, body) = marginalia.note(
+    ..args,
+    block(fill: oklch(90.26%, 0.058, 140.43deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt, body)
+  )
+#let note-with-background(..args, body) = marginalia.note(
+    ..args,
+    block(fill: oklch(90.26%, 0.058, 140.43deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt, body)
+  )
+Examples for backgrounds:
+#note-with-background(keep-order: true)[This is a note with a green background.]#note-with-background(numbered: false, keep-order: true)[So is this.]
+#note-with-wide-background(keep-order: true)[This is a note with a wide green background.]#note-with-wide-background(numbered: false,keep-order: true, shift: true)[So is this.]
+#codeblock(```typ
+  #let note-with-wide-background(..args, body) = marginalia.note(
+    ..args,
+    block(
+      fill: oklch(90.26%, 0.058, 140.43deg),
+      outset: (left: 10pt, rest: 4pt),
+      width: 100%, radius: 4pt,
+      body)
+  )
+  #let note-with-background(..args, body) = marginalia.note(
+    ..args,
+    block(fill: oklch(90.26%, 0.058, 140.43deg),
+    inset: (x: 4pt), outset: (y: 4pt),
+    width: 100%, radius: 4pt,
+    body)
+  )
+  ```)
+
 //
 // #text(fill: red)[TODO: OUTDATED]
 // It is recommended to reset the `notecounter` regularly, either per page:
