@@ -47,7 +47,12 @@
   number,
 ) = {
   let index = if repeat { calc.rem(number - 1, markers.len()) } else { number - 1 }
-  let symbol = if index < markers.len() { markers.at(index) } else { str(index + 1 - markers.len()) }
+  let symbol = if index < markers.len() {
+    markers.at(index)
+  } else {
+    str(index + 1 - markers.len())
+    h(1.5pt)
+  }
   return text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), symbol)
 }
 
@@ -648,15 +653,16 @@
     show figure.caption: it => {
       set align(left)
       if numbered {
-        context if _config.get().flush-numbers {
-          notecounter.display(_config.get().numbering)
-          h(1.5pt)
-        } else {
+        // // caption `it` seems to be block-level...
+        // context if _config.get().flush-numbers {
+        //   notecounter.display(_config.get().numbering)
+        //   h(1.5pt)
+        // } else {
           place(
             dx: -8pt,
             box(
               width: 8pt,
-              {
+              context {
                 h(1fr)
                 sym.zws
                 notecounter.display(_config.get().numbering)
@@ -664,7 +670,7 @@
               },
             ),
           )
-        }
+        // }
       }
       it
     }
