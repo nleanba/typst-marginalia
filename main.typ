@@ -150,7 +150,7 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
-  #import "@preview/marginalia:0.1.3" as marginalia: note, wideblock
+  #import "@preview/marginalia:0.1.4" as marginalia: note, wideblock
   #let config = (
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
