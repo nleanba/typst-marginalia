@@ -530,8 +530,9 @@
   /// Will be used to ```typc set``` the par style.
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
-  /// Will be passed to the `block` containing the note body.
-  /// -> dictionary
+  ///- Will be passed to the `block` containing the note body if the type is ```typc dictionary```.
+  ///- Will be executed if the type is ```typc (location) => dictionary```, so that you can use the current page number or other context information.
+  /// -> dictionary | function
   block-style: (
     width: 100%,
   ),
@@ -581,11 +582,19 @@
       body
     }
 
+    let _block-style = if type(block-style) == function {
+      block-style(here())
+    } else if type(block-style) == dictionary {
+      block-style
+    } else {
+      panic("block-style must be a function or dictionary")
+    }
+
     let body = align(
       top,
       block(
         width: 100%,
-        ..block-style,
+        .._block-style,
         {
           set text(..text-style)
           set par(..par-style)
@@ -658,18 +667,18 @@
         //   notecounter.display(_config.get().numbering)
         //   h(1.5pt)
         // } else {
-          place(
-            dx: -8pt,
-            box(
-              width: 8pt,
-              context {
-                h(1fr)
-                sym.zws
-                notecounter.display(_config.get().numbering)
-                h(1fr)
-              },
-            ),
-          )
+        place(
+          dx: -8pt,
+          box(
+            width: 8pt,
+            context {
+              h(1fr)
+              sym.zws
+              notecounter.display(_config.get().numbering)
+              h(1fr)
+            },
+          ),
+        )
         // }
       }
       it
