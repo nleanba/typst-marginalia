@@ -115,7 +115,8 @@
 //   }
 // }
 
-#show heading.where(level: 1): set block(above: 36pt, below: 12pt)
+#show heading.where(level: 1): set block(above: 42pt, below: 14pt)
+#show heading.where(level: 2): set block(above: 28pt, below: 12pt)
 
 #set par(justify: true, linebreaks: "optimized")
 #set text(fill: luma(30), size: 10pt)
@@ -231,7 +232,7 @@ To change the markers, you can override ```typc config.numbering```-function whi
 
 == Styling
 Both #link(label("marginalia-note()"))[```typc note()```] and #link(label("marginalia-notefigure()"))[```typc notefigure()```]
-accept a `text-style` and `par-style` parameter:
+accept `text-style`, `par-style`, and `block-style` parameters:
 - ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(side: "inner", text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(5)]
 - ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(side: "inner", par-style: (spacing: 20pt, leading: -2pt))[
     #lorem(4)
@@ -269,6 +270,29 @@ To style the block containing the note body, use the `block-style` argument.
   #note-with-wide-background(keep-order: true)[This is a note with an outset green background.]
   #note-with-wide-background(numbered: false, keep-order: true, shift: true)[So is this.]
 
+For more advanced use-cases, you can also pass a function as the `block-style`. It will be called with one argument, either ```typc "left"``` of ```typc "right"```, depending on the side the note will be placed on.
+Additionally, inside the function context is avaliable if neccessary.
+#let block-style = (side) => {
+  if side == "left" {
+    (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
+  } else {
+    (stroke: (right: none, rest: 0.5pt + purple), outset: (right: marginalia.get-right().far, left: 9pt, rest: 4pt))
+  }
+}
+#note(block-style: block-style)[Purple]
+#note(side: "inner", block-style: block-style)[Purple 2]
+
+#codeblock(```typ
+#let block-style = (side) => {
+  if side == "left" {
+    (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
+  } else {
+    (stroke: (right: none, rest: 0.5pt + purple), outset: (right: marginalia.get-right().far, left: 9pt, rest: 4pt))
+  }
+}
+#note(block-style: block-style)[Purple]
+#note(side: "inner", block-style: block-style)[Purple 2]
+```)
 
 // #codeblock(```typ
 // #let note-with-wide-background = marginalia.note.with(
@@ -322,6 +346,7 @@ To style the block containing the note body, use the `block-style` argument.
 //   #context marginalia._note_offset_left("8")
 // ]
 
+// #pagebreak(weak: true)
 = Wide Blocks
 #wideblock[
   The command
@@ -375,7 +400,19 @@ By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the c
   caption: [Aligned to top of figure with `dy: 0pt`.],
 )
 
-A label can be attached to the figure using the `label` argument.// C.f.~@markedfigure.
+A label can be attached to the figure using the `label` argument, as was done here for @markedfigure.
+
+Notefigures can also be given `side`, `text-style`, `par-style` and `block-style` parameters,
+as demonstrated in @styled-fig.
+#marginalia.notefigure(
+  side: "inner",
+  rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
+  caption: [Styled figure.],
+  block-style: block-style,
+  text-style: (size: 5pt, font: ("Iosevka Extended")),
+  par-style: (spacing: 20pt, leading: 0pt),
+  label: <styled-fig>,
+)
 
 == Large Figures
 For larger figures, use the following set and show rules:

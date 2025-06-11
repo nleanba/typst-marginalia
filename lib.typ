@@ -533,10 +533,9 @@
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// Will be passed to the `block` containing the note body.
-  /// -> dictionary
-  block-style: (
-    width: 100%,
-  ),
+  /// If this is a function, it will be called with "left" or "right" as its argument, and the result is passed to the `block`.
+  /// -> dictionary | function
+  block-style: (width: 100%),
   /// -> content
   body,
 ) = {
@@ -588,6 +587,12 @@
       }
     } else {
       body
+    }
+
+    let block-style = if type(block-style) == function {
+      block-style(side)
+    } else {
+      block-style
     }
 
     let body = align(
@@ -645,6 +650,10 @@
   text-style: (size: 0.85em, style: "normal", weight: "regular"),
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
+  /// Will be passed to the `block` containing the note body (this contains the entire figure).
+  /// If this is a function, it will be called with "left" or "right" as its argument, and the result is passed to the `block`.
+  /// -> dictionary | function
+  block-style: (width: 100%),
   /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.
   /// -> length
   gap: 0.55em,
@@ -727,6 +736,7 @@
       shift: shift,
       text-style: text-style,
       par-style: par-style,
+      block-style: block-style,
     )[
       #figure(
         content,
