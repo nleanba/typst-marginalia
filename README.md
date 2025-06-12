@@ -36,7 +36,7 @@ comments) are the default values taken if the corresponding keys are unset.
 
 Provided via the `#note[...]` command.
 
-- `#note(reverse: true)[...]` to put it on the inside margin.
+- `#note(side: "inner")[...]` to put it on the inside margin (left margin for single-sided documents).
 - `#note(numbered: false)[...]` to remove the marker.
 - `#note(shift: false)[...]` to force exact position of the note.
 - `#note(shift: "ignore")[...]` to force exact position of the note and disable collision.
@@ -47,10 +47,8 @@ Provided via the `#note[...]` command.
 
 Provided via the `#wideblock[...]` command.
 
-- `#wideblock(reverse: true)[...]` to extend into the inside margin instead.
-- `#wideblock(double: true)[...]` to extend into both margins.
-
-Note: `reverse` and `double` are mutually exclusive.
+- `#wideblock(side: "inner")[...]` to extend into the inside margin instead.
+- `#wideblock(side: "both")[...]` to extend into both margins.
 
 Note: Wideblocks do not handle pagebreaks in `book: true` documents well.
 
