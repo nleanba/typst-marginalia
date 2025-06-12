@@ -20,9 +20,9 @@
       raw(name, lang: "typc")
     }
   }
-  note(
-    numbered: false,
-    dy: -12pt,
+  place(top, note(
+    numbering: none,
+    // dy: -12pt,
     {
       if module-doc.functions.len() > 0 {
         text([Functions:], weight: "bold")
@@ -34,7 +34,7 @@
         list(..module-doc.variables.map(var => gen-entry(var.name)))
       }
     },
-  )
+  ))
 }
 #let show-type(type, style-args: (:)) = {
   styles.default.show-type(type, style-args: style-args)

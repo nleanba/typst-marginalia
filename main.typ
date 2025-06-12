@@ -8,18 +8,15 @@
   book: true,
   // clearance: 30pt,
   // flush-numbers: false,
-  // numbering: (..i) => super(numbering("a", ..i)),
-  // numbering: marginalia.note-numbering.with(repeat: false, markers: ())
-  // numbering: marginalia.note-numbering.with(repeat: false)
 )
 
-#marginalia.configure(..config)
+#show: marginalia.setup.with(..config)
 
 // testing html
 // #show: everything => context {
 //   if target() == "paged" {
 #set page(
-  ..marginalia.page-setup(..config),
+  // ..marginalia.page-setup(..config),
   header-ascent: 16mm,
   header: context {
     // marginalia.notecounter.update(0)
@@ -137,7 +134,7 @@
 #block(
   text(size: 3em, weight: "black")[
     Marginalia
-    #text(size: 10pt)[#note(numbered: false)[
+    #text(size: 10pt)[#note(numbering: none)[
         #outline(indent: 1em, depth: 2)
       ]]],
 )
@@ -152,30 +149,34 @@ Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
   #import "@preview/marginalia:0.1.5" as marginalia: note, wideblock
-  #let config = (
+
+  #show: marginalia.setup.with(
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
     // top: 2.5cm,
     // bottom: 2.5cm,
     // book: false,
     // clearance: 12pt,
-    // flush-numbers: false,
-    // numbering: /* numbering-function */,
-  )
-  #marginalia.configure(..config)
-  #set page(
-    // setup margins:
-    ..marginalia.page-setup(..config),
-    /* other page setup */
   )
   ```
 ]
 
-Where you can then customize `config` to your preferences. Shown here (as comments) are the default values taken if the corresponding keys are unset.
+Where you can then customize these options to your preferences.
+Shown here (as comments) are the default values taken if the corresponding keys are unset.
+#note[You can also skip the configuration step if you’re happy with these defaults, but 15mm is not a lot to write in.]
 
-See the appendix for a more detailed explanation of the #link(label("marginalia-configure()"), [```typc configure()```])
-and #link(label("marginalia-page-setup()"), [```typc page-setup()```])
-functions.
+If `book` is `false`, `inner` and `outer` correspond to the left and right
+margins respectively. If book is true, the margins swap sides on even and odd
+pages. Notes are placed in the outside margin by default.
+
+See the appendix for a more detailed explanation of the #link(label("marginalia-setup()"), [```typc setup()```]) function and its options.
+
+Additionally, I recommend using typst’s partial function application feature to customize other aspects of the notes:
+#codeblock[
+  ```typ
+  #let note = note.with(/* options here */)
+  ```
+]
 
 
 // // #context if calc.even(here().page()) {pagebreak(to: "odd", weak: true)}
@@ -217,25 +218,23 @@ It will attempt to move one note below a wide-block if there is not enough space
 ]
 
 == Markers
-The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set the configuration option ```typc flush-numbers: true```.
-#marginalia.configure(flush-numbers: true)
-#note[
-  This note is sandwiched between two calls to
-  ```typc configure()```.// toggling `flush-numbers`.
+The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set ```typc flush-numbering: true``` on the note.
+#note(flush-numbering: true)[
+  This note has flush numbering.
 ]
-#marginalia.configure(flush-numbers: false)
+(This is sadly not possible to do for `notefigure`s.)
 
-Setting the argument ```typc numbered: false```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
-we obtain notes without icon/number:#note(numbered: false)[Like this.]
+Setting the argument ```typc numbering: none```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
+we obtain notes without icon/number:#note(numbering: none)[Like this.]
 
 To change the markers, you can override ```typc config.numbering```-function which is used to generate the markers.
 
 == Styling
 Both #link(label("marginalia-note()"))[```typc note()```] and #link(label("marginalia-notefigure()"))[```typc notefigure()```]
 accept `text-style`, `par-style`, and `block-style` parameters:
-- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(side: "inner", text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(5)]
-- ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(side: "inner", par-style: (spacing: 20pt, leading: -2pt))[
-    #lorem(4)
+- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(10)]
+- ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(par-style: (spacing: 20pt, leading: -2pt))[
+    #lorem(10)
 
     #lorem(4)
   ]
@@ -244,6 +243,7 @@ The default options here are meant to be as close as possible to the stock footn
 
 I strongly recommend setting a fixed text-size for your notes (```typc size: __pt``` instead of ```typc size: __em```) to ensure consistent sizing of the notes independent on the font size of the surrounding text.
 
+=== `block-style`
 #let note-with-separator = marginalia.note.with(
   block-style: (
     stroke: (top: (thickness: 0.5pt, dash: "dotted")),
@@ -261,16 +261,14 @@ To style the block containing the note body, use the `block-style` argument.
 
 - ```typc block-style: (stroke: (top: (thickness: 0.5pt, dash: "dotted")), outset: (top: 6pt /* clearance is 12pt */), width: 100%)``` gives:
   #note-with-separator(keep-order: true)[This is a note with a dotted stroke above.]
-  #note-with-separator(numbered: false, keep-order: true, shift: true)[So is this.]
+  #note-with-separator(numbering: none, keep-order: true, shift: true)[So is this.]
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt)``` gives:
-  #marginalia.configure(flush-numbers: true)
-  #note-with-background(keep-order: true)[This is a note with a green background and `flush-numbers: true`.]
-  #note-with-background(numbered: false, keep-order: true, shift: true)[So is this.]
-  #marginalia.configure(flush-numbers: false)
+  #note-with-background(flush-numbering: true, keep-order: true)[This is a note with a green background and `flush-numbering: true`.]
+  #note-with-background(numbering: none, keep-order: true, shift: true)[So is this.]
 
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt)``` gives:
   #note-with-wide-background(keep-order: true)[This is a note with an outset green background.]
-  #note-with-wide-background(numbered: false, keep-order: true, shift: true)[So is this.]
+  #note-with-wide-background(numbering: none, keep-order: true, shift: true)[So is this.]
 
 For more advanced use-cases, you can also pass a function as the `block-style`. It will be called with one argument, either ```typc "left"``` of ```typc "right"```, depending on the side the note will be placed on.
 Additionally, inside the function context is avaliable if neccessary.
@@ -384,10 +382,10 @@ For small figures, you can place them in the margin with ```typc marginalia.note
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.mako)),
   caption: [A notefigure.],
 )
-It accepts all arguments `figure` takes (except `placement` and `scope`), plus all arguments `note` takes (except `align-baseline`). However, by default it has no marker, and to get a marker like other notes, you must pass ```typc numbered: true```, it will get a marker like other notes:
+It accepts all arguments `figure` takes (except `placement` and `scope`), plus all arguments `note` takes (except `align-baseline`). However, by default it has no marker, and to get a marker like other notes, you must pass ```typc numbering: marginalia.note-numbering```, it will get a marker like other notes:
 #marginalia.notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.turbo)),
-  numbered: true,
+  numbering: marginalia.note-numbering,
   label: <markedfigure>,
   caption: [A marked notefigure.],
 )
@@ -398,7 +396,7 @@ By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the c
 #marginalia.notefigure(
   dy: 0pt,
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.crest)),
-  numbered: true,
+  numbering: marginalia.note-numbering,
   caption: [Aligned to top of figure with `dy: 0pt`.],
 )
 
@@ -422,13 +420,13 @@ For larger figures, use the following set and show rules:
   ```typ
   #set figure(gap: 0pt)
   #set figure.caption(position: top)
-  #show figure.caption.where(position: top): note.with(numbered:false, dy:1em)
+  #show figure.caption.where(position: top): note.with(numbering:none, dy:1em)
   ```
 ]
 
 #set figure(gap: 0pt)
 #set figure.caption(position: top)
-#show figure.caption.where(position: top): note.with(numbered: false, dy: 1em)
+#show figure.caption.where(position: top): note.with(numbering: none, dy: 1em)
 
 #figure(
   rect(width: 100%, fill: gradient.linear(..color.map.inferno)),
@@ -467,28 +465,28 @@ The caption gets placed beneath the figure automatically, courtesy of regular wi
 You can place notes in absolute positions relative to the page using `place`:
 #codeblock[
   ```typ
-  #place(top, note(numbered: false, side: "inner")[Top])
-  #place(bottom, note(numbered: false, side: "inner")[Bottom])
+  #place(top, note(numbering: none, side: "inner")[Top])
+  #place(bottom, note(numbering: none, side: "inner")[Bottom])
   ```
 ]
-#place(top, note(numbered: false, side: "inner")[Top])
-#place(bottom, note(numbered: false, side: "inner")[Bottom])
+#place(top, note(numbering: none, side: "inner")[Top])
+#place(bottom, note(numbering: none, side: "inner")[Bottom])
 
 To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if you don't mind overlaps.)
 #codeblock[
   // #set text(size: 0.84em)
   ```typ
-  #place(top, note(numbered: false, shift: false)[Top (no shift)])
-  #place(bottom, note(numbered: false, shift: false)[Bottom (no shift)])
+  #place(top, note(numbering: none, shift: false)[Top (no shift)])
+  #place(bottom, note(numbering: none, shift: false)[Bottom (no shift)])
   ```
 ]
-#place(top, note(numbered: false, shift: false)[Top (no shift)])
-#place(bottom, note(numbered: false, shift: false)[Bottom (no shift)])
+#place(top, note(numbering: none, shift: false)[Top (no shift)])
+#place(bottom, note(numbering: none, shift: false)[Bottom (no shift)])
 
 By default, notes are aligned to their first baseline.
 To align the top of the note instead, set #link(label("marginalia-note.align-baseline"))[```typc align-baseline```] to ```typc false```.
-#place(top, note(numbered: false, shift: false, align-baseline: false)[Top (no shift, no baseline align)])
-#place(bottom, note(numbered: false, shift: false, align-baseline: false)[Bottom (no shift, no baseline al.)])
+#place(top, note(numbering: none, shift: false, align-baseline: false)[Top (no shift, no baseline align)])
+#place(bottom, note(numbering: none, shift: false, align-baseline: false)[Bottom (no shift, no baseline al.)])
 
 == Headers and Background
 This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the respective config option.
@@ -579,7 +577,8 @@ And here's the code for the lines in the background:
   - Just use multiple paragraphs in one note, or place multiple notes in the main text instead.
   - If really neccessary, use `shift: "ignore"` on the nested notes and manually set `dy`.
 
-- `notefigure`s ignore `flush-numbers: true`, because it is not easily possible for this package to insert the marker _into_ the caption#note[Which is a block-level element] without a newline.
+- `notefigure`s does not take a `flush-numbering` parameter,
+  because it is not easily possible for this package to insert the marker _into_ the caption#note[Which is a block-level element] without adding a newline.
 
 - If `book` is `true`, wideblocks that break across pages are broken. Sadly there doesn't seem to be a way to detect and react to page-breaks from within a `block`, so I don't know how to fix this.
 
@@ -594,13 +593,14 @@ The `wideblock` functionality was inspired by the one provided in the #link("htt
 
 Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which was used to produce the appendix.
 
+(This project is not affiliated with #link("https://marginalia-search.com/"), but that is _also_ a cool project.)
+
 
 // testing html
 // #context { if target() == "paged" [
 
 // no more book-style to allow for multipage wideblock
-#marginalia.configure(..config, book: false)
-#set page(..marginalia.page-setup(..config, book: false))
+#show: marginalia.setup.with(..config, book: false)
 #context counter(heading).update(0)
 #show heading.where(level: 1): set heading(numbering: "A.1", supplement: "Appendix")
 #show heading.where(level: 2): set heading(numbering: "A.1", supplement: "Appendix", outlined: false)
@@ -626,13 +626,22 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
 }
 #let ergo(do) = {
   linebreak()
-  h(2em)
-  [→ #do]
+  h(30pt)
+  box(width: 1fr, {
+    h(-15pt)
+    box(width: 15pt)[→]
+    do
+  })
 }
 
 #wideblock(side: "inner")[
-  = Detailed Documentation of all Exported Symbols
-  <appendix>
+  = Detailed Documentation of all Exported Symbols <appendix>
+
+  #compat((
+    "1.5.0": (
+      [The functions `configure()` and `page-setup()` have been combined into one #link(label("marginalia-setup()"), [```typc setup()```]) function.],
+    )
+  ))
 
   #import "@preview/tidy:0.4.2"
   #import "tidy-style.typ" as style
@@ -650,7 +659,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
       ergo: ergo,
       internal: (..text) => {
         let text = text.pos().at(0, default: [Internal.])
-        note(numbered: false, text)
+        note(numbering: none, text)
         h(0pt, weak: true)
         // set text(fill: white, weight: 600, size: 9pt)
         // block(fill: luma(40%), inset: 2pt, outset: 2pt, radius: 2pt, body)
