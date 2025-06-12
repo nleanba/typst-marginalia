@@ -151,7 +151,7 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
-  #import "@preview/marginalia:0.1.4" as marginalia: note, wideblock
+  #import "@preview/marginalia:0.1.5" as marginalia: note, wideblock
   #let config = (
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -241,6 +241,8 @@ accept `text-style`, `par-style`, and `block-style` parameters:
   ]
 
 The default options here are meant to be as close as possible to the stock footnote style.
+
+I strongly recommend setting a fixed text-size for your notes (```typc size: __pt``` instead of ```typc size: __em```) to ensure consistent sizing of the notes independent on the font size of the surrounding text.
 
 #let note-with-separator = marginalia.note.with(
   block-style: (
@@ -603,6 +605,31 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
 #show heading.where(level: 1): set heading(numbering: "A.1", supplement: "Appendix")
 #show heading.where(level: 2): set heading(numbering: "A.1", supplement: "Appendix", outlined: false)
 
+#let compat(versions) = {
+  show heading.where(level: 4): set block(above: 4pt, below: 4pt)
+  show heading.where(level: 4): set text(size: 8pt)
+  block(
+    fill: oklch(99%, 0.02, 30deg),
+    width: 100%,
+    inset: (y: 4pt),
+    outset: (x: 2pt),
+    {
+      [=== Breaking Changes]
+      for (version, changes) in versions {
+        [==== #version]
+        for change in changes {
+          [- #change]
+        }
+      }
+    }
+  )
+}
+#let ergo(do) = {
+  linebreak()
+  h(2em)
+  [→ #do]
+}
+
 #wideblock(side: "inner")[
   = Detailed Documentation of all Exported Symbols
   <appendix>
@@ -619,6 +646,8 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
       note-markers: marginalia.note-markers,
       note-markers-alternating: marginalia.note-markers-alternating,
       marginalia: marginalia,
+      compat: compat,
+      ergo: ergo,
       internal: (..text) => {
         let text = text.pos().at(0, default: [Internal.])
         note(numbered: false, text)

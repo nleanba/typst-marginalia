@@ -495,6 +495,13 @@
 
 /// Create a marginnote.
 /// Will adjust it's position downwards to avoid previously placed notes, and upwards to avoid extending past the bottom margin.
+///
+/// #compat((
+///   "0.1.5": (
+///     [`reverse` has been replaced with @wideblock.side.
+///      #ergo[use \````typc side: "inner"```\` instead of \````typc reverse: true```\`]],
+///   ),
+/// ))
 #let note(
   /// Whether to put a mark.
   /// -> boolean
@@ -621,8 +628,14 @@
 
 /// Creates a figure in the margin.
 ///
-/// Parameters `numbered`, `side`, `keep-order`, `shift`, `text-style` and `par-style` work the same as for @note.
+/// Parameters `numbered`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
 ///
+/// #compat((
+///   "0.1.5": (
+///     [`reverse` has been replaced with @wideblock.side.
+///      #ergo[use \````typc side: "inner"```\` instead of \````typc reverse: true```\`]],
+///   ),
+/// ))
 /// -> content
 #let notefigure(
   // Same as @note.numbered
@@ -759,6 +772,14 @@
 ///#set page(..page-setup(..config, book: false))
 ///#wideblock(side: "inner")[...]
 ///```
+///
+/// #compat((
+///   "0.1.5": (
+///     [`reverse` and `double` have been replaced with @wideblock.side.
+///      #ergo[use \````typc side: "inner"```\` instead of \````typc reverse: true```\`]
+///      #ergo[use \````typc side: "both"```\` instead of \````typc double: true```\`]],
+///   ),
+/// ))
 /// -> content
 #let wideblock(
   /// Which side to extend into.
