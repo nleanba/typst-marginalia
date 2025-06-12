@@ -1,6 +1,6 @@
 [package]
 name = "marginalia"
-version = "0.1.4"
+version = "0.1.5"
 entrypoint = "lib.typ"
 authors = ["nleanba <@nleanba>"]
 license = "Unlicense"

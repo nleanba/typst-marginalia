@@ -28,7 +28,7 @@
     let rightm = marginalia.get-right()
     if here().page() > 1 {
       wideblock(
-        double: true,
+        side: "both",
         {
           box(
             width: leftm.width,
@@ -115,7 +115,8 @@
 //   }
 // }
 
-#show heading.where(level: 1): set block(above: 36pt, below: 12pt)
+#show heading.where(level: 1): set block(above: 42pt, below: 14pt)
+#show heading.where(level: 2): set block(above: 28pt, below: 12pt)
 
 #set par(justify: true, linebreaks: "optimized")
 #set text(fill: luma(30), size: 10pt)
@@ -124,7 +125,7 @@
 
 #let codeblock(code) = {
   wideblock(
-    reverse: true,
+    side: "inner",
     {
       // #set text(size: 0.84em)
       block(stroke: 0.5pt + luma(90%), fill: white, width: 100%, inset: (y: 5pt), code)
@@ -150,7 +151,7 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
-  #import "@preview/marginalia:0.1.4" as marginalia: note, wideblock
+  #import "@preview/marginalia:0.1.5" as marginalia: note, wideblock
   #let config = (
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -189,10 +190,11 @@ By default, the #link(label("marginalia-note()"))[```typst #note[...]```] comman
   They can contain any content, and will wrap within the note column.
   // #note(dy: -1em)[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
 ].
-By giving the argument ```typc reverse: true```, we obtain a note on the left/inner margin.#note(reverse: true)[Reversed.]
+By giving the argument ```typc side: "inner"```, we obtain a note on the inner (left) margin.#note(side: "inner")[Reversed.]
 If ```typc config.book = true```, the side will of course be adjusted automatically.
+It is also possible to pass ```typc side: "left"``` or ```typc side: "right"``` if you want a fixed side even in books.
 
-If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(reverse: true, dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy and was shifted less than that to stay on the page.] they automatically adjust their positions.
+If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(side: "inner", dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy and was shifted less than that to stay on the page.] they automatically adjust their positions.
 Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around, unless configured otherwise via the #link(label("marginalia-note.shift"))[```typc shift```] parameter of ```typ #note()```.
 
 Notes will shift vertically to avoid other notes, wideblocks, and the top page margin.
@@ -230,15 +232,17 @@ To change the markers, you can override ```typc config.numbering```-function whi
 
 == Styling
 Both #link(label("marginalia-note()"))[```typc note()```] and #link(label("marginalia-notefigure()"))[```typc notefigure()```]
-accept a `text-style` and `par-style` parameter:
-- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(reverse: true, text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(5)]
-- ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(reverse: true, par-style: (spacing: 20pt, leading: -2pt))[
+accept `text-style`, `par-style`, and `block-style` parameters:
+- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(side: "inner", text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(5)]
+- ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(side: "inner", par-style: (spacing: 20pt, leading: -2pt))[
     #lorem(4)
 
     #lorem(4)
   ]
 
 The default options here are meant to be as close as possible to the stock footnote style.
+
+I strongly recommend setting a fixed text-size for your notes (```typc size: __pt``` instead of ```typc size: __em```) to ensure consistent sizing of the notes independent on the font size of the surrounding text.
 
 #let note-with-separator = marginalia.note.with(
   block-style: (
@@ -265,9 +269,32 @@ To style the block containing the note body, use the `block-style` argument.
   #marginalia.configure(flush-numbers: false)
 
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt)``` gives:
-  #note-with-wide-background(keep-order: true)[This is a note with a wide green background.]
+  #note-with-wide-background(keep-order: true)[This is a note with an outset green background.]
   #note-with-wide-background(numbered: false, keep-order: true, shift: true)[So is this.]
 
+For more advanced use-cases, you can also pass a function as the `block-style`. It will be called with one argument, either ```typc "left"``` of ```typc "right"```, depending on the side the note will be placed on.
+Additionally, inside the function context is avaliable if neccessary.
+#let block-style = (side) => {
+  if side == "left" {
+    (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
+  } else {
+    (stroke: (right: none, rest: 0.5pt + purple), outset: (right: marginalia.get-right().far, left: 9pt, rest: 4pt))
+  }
+}
+#note(block-style: block-style)[Purple]
+#note(side: "inner", block-style: block-style)[Purple 2]
+
+#codeblock(```typ
+#let block-style = (side) => {
+  if side == "left" {
+    (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
+  } else {
+    (stroke: (right: none, rest: 0.5pt + purple), outset: (right: marginalia.get-right().far, left: 9pt, rest: 4pt))
+  }
+}
+#note(block-style: block-style)[Purple]
+#note(side: "inner", block-style: block-style)[Purple 2]
+```)
 
 // #codeblock(```typ
 // #let note-with-wide-background = marginalia.note.with(
@@ -321,6 +348,7 @@ To style the block containing the note body, use the `block-style` argument.
 //   #context marginalia._note_offset_left("8")
 // ]
 
+// #pagebreak(weak: true)
 = Wide Blocks
 #wideblock[
   The command
@@ -329,23 +357,22 @@ To style the block containing the note body, use the `block-style` argument.
 
   Note: when using an asyymetric page layout with `book: true`, wideblocks which span across pagebreaks are messy, because there is no way for the wideblock to detect the pagebreak and adjust ist position after it.
 
-  It is possible to use notes in a wide block:#note[Voila.]#note(reverse: true)[Wow!].
+  It is possible to use notes in a wide block:#note[Voila.]#note(side: "inner")[Wow!].
   They will automatically shift downwards to avoid colliding with the wideblock.
   #note(dy: -8em)[Unless they are given a `dy` argument moving them above the block.]
 ]
 
-#wideblock(reverse: true)[
-  ```typst #wideblock(reverse: true)[...]```: The `reverse` option makes the block extend to the inside margin instead.
-  This is analogous to the `reverse` option on notes and allows placing notes in their usual column.
+#wideblock(side: "inner")[
+  ```typst #wideblock(side: "inner")[...]```: The `side` option allows extending the block into the inside margin instead.
+  This is analogous to the `side` option on notes and allows placing notes in their usual column.
 
-  In this manual, a reverse wideblock is used to set the appendix to make it take up fewer pages.
+  In this manual, an inner wideblock is used to set the appendix to make it take up fewer pages.
   This is also why the appendix is no longer using `book: true`.
   #note[Notes above a `wideblock` will shift upwards if necessary.]
 ]
 
-#wideblock(double: true)[
-  ```typst #wideblock(double: true)[...]```: The `double` option makes it extend both ways.
-  Note that setting both `reverse: true` and `double: true` is disallowed and will panic.
+#wideblock(side: "both")[
+  ```typst #wideblock(side: "both")[...]```: Additionally, wideblocks can extend on both sides, for extra wide content...
 ]
 
 // #pagebreak(weak: true)
@@ -375,7 +402,19 @@ By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the c
   caption: [Aligned to top of figure with `dy: 0pt`.],
 )
 
-A label can be attached to the figure using the `label` argument.// C.f.~@markedfigure.
+A label can be attached to the figure using the `label` argument, as was done here for @markedfigure.
+
+Notefigures can also be given `side`, `text-style`, `par-style` and `block-style` parameters,
+as demonstrated in @styled-fig.
+#marginalia.notefigure(
+  side: "inner",
+  rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
+  caption: [Styled figure.],
+  block-style: block-style,
+  text-style: (size: 5pt, font: ("Iosevka Extended")),
+  par-style: (spacing: 20pt, leading: 0pt),
+  label: <styled-fig>,
+)
 
 == Large Figures
 For larger figures, use the following set and show rules:
@@ -410,16 +449,16 @@ The caption gets placed beneath the figure automatically, courtesy of regular wi
     caption: [A figure in a wide block.],
   )
 ]
-#wideblock(reverse: true)[
+#wideblock(side: "inner")[
   #figure(
     rect(width: 100%, height: 5em, fill: gradient.linear(..color.map.icefire)),
     caption: [A figure in a reversed wide block.],
   )
 ]
-#wideblock(double: true)[
+#wideblock(side: "both")[
   #figure(
     rect(width: 100%, fill: gradient.linear(..color.map.spectral)),
-    caption: [A figure in a double-wide block.],
+    caption: [A figure in an extra-wide wideblock.],
   )
 ]
 
@@ -428,12 +467,12 @@ The caption gets placed beneath the figure automatically, courtesy of regular wi
 You can place notes in absolute positions relative to the page using `place`:
 #codeblock[
   ```typ
-  #place(top, note(numbered: false, reverse: true)[Top])
-  #place(bottom, note(numbered: false, reverse: true)[Bottom])
+  #place(top, note(numbered: false, side: "inner")[Top])
+  #place(bottom, note(numbered: false, side: "inner")[Bottom])
   ```
 ]
-#place(top, note(numbered: false, reverse: true)[Top])
-#place(bottom, note(numbered: false, reverse: true)[Bottom])
+#place(top, note(numbered: false, side: "inner")[Top])
+#place(bottom, note(numbered: false, side: "inner")[Bottom])
 
 To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if you don't mind overlaps.)
 #codeblock[
@@ -467,7 +506,7 @@ Here's how the headers in this document were made:
     let leftm = marginalia.get-left()
     let rightm = marginalia.get-right()
     if here().page() > 1 {
-      wideblock(double: true, {
+      wideblock(side: "both", {
         box(width: leftm.width, {
           if not (book) or calc.odd(here().page()) [
             Page
@@ -534,7 +573,7 @@ And here's the code for the lines in the background:
     In this manual, for example, it works fine (with warnings) here,
     #note[Probably because there aren't many other notes around.]
     but not on the first page.
-    #note(reverse: true)[Notes on the other side are usually fine though.]
+    #note(side: "inner")[Notes on the other side are usually fine though.]
   ]
   In nearly all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
   - Just use multiple paragraphs in one note, or place multiple notes in the main text instead.
@@ -566,7 +605,32 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
 #show heading.where(level: 1): set heading(numbering: "A.1", supplement: "Appendix")
 #show heading.where(level: 2): set heading(numbering: "A.1", supplement: "Appendix", outlined: false)
 
-#wideblock(reverse: true)[
+#let compat(versions) = {
+  show heading.where(level: 4): set block(above: 4pt, below: 4pt)
+  show heading.where(level: 4): set text(size: 8pt)
+  block(
+    fill: oklch(99%, 0.02, 30deg),
+    width: 100%,
+    inset: (y: 4pt),
+    outset: (x: 2pt),
+    {
+      [=== Breaking Changes]
+      for (version, changes) in versions {
+        [==== #version]
+        for change in changes {
+          [- #change]
+        }
+      }
+    }
+  )
+}
+#let ergo(do) = {
+  linebreak()
+  h(2em)
+  [→ #do]
+}
+
+#wideblock(side: "inner")[
   = Detailed Documentation of all Exported Symbols
   <appendix>
 
@@ -582,6 +646,8 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
       note-markers: marginalia.note-markers,
       note-markers-alternating: marginalia.note-markers-alternating,
       marginalia: marginalia,
+      compat: compat,
+      ergo: ergo,
       internal: (..text) => {
         let text = text.pos().at(0, default: [Internal.])
         note(numbered: false, text)

@@ -495,13 +495,22 @@
 
 /// Create a marginnote.
 /// Will adjust it's position downwards to avoid previously placed notes, and upwards to avoid extending past the bottom margin.
+///
+/// #compat((
+///   "0.1.5": (
+///     [`reverse` has been replaced with @wideblock.side.
+///      #ergo[use \````typc side: "inner"```\` instead of \````typc reverse: true```\`]],
+///   ),
+/// ))
 #let note(
   /// Whether to put a mark.
   /// -> boolean
   numbered: true,
-  /// Whether to put it in the opposite (inner/left) margin.
-  /// -> boolean
-  reverse: false,
+  /// Which side to place the note.
+  /// ```typc auto``` defaults to ```typc "outer"```.
+  /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
+  /// -> auto | "outer" | "inner" | "left" | "right"
+  side: auto,
   /// Inital vertical offset of the note.
   /// Note may get shifted still to avoid other notes.
   /// -> length
@@ -531,10 +540,9 @@
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// Will be passed to the `block` containing the note body.
-  /// -> dictionary
-  block-style: (
-    width: 100%,
-  ),
+  /// If this is a function, it will be called with "left" or "right" as its argument, and the result is passed to the `block`.
+  /// -> dictionary | function
+  block-style: (width: 100%),
   /// -> content
   body,
 ) = {
@@ -547,10 +555,17 @@
     let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
     let dy = dy - lineheight
 
-    let note-fn = if _config.get().book and calc.even(here().page()) {
-      if reverse { _note_right } else { _note_left }
+    let side = if side == "outer" or side == auto {
+      if _config.get().book and calc.even(here().page()) { "left" } else { "right" }
+    } else if side == "inner" {
+      if _config.get().book and calc.even(here().page()) { "right" } else { "left" }
+    } else { side }
+
+    assert(side == "left" or side == "right", message: "side must be auto, left, right, outer, or inner.")
+    let note-fn = if side == "right" {
+      _note_right
     } else {
-      if reverse { _note_left } else { _note_right }
+      _note_left
     }
 
     let body = if numbered {
@@ -581,6 +596,12 @@
       body
     }
 
+    let block-style = if type(block-style) == function {
+      block-style(side)
+    } else {
+      block-style
+    }
+
     let body = align(
       top,
       block(
@@ -607,16 +628,25 @@
 
 /// Creates a figure in the margin.
 ///
-/// Parameters `numbered`, `reverse`, `keep-order`, `shift`, `text-style` and `par-style` work the same as for @note.
+/// Parameters `numbered`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
 ///
+/// #compat((
+///   "0.1.5": (
+///     [`reverse` has been replaced with @wideblock.side.
+///      #ergo[use \````typc side: "inner"```\` instead of \````typc reverse: true```\`]],
+///   ),
+/// ))
 /// -> content
 #let notefigure(
   // Same as @note.numbered
   /// -> boolean
   numbered: false,
-  // Same as @note.reverse
-  /// -> boolean
-  reverse: false,
+  /// Same as @note.side:
+  /// Which side to place the note.
+  /// ```typc auto``` defaults to ```typc "outer"```.
+  /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
+  /// -> auto | "outer" | "inner" | "left" | "right"
+  side: auto,
   /// How much to shift the note. ```typc 100%``` corresponds to the height of `content` + `gap` + the first baseline.
   ///
   /// Thus ```typc dy: 0pt - 100%``` aligns the text and caption baselines.
@@ -633,6 +663,10 @@
   text-style: (size: 0.85em, style: "normal", weight: "regular"),
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
+  /// Will be passed to the `block` containing the note body (this contains the entire figure).
+  /// If this is a function, it will be called with "left" or "right" as its argument, and the result is passed to the `block`.
+  /// -> dictionary | function
+  block-style: (width: 100%),
   /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.
   /// -> length
   gap: 0.55em,
@@ -674,7 +708,13 @@
       }
       it
     }
-    let width = if reverse or (_config.get().book and calc.even(here().page())) {
+
+    let side = if side == "outer" or side == auto {
+      if _config.get().book and calc.even(here().page()) { "left" } else { "right" }
+    } else if side == "inner" {
+      if _config.get().book and calc.even(here().page()) { "right" } else { "left" }
+    } else { side }
+    let width = if side == "left" {
       get-left().width
     } else {
       get-right().width
@@ -702,13 +742,14 @@
     let shift = if shift == auto { if numbered { true } else { "avoid" } } else { shift }
     note(
       numbered: false,
-      reverse: reverse,
+      side: side,
       dy: dy.length + dy.ratio * height,
       align-baseline: false,
       keep-order: keep-order,
       shift: shift,
       text-style: text-style,
       par-style: par-style,
+      block-style: block-style,
     )[
       #figure(
         content,
@@ -729,59 +770,51 @@
 ///```typst
 ///#configure(..config, book: false)
 ///#set page(..page-setup(..config, book: false))
-///#wideblock(reverse: true)[...]
+///#wideblock(side: "inner")[...]
 ///```
+///
+/// #compat((
+///   "0.1.5": (
+///     [`reverse` and `double` have been replaced with @wideblock.side.
+///      #ergo[use \````typc side: "inner"```\` instead of \````typc reverse: true```\`]
+///      #ergo[use \````typc side: "both"```\` instead of \````typc double: true```\`]],
+///   ),
+/// ))
 /// -> content
 #let wideblock(
-  /// Whether to extend into the inside/left margin instead.
-  /// -> boolean
-  reverse: false,
-  /// Whether to extend into both margins. Cannot be combined with `reverse`.
-  /// -> boolean
-  double: false,
+  /// Which side to extend into.
+  /// ```typc auto``` defaults to ```typc "outer"```.
+  /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
+  /// -> auto | "outer" | "inner" | "left" | "right" | "both"
+  side: auto,
   /// -> content
   body,
 ) = (
   context {
-    if double and reverse {
-      panic("Cannot be both reverse and double wide.")
-    }
+    let left-margin = get-left()
+    let right-margin = get-right()
 
-    let oddpage = calc.odd(here().page())
-    let config = _config.get()
+    let side = if side == "outer" or side == auto {
+      if _config.get().book and calc.even(here().page()) { "left" } else { "right" }
+    } else if side == "inner" {
+      if _config.get().book and calc.even(here().page()) { "right" } else { "left" }
+    } else { side }
 
-    let left = if not (config.book) or oddpage {
-      if double or reverse {
-        config.inner.width + config.inner.sep
-      } else {
-        0pt
-      }
+    assert(side == "left" or side == "right" or side == "both", message: "side must be auto, both, left, right, outer, or inner.")
+
+    let left = if side == "both" or side == "left" {
+      left-margin.width + left-margin.sep
     } else {
-      if reverse {
-        0pt
-      } else {
-        config.outer.width + config.outer.sep
-      }
+      0pt
     }
-
-    let right = if not (config.book) or oddpage {
-      if reverse {
-        0pt
-      } else {
-        config.outer.width + config.outer.sep
-      }
+    let right = if side == "both" or side == "right" {
+      right-margin.width + right-margin.sep
     } else {
-      if double or reverse {
-        config.inner.width + config.inner.sep
-      } else {
-        0pt
-      }
+      0pt
     }
 
     let position = here().position().y
     let page_num = str(here().page())
-    let left-margin = get-left()
-    let right-margin = get-right()
     let linewidth = (
       page.width
         - left-margin.far
