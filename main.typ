@@ -10,13 +10,13 @@
   // flush-numbers: false,
 )
 
-#marginalia.configure(..config)
+#show: marginalia.setup.with(..config)
 
 // testing html
 // #show: everything => context {
 //   if target() == "paged" {
 #set page(
-  ..marginalia.page-setup(..config),
+  // ..marginalia.page-setup(..config),
   header-ascent: 16mm,
   header: context {
     // marginalia.notecounter.update(0)
@@ -149,7 +149,8 @@ Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
   #import "@preview/marginalia:0.1.5" as marginalia: note, wideblock
-  #let config = (
+
+  #show: marginalia.setup.with(
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
     // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
     // top: 2.5cm,
@@ -157,20 +158,18 @@ Put something akin to the following at the start of your `.typ` file:
     // book: false,
     // clearance: 12pt,
   )
-  #marginalia.configure(..config)
-  #set page(
-    // setup margins:
-    ..marginalia.page-setup(..config),
-    /* other page setup */
-  )
   ```
 ]
 
-Where you can then customize `config` to your preferences. Shown here (as comments) are the default values taken if the corresponding keys are unset.
+Where you can then customize these options to your preferences.
+Shown here (as comments) are the default values taken if the corresponding keys are unset.
+#note[You can also skip the configuration step if you’re happy with these defaults, but 15mm is not a lot to write in.]
 
-See the appendix for a more detailed explanation of the #link(label("marginalia-configure()"), [```typc configure()```])
-and #link(label("marginalia-page-setup()"), [```typc page-setup()```])
-functions.
+If `book` is `false`, `inner` and `outer` correspond to the left and right
+margins respectively. If book is true, the margins swap sides on even and odd
+pages. Notes are placed in the outside margin by default.
+
+See the appendix for a more detailed explanation of the #link(label("marginalia-setup()"), [```typc setup()```]) function and its options.
 
 Additionally, I recommend using typst’s partial function application feature to customize other aspects of the notes:
 #codeblock[
@@ -233,9 +232,9 @@ To change the markers, you can override ```typc config.numbering```-function whi
 == Styling
 Both #link(label("marginalia-note()"))[```typc note()```] and #link(label("marginalia-notefigure()"))[```typc notefigure()```]
 accept `text-style`, `par-style`, and `block-style` parameters:
-- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(side: "inner", text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(5)]
-- ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(side: "inner", par-style: (spacing: 20pt, leading: -2pt))[
-    #lorem(4)
+- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(10)]
+- ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(par-style: (spacing: 20pt, leading: -2pt))[
+    #lorem(10)
 
     #lorem(4)
   ]
@@ -264,10 +263,8 @@ To style the block containing the note body, use the `block-style` argument.
   #note-with-separator(keep-order: true)[This is a note with a dotted stroke above.]
   #note-with-separator(numbering: none, keep-order: true, shift: true)[So is this.]
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt)``` gives:
-  #marginalia.configure(flush-numbers: true)
-  #note-with-background(keep-order: true)[This is a note with a green background and `flush-numbers: true`.]
+  #note-with-background(flush-numbering: true, keep-order: true)[This is a note with a green background and `flush-numbering: true`.]
   #note-with-background(numbering: none, keep-order: true, shift: true)[So is this.]
-  #marginalia.configure(flush-numbers: false)
 
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt)``` gives:
   #note-with-wide-background(keep-order: true)[This is a note with an outset green background.]
@@ -596,13 +593,14 @@ The `wideblock` functionality was inspired by the one provided in the #link("htt
 
 Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which was used to produce the appendix.
 
+(This project is not affiliated with #link("https://marginalia-search.com/"), but that is _also_ a cool project.)
+
 
 // testing html
 // #context { if target() == "paged" [
 
 // no more book-style to allow for multipage wideblock
-#marginalia.configure(..config, book: false)
-#set page(..marginalia.page-setup(..config, book: false))
+#show: marginalia.setup.with(..config, book: false)
 #context counter(heading).update(0)
 #show heading.where(level: 1): set heading(numbering: "A.1", supplement: "Appendix")
 #show heading.where(level: 2): set heading(numbering: "A.1", supplement: "Appendix", outlined: false)
@@ -637,8 +635,13 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
 }
 
 #wideblock(side: "inner")[
-  = Detailed Documentation of all Exported Symbols
-  <appendix>
+  = Detailed Documentation of all Exported Symbols <appendix>
+
+  #compat((
+    "1.5.0": (
+      [The functions `configure()` and `page-setup()` have been combined into one #link(label("marginalia-setup()"), [```typc setup()```]) function.],
+    )
+  ))
 
   #import "@preview/tidy:0.4.2"
   #import "tidy-style.typ" as style

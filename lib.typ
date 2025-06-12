@@ -82,28 +82,63 @@
 
 #let _config = state("_config", _fill_config())
 
-/// This will update the marginalia config with the provided config options.
+/// Page setup helper
 ///
+/// This will generate a dictionary ```typc ( margin: .. )``` compatible with the passed config.
+/// This can then be spread into the page setup like so:
+///```typ
+/// #set page( ..page-setup(..config) )```
+///
+/// Takes the same options as @setup.
+/// -> dictionary
+#let _page-setup(
+  /// Missing entries are filled with package defaults. Note: missing entries are _not_ taken from the current marginalia config, as this would require context.
+  /// -> dictionary
+  ..config,
+) = {
+  let config = _fill_config(..config)
+  if config.book {
+    return (
+      margin: (
+        inside: config.inner.far + config.inner.width + config.inner.sep,
+        outside: config.outer.far + config.outer.width + config.outer.sep,
+        top: config.top,
+        bottom: config.bottom,
+      ),
+    )
+  } else {
+    return (
+      margin: (
+        left: config.inner.far + config.inner.width + config.inner.sep,
+        right: config.outer.far + config.outer.width + config.outer.sep,
+        top: config.top,
+        bottom: config.bottom,
+      ),
+    )
+  }
+}
+
+/// This will update the marginalia config and setup the page with the provided config options.
+/// (This means this will insert a pagebreak.)
+/// 
+/// Use as
+/// ```typ
+/// #show: marginalia.setup.with(/* options here */)
+/// ```
+/// 
 /// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
-///
-/// The shown default values are for the first usage of this function.
-/// On later calls, unspecified options are kept from the previous configuration state:
-///   ```typc
-///   configure(clearance: 5pt)
-///   configure(book: true)
-///   ```
-///   is equivalent to
-///   ```typc configure(clearance: 5pt, book: true)```.
 ///
 /// #compat((
 ///   "0.1.5": (
 ///     [`numberig` has been replaced with @note.numbering/@notefigure.numbering.
-///      #ergo[set \````typc numbering: /**/```\` directly on your notes instead of via @configure.\ Use ```typ #let note = note.with(numbering: /**/)``` for consistency.]],
+///      #ergo[set \````typc numbering: /**/```\` directly on your notes instead of via @setup.\ Use ```typ #let note = note.with(numbering: /**/)``` for consistency.]],
 ///     [`flush-numbers` has been replaced by @note.flush-numbering.
-///      #ergo[set \````typc flush-numbering: true```\` directly on your notes instead of via @configure.\ Use ```typ #let note = note.with(flush-numbering: /**/)``` for consistency.]],
+///      #ergo[set \````typc flush-numbering: true```\` directly on your notes instead of via @setup.\ Use ```typ #let note = note.with(flush-numbering: /**/)``` for consistency.]],
+///     [This function does no longer apply the configuration partially, but will reset all unspecified options to the default.
+///      Additionally, it replaces the `page-setup()` function that was needed previously and is no longer called `configure()`],
 ///   ),
 /// ))
-#let configure(
+#let setup(
   /// Inside/left margins.
   ///     - `far`: Distance between edge of page and margin (note) column.
   ///     - `width`: Width of the margin column.
@@ -130,52 +165,13 @@
   /// Minimal vertical distance between notes and to wide blocks.
   /// -> length
   clearance: 12pt,
+  /// -> content
+  body,
 ) = { }
-#let configure(..config) = (
-  context {
-    _config.update(old => {
-      if type(old) != dictionary {
-        panic("marginalia _config should always be a dictionary")
-      }
-      _fill_config(..old, ..config)
-    })
-  }
-)
-
-/// Page setup helper
-///
-/// This will generate a dictionary ```typc ( margin: .. )``` compatible with the passed config.
-/// This can then be spread into the page setup like so:
-///```typ
-/// #set page( ..page-setup(..config) )```
-///
-/// Takes the same options as @configure.
-/// -> dictionary
-#let page-setup(
-  /// Missing entries are filled with package defaults. Note: missing entries are _not_ taken from the current marginalia config, as this would require context.
-  /// -> dictionary
-  ..config,
-) = {
-  let config = _fill_config(..config)
-  if config.book {
-    return (
-      margin: (
-        inside: config.inner.far + config.inner.width + config.inner.sep,
-        outside: config.outer.far + config.outer.width + config.outer.sep,
-        top: config.top,
-        bottom: config.bottom,
-      ),
-    )
-  } else {
-    return (
-      margin: (
-        left: config.inner.far + config.inner.width + config.inner.sep,
-        right: config.outer.far + config.outer.width + config.outer.sep,
-        top: config.top,
-        bottom: config.bottom,
-      ),
-    )
-  }
+#let setup(..config, body) = {
+  _config.update(_fill_config(..config))
+  set page( .._page-setup(..config) )
+  body
 }
 
 /// #internal[Mostly internal.]
@@ -779,11 +775,10 @@
 /// If ```typc config.book = false```, this is not a problem, as then the margins on all pages are the same.
 /// However, when using alternating page margins, a multi-page `wideblock` will not work properly.
 /// To be able to set this appendix in a many-page wideblock, this code was used:
-///```typst
-///#configure(..config, book: false)
-///#set page(..page-setup(..config, book: false))
-///#wideblock(side: "inner")[...]
-///```
+/// ```typ
+/// #show: marginalia.setup.with(..config, book: false)
+/// #wideblock(side: "inner")[...]
+/// ```
 ///
 /// #compat((
 ///   "0.1.5": (
