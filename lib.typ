@@ -4,7 +4,7 @@
 /// #internal[Mostly internal.]
 /// The counter used for the note icons.
 ///
-/// If you use @note-numbering without @note-numbering.repeat, it is reccommended you reset this occasionally, e.g. per heading or per page.
+/// If you use @note-numbering without @note-numbering.repeat, it is recommended you reset this occasionally, e.g. per heading or per page.
 /// #example(scale-preview: 100%, ```typc notecounter.update(1)```)
 /// -> counter
 #let notecounter = counter("notecounter")
@@ -77,8 +77,6 @@
     bottom: config.at("bottom", default: 2.5cm),
     book: config.at("book", default: false),
     clearance: config.at("clearance", default: 12pt),
-    flush-numbers: config.at("flush-numbers", default: false),
-    numbering: config.at("numbering", default: note-numbering),
   )
 }
 
@@ -96,6 +94,15 @@
 ///   ```
 ///   is equivalent to
 ///   ```typc configure(clearance: 5pt, book: true)```.
+///
+/// #compat((
+///   "0.1.5": (
+///     [`numberig` has been replaced with @note.numbering/@notefigure.numbering.
+///      #ergo[set \````typc numbering: /**/```\` directly on your notes instead of via @configure.\ Use ```typ #let note = note.with(numbering: /**/)``` for consistency.]],
+///     [`flush-numbers` has been replaced by @note.flush-numbering.
+///      #ergo[set \````typc flush-numbering: true```\` directly on your notes instead of via @configure.\ Use ```typ #let note = note.with(flush-numbering: /**/)``` for consistency.]],
+///   ),
+/// ))
 #let configure(
   /// Inside/left margins.
   ///     - `far`: Distance between edge of page and margin (note) column.
@@ -123,17 +130,6 @@
   /// Minimal vertical distance between notes and to wide blocks.
   /// -> length
   clearance: 12pt,
-  /// Disallow note markers hanging into the whitespace.
-  /// -> boolean
-  flush-numbers: false,
-  /// Function or `numbering`-string to generate the note markers from the `notecounter`.
-  ///
-  /// Examples:
-  /// - ```typc (..i) => super(numbering("1", ..i))``` for superscript numbers
-  /// - ```typc (..i) => super(numbering("a", ..i))``` for superscript letters
-  /// - ```typc marginalia.note-numbering.with(repeat: false, markers: ())``` for small blue numbers
-  /// -> function | string
-  numbering: note-numbering,
 ) = { }
 #let configure(..config) = (
   context {
@@ -498,14 +494,25 @@
 ///
 /// #compat((
 ///   "0.1.5": (
-///     [`reverse` has been replaced with @wideblock.side.
+///     [`reverse` has been replaced with @note.side.
 ///      #ergo[use \````typc side: "inner"```\` instead of \````typc reverse: true```\`]],
+///     [`numbered` has been replaced with @note.numbering.
+///      #ergo[use \````typc numbering: "none"```\` instead of \````typc numbered: false```\`]],
 ///   ),
 /// ))
 #let note(
-  /// Whether to put a mark.
+  /// Function or `numbering`-string to generate the note markers from the `notecounter`.
+  /// If none, will not step the @notecounter.
+  ///
+  /// Examples:
+  /// - ```typc (..i) => super(numbering("1", ..i))``` for superscript numbers
+  /// - ```typc (..i) => super(numbering("a", ..i))``` for superscript letters
+  /// - ```typc marginalia.note-numbering.with(repeat: false, markers: ())``` for small blue numbers
+  /// -> none | function | string
+  numbering: note-numbering,
+  /// Disallow note markers hanging into the whitespace.
   /// -> boolean
-  numbered: true,
+  flush-numbering: false,
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
   /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
@@ -521,7 +528,7 @@
   align-baseline: true,
   /// Notes with ```typc keep-order: true``` are not re-ordered relative to one another.
   ///
-  /// // If ```typc auto```, defaults to false unless ```typc numbered: false``` is set.
+  /// // If ```typc auto```, defaults to false unless ```typc numbering``` is ```typc none``.
   /// // -> boolean | auto
   /// -> boolean
   keep-order: false,
@@ -547,9 +554,9 @@
   body,
 ) = {
   // let keep-order = if keep-order == auto { not numbered } else { keep-orders }
-  let shift = if shift == auto { if numbered { true } else { "avoid" } } else { shift }
+  let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
 
-  if numbered { notecounter.step() }
+  if numbering != none { notecounter.step() }
 
   context {
     let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
@@ -568,10 +575,10 @@
       _note_left
     }
 
-    let body = if numbered {
-      if _config.get().flush-numbers {
+    let body = if numbering != none {
+      if flush-numbering {
         box({
-          notecounter.display(_config.get().numbering)
+          notecounter.display(numbering)
           h(2pt)
         })
         h(0pt, weak: true)
@@ -586,7 +593,7 @@
             {
               h(1fr)
               sym.zws
-              notecounter.display(_config.get().numbering)
+              notecounter.display(numbering)
               h(1fr)
             },
           ),
@@ -617,9 +624,9 @@
 
     h(0pt, weak: true)
     box({
-      if numbered {
+      if numbering != none {
         h(1.5pt, weak: true)
-        notecounter.display(_config.get().numbering)
+        notecounter.display(numbering)
       }
       note-fn(dy: dy, keep-order: keep-order, shift: shift, body)
     })
@@ -628,19 +635,24 @@
 
 /// Creates a figure in the margin.
 ///
-/// Parameters `numbered`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
+/// Parameters `numbering`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
+/// 
+/// N.B. this does not take a `flush-numbering` parameter (like @note.flush-numbering), because it is not easily
+/// possible for this package to insert the marker _into_ the caption without adding a newline.
 ///
 /// #compat((
 ///   "0.1.5": (
-///     [`reverse` has been replaced with @wideblock.side.
+///     [`reverse` has been replaced with @notefigure.side.
 ///      #ergo[use \````typc side: "inner"```\` instead of \````typc reverse: true```\`]],
+///     [`numbered` has been replaced with @notefigure.numbering.
+///      #ergo[use \````typc numbering: marginalia.note-numbering```\` instead of \````typc numbered: true```\`]],
 ///   ),
 /// ))
 /// -> content
 #let notefigure(
-  // Same as @note.numbered
-  /// -> boolean
-  numbered: false,
+  /// Same as @note.numbering, but with different default value.
+  /// -> none | function | string
+  numbering: none,
   /// Same as @note.side:
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
@@ -686,9 +698,9 @@
     set figure.caption(position: bottom)
     show figure.caption: it => {
       set align(left)
-      if numbered {
+      if numbering != none {
         // // caption `it` seems to be block-level...
-        // context if _config.get().flush-numbers {
+        // context if flush-numbering {
         //   notecounter.display(_config.get().numbering)
         //   h(1.5pt)
         // } else {
@@ -699,7 +711,7 @@
               context {
                 h(1fr)
                 sym.zws
-                notecounter.display(_config.get().numbering)
+                notecounter.display(numbering)
                 h(1fr)
               },
             ),
@@ -731,17 +743,17 @@
         + measure(text(..text-style, v(gap))).height
         + measure(text(..text-style, sym.zws)).height
     )
-    if numbered {
+    if numbering != none {
       h(1.5pt, weak: true)
       notecounter.step()
-      context { notecounter.display(_config.get().numbering) }
+      context { notecounter.display(numbering) }
     } else {
       h(0pt, weak: true)
     }
     let dy = 0% + 0pt + dy
-    let shift = if shift == auto { if numbered { true } else { "avoid" } } else { shift }
+    let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
     note(
-      numbered: false,
+      numbering: none,
       side: side,
       dy: dy.length + dy.ratio * height,
       align-baseline: false,

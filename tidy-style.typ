@@ -21,7 +21,7 @@
     }
   }
   note(
-    numbered: false,
+    numbering: none,
     dy: -12pt,
     {
       if module-doc.functions.len() > 0 {
