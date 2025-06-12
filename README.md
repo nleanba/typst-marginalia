@@ -32,6 +32,8 @@ Where you can then customize `config` to your preferences. Shown here (as
 comments) are the default values taken if the corresponding keys are unset.
 [Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
 
+(Note that the above configuration step is not neccessary if you are happy with the defaults provided.)
+
 ## Margin-Notes
 
 Provided via the `#note[...]` command.
@@ -76,8 +78,8 @@ For small figures, the package also provides a `notefigure` command which places
 [![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/heads/main/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
 [Full Manual →](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
 
-<!-- [![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/tags/v0.2.0/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/v0.2.0/Marginalia.pdf)
-[Full Manual →](https://github.com/nleanba/typst-marginalia/blob/v0.2.0/Marginalia.pdf) -->
+<!-- [![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/tags/v0.1.5/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/v0.1.5/Marginalia.pdf)
+[Full Manual →](https://github.com/nleanba/typst-marginalia/blob/v0.1.5/Marginalia.pdf) -->
 
 ## Feedback
 Have you encountered a bug? [Please report it as an issue in my github repository.](https://github.com/nleanba/typst-marginalia/issues)
