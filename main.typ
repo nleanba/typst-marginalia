@@ -233,17 +233,20 @@ To change the markers, you can override the #link(label("marginalia-note.numberi
 
 If a different style is deisred for the marker in the text and in the margins, you can use the #link(label("marginalia-note.anchor-numbering"), [```typc note.anchor-numbering```]) parameter to control the in-text marker:
 #note(
-  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
+  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em - 2pt)],
   anchor-numbering: (.., i) => super[#i],
-)[lol]
+)[The ```typc -2pt``` in the ```typ #h()``` is there because ```typ #note()``` inserts a ```typc 2pt``` space.]
 #codeblock[```typ
 #note(
-  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
+  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em - 2pt)],
   anchor-numbering: (.., i) => super[#i],
-)[lol]
+)[...]
 ```]
 Note that doing this implies #link(label("marginalia-note.flush-numbering"), [```typc flush-numbering```])```typc : true```.
-This is based on the assumption that if you have set tow different numbering functions, you want to handle the placement yourself. Non-flush numbers, which are `place`d, complicate this.
+This is based on the assumption that if you have set two different numbering functions, you want to handle the placement yourself.
+Non-flush numbers, which are `place`d, complicate this.
+
+This can also be used to create notes that have an anchor,
 #note(
   numbering: none,
   anchor-numbering: (..) => {
@@ -251,10 +254,11 @@ This is based on the assumption that if you have set tow different numbering fun
     if calc.even(here().page()) [←] else [→]
   },
 )[
-  This can also be used to create notes that have an anchor, but no numbering in the note itself.
+  Like this one.
 ]
+but no numbering in the note itself.
 #note(
-  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
+  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em - 2pt)],
   anchor-numbering: (.., i) => super[#i],
 )[(the #link(label("marginalia-notecounter"), [```typc notecounter```]) is unaffected by the previous note, as it has #link(label("marginalia-note.numbering"), [```typc numbering```])```typc : none```)]
 
