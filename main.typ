@@ -218,16 +218,46 @@ It will attempt to move one note below a wide-block if there is not enough space
 ]
 
 == Markers
-The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set ```typc flush-numbering: true``` on the note.
+The margin notes are decorated with little symbols, which by default hang into the gap. If this is not desired, set #link(label("marginalia-note.flush-numbering"), [```typc flush-numbering```])```typc : true``` on the note.
 #note(flush-numbering: true)[
   This note has flush numbering.
 ]
 (This is sadly not possible to do for `notefigure`s.)
 
-Setting the argument ```typc numbering: none```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
+Setting the argument #link(label("marginalia-note.numbering"), [```typc numbering```])```typc : none```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
 we obtain notes without icon/number:#note(numbering: none)[Like this.]
 
-To change the markers, you can override ```typc config.numbering```-function which is used to generate the markers.
+To change the markers, you can override the #link(label("marginalia-note.numbering"), [```typc numbering```]) function which is used to generate the markers.
+
+=== Advanced Markers
+
+If a different style is deisred for the marker in the text and in the margins, you can use the #link(label("marginalia-note.anchor-numbering"), [```typc note.anchor-numbering```]) parameter to control the in-text marker:
+#note(
+  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
+  anchor-numbering: (.., i) => super[#i],
+)[lol]
+#codeblock[```typ
+#note(
+  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
+  anchor-numbering: (.., i) => super[#i],
+)[lol]
+```]
+Note that doing this implies #link(label("marginalia-note.flush-numbering"), [```typc flush-numbering```])```typc : true```.
+This is based on the assumption that if you have set tow different numbering functions, you want to handle the placement yourself. Non-flush numbers, which are `place`d, complicate this.
+#note(
+  numbering: none,
+  anchor-numbering: (..) => {
+    set text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%))
+    if calc.even(here().page()) [←] else [→]
+  },
+)[
+  This can also be used to create notes that have an anchor, but no numbering in the note itself.
+]
+#note(
+  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
+  anchor-numbering: (.., i) => super[#i],
+)[(the #link(label("marginalia-notecounter"), [```typc notecounter```]) is unaffected by the previous note, as it has #link(label("marginalia-note.numbering"), [```typc numbering```])```typc : none```)]
+
 
 == Styling
 Both #link(label("marginalia-note()"))[```typc note()```] and #link(label("marginalia-notefigure()"))[```typc notefigure()```]

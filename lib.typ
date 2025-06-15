@@ -508,9 +508,14 @@
   /// - ```typc marginalia.note-numbering.with(repeat: false, markers: ())``` for small blue numbers
   /// -> none | function | string
   numbering: note-numbering,
+  /// Used to generate the marker for the anchor (i.e. the one in the surrounding text)
+  /// - If ```typc auto```, will use the given @note.numbering.
+  /// -> none | auto | function | string
+  anchor-numbering: auto,
   /// Disallow note markers hanging into the whitespace.
-  /// -> boolean
-  flush-numbering: false,
+  /// - If ```typc auto```, acts like ```typc false``` if @note.anchor-numbering is ```typc auto```.
+  /// -> auto | boolean
+  flush-numbering: auto,
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
   /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
@@ -555,6 +560,8 @@
   let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
 
   if numbering != none { notecounter.step() }
+  let flush-numbering = if flush-numbering == auto { anchor-numbering != auto } else { flush-numbering }
+  let anchor-numbering = if anchor-numbering == auto { numbering } else { anchor-numbering }
 
   context {
     let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
@@ -583,15 +590,18 @@
         body
       } else {
         body
+        let number = notecounter.display(numbering)
+        let width = measure(number).width
+        if width < 8pt { width = 8pt }
         place(
           top + left,
-          dx: -8pt,
+          dx: -width,
           box(
-            width: 8pt,
+            width: width,
             {
               h(1fr)
               sym.zws
-              notecounter.display(numbering)
+              number
               h(1fr)
             },
           ),
@@ -622,9 +632,9 @@
 
     h(0pt, weak: true)
     box({
-      if numbering != none {
+      if anchor-numbering != none {
         h(1.5pt, weak: true)
-        notecounter.display(numbering)
+        notecounter.display(anchor-numbering)
       }
       note-fn(dy: dy, keep-order: keep-order, shift: shift, body)
     })
