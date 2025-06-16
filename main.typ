@@ -222,7 +222,6 @@ The margin notes are decorated with little symbols, which by default hang into t
 #note(flush-numbering: true)[
   This note has flush numbering.
 ]
-(This is sadly not possible to do for `notefigure`s.)
 
 Setting the argument #link(label("marginalia-note.numbering"), [```typc numbering```])```typc : none```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
 we obtain notes without icon/number:#note(numbering: none)[Like this.]
@@ -446,6 +445,14 @@ as demonstrated in @styled-fig.
   text-style: (size: 5pt, font: ("Iosevka Extended")),
   par-style: (spacing: 20pt, leading: 0pt),
   label: <styled-fig>,
+)
+Furthermore, the `numbering`, `anchor-numbering`, and `flush-numbering` parameters work as expected.
+#marginalia.notefigure(
+  rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.plasma)),
+  caption: [Figure with custom numbering],
+  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
+  anchor-numbering: (.., i) => super[#i],
+  // flush-numbering: false,
 )
 
 == Large Figures

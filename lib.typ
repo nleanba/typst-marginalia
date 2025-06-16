@@ -539,6 +539,7 @@
   /// - ```typc true```: The note may shift to avoid other notes, wide-blocks and the top/bottom margins.
   /// - ```typc false```: The note is placed exactly where it appears, and other notes may shift to avoid it.
   /// - ```typc "avoid"```: The note is only shifted if shifting other notes is not sufficent to avoid a collision.
+  ///   E.g. if it would collide with a wideblock or a note with ```typc shift: false```.
   /// - ```typc "ignore"```: Like ```typc false```, but other notes do not try to avoid it.
   /// - ```typc auto```: ```typc true``` if numbered, ```typc "avoid"``` otherwise.
   /// -> boolean | auto | "avoid" | "ignore"
@@ -591,7 +592,11 @@
       } else {
         body
         let number = notecounter.display(numbering)
-        let width = measure(number).width
+        let width = measure({
+          set text(..text-style)
+          set par(..par-style)
+          number
+        }).width
         if width < 8pt { width = 8pt }
         place(
           top + left,
@@ -643,10 +648,7 @@
 
 /// Creates a figure in the margin.
 ///
-/// Parameters `numbering`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
-/// 
-/// N.B. this does not take a `flush-numbering` parameter (like @note.flush-numbering), because it is not easily
-/// possible for this package to insert the marker _into_ the caption without adding a newline.
+/// Parameters `numbering`, `anchor-numbering`, `flush-numbering`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
 ///
 /// #compat((
 ///   "0.1.5": (
@@ -661,6 +663,14 @@
   /// Same as @note.numbering, but with different default value.
   /// -> none | function | string
   numbering: none,
+  /// Used to generate the marker for the anchor (i.e. the one in the surrounding text)
+  /// - If ```typc auto```, will use the given @notefigure.numbering.
+  /// -> none | auto | function | string
+  anchor-numbering: auto,
+  /// Disallow note markers hanging into the whitespace.
+  /// - If ```typc auto```, acts like ```typc false``` if @note.anchor-numbering is ```typc auto```.
+  /// -> auto | boolean
+  flush-numbering: auto,
   /// Same as @note.side:
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
@@ -687,6 +697,19 @@
   /// If this is a function, it will be called with "left" or "right" as its argument, and the result is passed to the `block`.
   /// -> dictionary | function
   block-style: (width: 100%),
+  /// A function with two arguments, the number and the caption.
+  /// Will be called as the caption show rule.
+  ///
+  /// If @notefigure.numbering is ```typc none```, `number` will be ```typc none```.
+  /// -> function
+  show-caption: (number, caption) => {
+    number
+    caption.supplement
+    [ ]
+    caption.counter.display(caption.numbering)
+    caption.separator
+    caption.body
+  },
   /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.
   /// -> length
   gap: 0.55em,
@@ -701,32 +724,56 @@
   /// (E.g. `caption`)
   /// -> arguments
   ..figureargs,
-) = (
+) = {
+  let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
+
+  if numbering != none { notecounter.step() }
+  let flush-numbering = if flush-numbering == auto { anchor-numbering != auto } else { flush-numbering }
+  let anchor-numbering = if anchor-numbering == auto { numbering } else { anchor-numbering }
+
   context {
+    let number-width = if numbering != none and not flush-numbering {
+      let number = notecounter.display(numbering)
+      let width = measure({
+        set text(..text-style)
+        set par(..par-style)
+        number
+      }).width
+      if width < 8pt { 8pt } else { width }
+    } else { 0pt }
+
     set figure.caption(position: bottom)
     show figure.caption: it => {
       set align(left)
       if numbering != none {
-        // // caption `it` seems to be block-level...
-        // context if flush-numbering {
-        //   notecounter.display(_config.get().numbering)
-        //   h(1.5pt)
-        // } else {
-          place(
-            dx: -8pt,
-            box(
-              width: 8pt,
-              context {
-                h(1fr)
-                sym.zws
-                notecounter.display(numbering)
-                h(1fr)
-              },
+        context if flush-numbering {
+          show-caption({
+            notecounter.display(numbering)
+            h(2pt)
+          }, it)
+        } else {
+          let number = notecounter.display(numbering)
+          show-caption(
+            place(
+              // top + left,
+              left,
+              dx: -number-width,
+              box(
+                width: number-width,
+                {
+                  h(1fr)
+                  sym.zws
+                  number
+                  h(1fr)
+                },
+              ),
             ),
+            it
           )
-        // }
+        }
+      } else {
+        context show-caption(none, it)
       }
-      it
     }
 
     let side = if side == "outer" or side == auto {
@@ -751,15 +798,13 @@
         + measure(text(..text-style, v(gap))).height
         + measure(text(..text-style, sym.zws)).height
     )
-    if numbering != none {
+    if anchor-numbering != none {
       h(1.5pt, weak: true)
-      notecounter.step()
-      context { notecounter.display(numbering) }
+      context { notecounter.display(anchor-numbering) }
     } else {
       h(0pt, weak: true)
     }
     let dy = 0% + 0pt + dy
-    let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
     note(
       numbering: none,
       side: side,
@@ -779,7 +824,7 @@
       ) #label
     ]
   }
-)
+}
 
 /// Creates a block that extends into the outside/right margin.
 ///
