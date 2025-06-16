@@ -206,6 +206,46 @@
   }
 }
 
+/// Adds lines to the page background showing the various vertical and horizontal boundaries used by marginalia.
+///
+/// To be used in a show-rule:
+/// ```typ
+/// #show: marginalia.show-frame
+/// ```
+/// -> content
+#let show-frame(
+  /// Stroke for the lines.
+  ///
+  /// ```typ
+  /// #show: marginalia.show-frame.with(stroke: 2pt + red)
+  /// ```
+  /// -> color
+  stroke: 0.5pt + luma(90%),
+  /// -> content
+  body
+) = {
+  set page(background: context {
+    let leftm = get-left()
+    let rightm = get-right()
+    place(top, dy: _config.get().top,
+          line(length: 100%, stroke: stroke))
+    place(top, dy: _config.get().top - page.header-ascent,
+          line(length: 100%, stroke: stroke))
+    place(bottom, dy: -_config.get().bottom,
+          line(length: 100%, stroke: stroke))
+    place(dx: leftm.far,
+          rect(width: leftm.width, height: 100%, stroke: (x: stroke)))
+    place(dx: leftm.far + leftm.width + leftm.sep,
+          rect(width: 10pt, height: 100%, stroke: (left: stroke)))
+    place(right, dx: -rightm.far,
+          rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
+    place(right, dx: -rightm.far - rightm.width - rightm.sep,
+          rect(width: 10pt, height: 100%, stroke: (right: stroke)))
+  })
+
+  body
+}
+
 
 /// #internal[Mostly internal.]
 /// Calculates positions for notes.
@@ -704,10 +744,7 @@
   /// -> function
   show-caption: (number, caption) => {
     number
-    caption.supplement
-    [ ]
-    caption.counter.display(caption.numbering)
-    caption.separator
+    caption.supplement; [ ]; caption.counter.display(caption.numbering); caption.separator
     caption.body
   },
   /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.

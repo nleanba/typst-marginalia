@@ -57,61 +57,14 @@
       )
     }
   },
-  background: context {
-    let leftm = marginalia.get-left()
-    let rightm = marginalia.get-right()
-    place(
-      top,
-      dy: marginalia._config.get().top,
-      line(length: 100%, stroke: 0.5pt + luma(90%)),
-    )
-    place(
-      top,
-      dy: marginalia._config.get().top - page.header-ascent,
-      line(length: 100%, stroke: 0.5pt + luma(90%)),
-    )
-    place(
-      bottom,
-      dy: -marginalia._config.get().bottom,
-      line(length: 100%, stroke: 0.5pt + luma(90%)),
-    )
-    place(
-      dx: leftm.far,
-      rect(
-        width: leftm.width,
-        height: 100%,
-        stroke: (x: 0.5pt + luma(90%)),
-        inset: 0pt,
-        {
-          // place(
-          //   top,
-          //   dy: marginalia._config.get().top,
-          //   line(length: 100%, stroke: luma(90%)),
-          // )
-        },
-      ),
-    )
-    place(
-      dx: leftm.far + leftm.width + leftm.sep,
-      rect(width: 10pt, height: 100%, stroke: (left: 0.5pt + luma(90%))),
-    )
-    place(
-      right,
-      dx: -rightm.far,
-      rect(width: rightm.width, height: 100%, stroke: (x: 0.5pt + luma(90%))),
-    )
-    place(
-      right,
-      dx: -rightm.far - rightm.width - rightm.sep,
-      rect(width: 10pt, height: 100%, stroke: (right: 0.5pt + luma(90%))),
-    )
-  },
 )
 //     everything
 //   } else {
 //     everything
 //   }
 // }
+
+#show: marginalia.show-frame
 
 #show heading.where(level: 1): set block(above: 42pt, below: 14pt)
 #show heading.where(level: 2): set block(above: 28pt, below: 12pt)
@@ -608,11 +561,16 @@ To align the top of the note instead, set #link(label("marginalia-note.align-bas
 #place(top, note(numbering: none, shift: false, align-baseline: false)[Top (no shift, no baseline align)])
 #place(bottom, note(numbering: none, shift: false, align-baseline: false)[Bottom (no shift, no baseline al.)])
 
-== Headers and Background
+== Background Lines
+They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using
+#codeblock[```typ
+  #show: marginalia.show-frame
+  ```]
+
+== Headers
 This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the respective config option.
 In your documents, consider removing this check and simplifying the ```typc if``` a bit.
 #note[Also, please don't ```typc .update()``` the `marginalia._config` directly, this can easily break the notes.]
-
 
 Here's how the headers in this document were made:
 #codeblock[
@@ -650,35 +608,7 @@ Here's how the headers in this document were made:
   ```
 ]
 
-And here's the code for the lines in the background:
-#note[
-  Not that you should copy them, they're mostly here to showcase the columns and help me verify that everything gets placed in the right spot.
-]
-#codeblock[
-  // #set text(size: 0.84em)
-  ```typst
-  #set page(background: context {
-    let leftm = marginalia.get-left()
-    let rightm = marginalia.get-right()
-    place(top, dy: marginalia._config.get().top,
-          line(length: 100%, stroke: luma(90%)))
-    place(top, dy: marginalia._config.get().top - page.header-ascent,
-          line(length: 100%, stroke: luma(90%)))
-    place(bottom, dy: -marginalia._config.get().bottom,
-          line(length: 100%, stroke: luma(90%)))
-    place(dx: leftm.far,
-          rect(width: leftm.width, height: 100%, stroke: (x: luma(90%))))
-    place(dx: leftm.far + leftm.width + leftm.sep,
-          rect(width: 10pt, height: 100%, stroke: (left: luma(90%))))
-    place(right, dx: -rightm.far,
-          rect(width: rightm.width, height: 100%, stroke: (x: luma(90%))))
-    place(right, dx: -rightm.far - rightm.width - rightm.sep,
-          rect(width: 10pt, height: 100%, stroke: (right: luma(90%))))
-  })
-  ```
-]
-
-#pagebreak(weak: true)
+// #pagebreak(weak: true)
 = Troubleshooting / Known Bugs
 
 - If the document needs multiple passes to figure out page-breaks,
