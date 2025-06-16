@@ -546,7 +546,7 @@
   shift: auto,
   /// Will be used to ```typc set``` the text style.
   /// -> dictionary
-  text-style: (size: 0.85em, style: "normal", weight: "regular"),
+  text-style: (size: 9.35pt, style: "normal", weight: "regular"),
   /// Will be used to ```typc set``` the par style.
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
@@ -563,6 +563,9 @@
   if numbering != none { notecounter.step() }
   let flush-numbering = if flush-numbering == auto { anchor-numbering != auto } else { flush-numbering }
   let anchor-numbering = if anchor-numbering == auto { numbering } else { anchor-numbering }
+
+  let text-style = (size: 9.35pt, style: "normal", weight: "regular", ..text-style)
+  let par-style = (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
 
   context {
     let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
@@ -638,7 +641,6 @@
     h(0pt, weak: true)
     box({
       if anchor-numbering != none {
-        h(1.5pt, weak: true)
         notecounter.display(anchor-numbering)
       }
       note-fn(dy: dy, keep-order: keep-order, shift: shift, body)
@@ -690,7 +692,7 @@
   shift: auto,
   // Will be used to ```typc set``` the text style.
   /// -> dictionary
-  text-style: (size: 0.85em, style: "normal", weight: "regular"),
+  text-style: (size: 9.35pt, style: "normal", weight: "regular"),
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// Will be passed to the `block` containing the note body (this contains the entire figure).
@@ -730,6 +732,9 @@
   if numbering != none { notecounter.step() }
   let flush-numbering = if flush-numbering == auto { anchor-numbering != auto } else { flush-numbering }
   let anchor-numbering = if anchor-numbering == auto { numbering } else { anchor-numbering }
+
+  let text-style = (size: 9.35pt, style: "normal", weight: "regular", ..text-style)
+  let par-style = (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
 
   context {
     let number-width = if numbering != none and not flush-numbering {
@@ -798,11 +803,9 @@
         + measure(text(..text-style, v(gap))).height
         + measure(text(..text-style, sym.zws)).height
     )
+    h(0pt, weak: true)
     if anchor-numbering != none {
-      h(1.5pt, weak: true)
       context { notecounter.display(anchor-numbering) }
-    } else {
-      h(0pt, weak: true)
     }
     let dy = 0% + 0pt + dy
     note(

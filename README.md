@@ -5,7 +5,7 @@
 Put something akin to the following at the start of your `.typ` file:
 
 ```typ
-#import "@preview/marginalia:0.2.0" as marginalia: note, wideblock
+#import "@preview/marginalia:0.2.0" as marginalia: note, notefigure, wideblock
 
 #show: marginalia.setup.with(
   // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -59,7 +59,7 @@ To get captions on the side, use
 
 For small figures, the package also provides a `notefigure` command which places the figure in the margin.
 ```typ
-#marginalia.notefigure(
+#notefigure(
   rect(width: 100%),
   label: <aaa>,
   caption: [A notefigure.],

@@ -1,4 +1,4 @@
-#import "lib.typ" as marginalia: note, wideblock
+#import "lib.typ" as marginalia: note, notefigure, wideblock
 
 #let config = (
   inner: (far: 16mm, width: 20mm, sep: 8mm),
@@ -120,6 +120,9 @@
 #show raw: set text(font: ("IBM Plex Mono", "DejaVu Sans Mono"))
 #show link: underline
 
+#let note = note.with(text-style: (size: 8.5pt))
+#let notefigure = notefigure.with(text-style: (size: 8.5pt))
+
 #let codeblock(code) = {
   wideblock(
     side: "inner",
@@ -148,7 +151,7 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
-  #import "@preview/marginalia:0.2.0" as marginalia: note, wideblock
+  #import "@preview/marginalia:0.2.0" as marginalia: note, notefigure, wideblock
 
   #show: marginalia.setup.with(
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -171,10 +174,11 @@ pages. Notes are placed in the outside margin by default.
 
 See the appendix for a more detailed explanation of the #link(label("marginalia-setup()"), [```typc setup()```]) function and its options.
 
-Additionally, I recommend using typst’s partial function application feature to customize other aspects of the notes:
+Additionally, I recommend using typst’s partial function application feature to customize other aspects of the notes consistently:
 #codeblock[
   ```typ
   #let note = note.with(/* options here */)
+  #let notefigure = notefigure.with(/* same options here */)
   ```
 ]
 
@@ -272,9 +276,8 @@ accept `text-style`, `par-style`, and `block-style` parameters:
     #lorem(4)
   ]
 
-The default options here are meant to be as close as possible to the stock footnote style.
-
-I strongly recommend setting a fixed text-size for your notes (```typc size: __pt``` instead of ```typc size: __em```) to ensure consistent sizing of the notes independent on the font size of the surrounding text.
+The default options here are meant to be as close as possible to the stock footnote style given 11pt text.
+For other text sizes, set the `text-style` size to 0.85 times your body text size if you want to match the stock footnotes.
 
 === `block-style`
 #let note-with-separator = marginalia.note.with(
@@ -410,13 +413,13 @@ Additionally, inside the function context is avaliable if neccessary.
 = Figures
 
 == Notefigures
-For small figures, you can place them in the margin with ```typc marginalia.notefigure```.
-#marginalia.notefigure(
+For small figures, you can place them in the margin with ```typ #notefigure()```.
+#notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.mako)),
   caption: [A notefigure.],
 )
 It accepts all arguments `figure` takes (except `placement` and `scope`), plus all arguments `note` takes (except `align-baseline`). However, by default it has no marker, and to get a marker like other notes, you must pass ```typc numbering: marginalia.note-numbering```, it will get a marker like other notes:
-#marginalia.notefigure(
+#notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.turbo)),
   numbering: marginalia.note-numbering,
   label: <markedfigure>,
@@ -426,7 +429,7 @@ It accepts all arguments `figure` takes (except `placement` and `scope`), plus a
 Additionally, the `dy` argument now takes a relative length, where ```typc 100%``` is the distance between the top of the figure content and the first baseline of the caption.
 //height of the figure content + gap, but without the caption.
 By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the caption being aligned horizontally to the text.
-#marginalia.notefigure(
+#notefigure(
   dy: 0pt,
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.crest)),
   numbering: marginalia.note-numbering,
@@ -437,7 +440,7 @@ A label can be attached to the figure using the `label` argument, as was done he
 
 Notefigures can also be given `side`, `text-style`, `par-style` and `block-style` parameters,
 as demonstrated in @styled-fig.
-#marginalia.notefigure(
+#notefigure(
   side: "inner",
   rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
   caption: [Styled figure.],
@@ -447,7 +450,7 @@ as demonstrated in @styled-fig.
   label: <styled-fig>,
 )
 Furthermore, the `numbering`, `anchor-numbering`, and `flush-numbering` parameters work as expected.
-#marginalia.notefigure(
+#notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.plasma)),
   caption: [Figure with custom numbering],
   numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
