@@ -687,9 +687,10 @@
   keep-order: false,
   /// -> boolean | auto | "avoid" | "ignore"
   shift: auto,
-  // Will be used to ```typc set``` the text style.
+  /// Will be used to ```typc set``` the text style.
   /// -> dictionary
   text-style: (size: 9.35pt, style: "normal", weight: "regular"),
+  /// Will be used to ```typc set``` the par style.
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// Will be passed to the `block` containing the note body (this contains the entire figure).

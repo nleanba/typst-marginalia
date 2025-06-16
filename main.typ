@@ -20,6 +20,7 @@
   header-ascent: 16mm,
   header: context {
     // marginalia.notecounter.update(0)
+    set text(size: 8.5pt, number-type: "old-style")
     let book = marginalia._config.get().book
     let leftm = marginalia.get-left()
     let rightm = marginalia.get-right()
@@ -39,7 +40,7 @@
             },
           )
           h(leftm.sep)
-          box(width: 1fr, smallcaps[Marginalia])
+          box(width: 1fr, smallcaps[Marginalia 0.2.0])
           h(rightm.sep)
           box(
             width: rightm.width,
@@ -117,7 +118,7 @@
 
 #set par(justify: true, linebreaks: "optimized")
 #set text(fill: luma(30), size: 10pt)
-#show raw: set text(font: ("Iosevka Term", "IBM Plex Mono", "DejaVu Sans Mono"))
+#show raw: set text(font: ("Iosevka Term", "IBM Plex Mono", "DejaVu Sans Mono"), size: 1.25 * 0.8em)
 #show link: underline
 
 #let note = note.with(text-style: (size: 8.5pt))
@@ -168,7 +169,7 @@ Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.
 #note[You can also skip the configuration step if you’re happy with these defaults, but 15mm is not a lot to write in.]
 
-If `book` is ```typc false```, `inner` and `outer` correspond to the left and right
+If #link(label("marginalia-setup.book"))[```typc book```] is ```typc false```, `inner` and `outer` correspond to the left and right
 margins respectively. If book is true, the margins swap sides on even and odd
 pages. Notes are placed in the outside margin by default.
 
@@ -189,18 +190,18 @@ Additionally, I recommend using typst’s partial function application feature t
 // (or all pages ```typst #if book = false```)
 
 = Margin-Notes
-By default, the #link(label("marginalia-note()"))[```typst #note[...]```] command places a note to the right/outer margin, like so:#note[
+By default, the #link(label("marginalia-note()"))[```typst #note[]```] command places a note to the right/outer margin, like so:#note[
   This is a note.
 
   They can contain any content, and will wrap within the note column.
   // #note(dy: -1em)[Sometimes, they can even contain other notes! (But not always, and I don't know what gives.)]
 ].
-By giving the argument ```typc side: "inner"```, we obtain a note on the inner (left) margin.#note(side: "inner")[Reversed.]
-If ```typc config.book = true```, the side will of course be adjusted automatically.
-It is also possible to pass ```typc side: "left"``` or ```typc side: "right"``` if you want a fixed side even in books.
+By giving the argument #link(label("marginalia-note.side"))[```typc side```]```typc : "inner"```, we obtain a note on the inner (left) margin.#note(side: "inner")[Reversed.]
+If #link(label("marginalia-setup.book"))[```typc setup.book```] is ```typc true```, the side will of course be adjusted automatically.
+It is also possible to pass #link(label("marginalia-note.side"))[```typc side```]```typc : "left"``` or #link(label("marginalia-note.side"))[```typc side```]```typc : "right"``` if you want a fixed side even in books.
 
 If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(side: "inner", dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy and was shifted less than that to stay on the page.] they automatically adjust their positions.
-Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around, unless configured otherwise via the #link(label("marginalia-note.shift"))[```typc shift```] parameter of ```typ #note()```.
+Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around, unless configured otherwise via the #link(label("marginalia-note.shift"))[```typc shift```] parameter of #link(label("marginalia-note()"))[```typst #note[]```].
 
 Notes will shift vertically to avoid other notes, wideblocks, and the top page margin.
 It will attempt to move one note below a wide-block if there is not enough space above, but if there are multiple notes that would need to be rearranged you must assist by manually setting `dy` such that their initial position is below the wideblock.
@@ -211,14 +212,17 @@ It will attempt to move one note below a wide-block if there is not enough space
 // so two ```typ #note```s are placed in the same order vertically as they appear in the markup, even if the first is shifted with a `dy` such that the other would fit above it.
 
 // #pagebreak(weak: true)
-#columns(3)[
-  Margin notes also work from within most containers such as blocks or ```typ #column()```s.#note(keep-order: true)[#lorem(4)]
-  #colbreak()
-  Blah blah.#note[Note from second column.]
-  To force the notes to appear in the margin in the same order as they appear in the text, use
-  #colbreak()
-  ```typ #note(keep-order: true)[]```#note(keep-order: true)[Like so. The lorem-ipsum note was also placed with `keep-order`.]
-  for _all_ notes whose relative order is important.
+#block(height: 59pt)[
+  #columns(3)[
+    Margin notes also work from within most containers such as ```typ #block[]```s or ```typ #column[]```s.
+    #note(keep-order: true)[#lorem(4)]
+    By default, they are placed aligned with their anchor.
+    #note[Note from second column.]
+    To force the notes to appear in the margin in the same order as they appear in the text, set
+    #link(label("marginalia-note.keep-order"))[```typc keep-order```]```typ : true```
+    #note(keep-order: true)[Like so. The lorem-ipsum note was also placed with `keep-order`.]
+    on _all_ notes whose relative order is important.
+  ]
 ]
 
 == Markers
@@ -234,14 +238,14 @@ To change the markers, you can override the #link(label("marginalia-note.numberi
 
 === Advanced Markers
 
-If a different style is deisred for the marker in the text and in the margins, you can use the #link(label("marginalia-note.anchor-numbering"), [```typc note.anchor-numbering```]) parameter to control the in-text marker:
+If a different style is deisred for the marker in the text and in the margins, you can use the #link(label("marginalia-note.anchor-numbering"), [```typc anchor-numbering```]) parameter to control the in-text marker:
 #note(
-  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em - 2pt)],
+  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
   anchor-numbering: (.., i) => super[#i],
 )[The ```typc -2pt``` in the ```typ #h()``` is there because ```typ #note()``` inserts a ```typc 2pt``` space.]
 #codeblock[```typ
 #note(
-  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em - 2pt)],
+  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
   anchor-numbering: (.., i) => super[#i],
 )[...]
 ```]
@@ -261,14 +265,16 @@ This can also be used to create notes that have an anchor,
 ]
 but no numbering in the note itself.
 #note(
-  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em - 2pt)],
+  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
   anchor-numbering: (.., i) => super[#i],
 )[(the #link(label("marginalia-notecounter"), [```typc notecounter```]) is unaffected by the previous note, as it has #link(label("marginalia-note.numbering"), [```typc numbering```])```typc : none```)]
 
 
 == Styling
 Both #link(label("marginalia-note()"))[```typc note()```] and #link(label("marginalia-notefigure()"))[```typc notefigure()```]
-accept `text-style`, `par-style`, and `block-style` parameters:
+accept #link(label("marginalia-note.text-style"), [```typc text-style```]),
+#link(label("marginalia-note.par-style"), [```typc par-style```]),
+and #link(label("marginalia-note.block-style"), [```typc block-style```]) parameters:
 - ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(10)]
 - ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(par-style: (spacing: 20pt, leading: -2pt))[
     #lorem(10)
@@ -277,7 +283,7 @@ accept `text-style`, `par-style`, and `block-style` parameters:
   ]
 
 The default options here are meant to be as close as possible to the stock footnote style given 11pt text.
-For other text sizes, set the `text-style` size to 0.85 times your body text size if you want to match the stock footnotes.
+For other text sizes, set the #link(label("marginalia-note.text-style"), [```typc text-style```]) `size` to 0.85 times your body text size if you want to match the stock footnotes.
 
 === `block-style`
 #let note-with-separator = marginalia.note.with(
@@ -293,7 +299,7 @@ For other text sizes, set the `text-style` size to 0.85 times your body text siz
 #let note-with-background = marginalia.note.with(
   block-style: (fill: oklch(90%, 0.06, 140deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt),
 )
-To style the block containing the note body, use the `block-style` argument.
+To style the block containing the note body, use the #link(label("marginalia-note.block-style"), [```typc block-style```]) parameter.
 
 - ```typc block-style: (stroke: (top: (thickness: 0.5pt, dash: "dotted")), outset: (top: 6pt /* clearance is 12pt */), width: 100%)``` gives:
   #note-with-separator(keep-order: true)[This is a note with a dotted stroke above.]
@@ -306,8 +312,9 @@ To style the block containing the note body, use the `block-style` argument.
   #note-with-wide-background(keep-order: true)[This is a note with an outset green background.]
   #note-with-wide-background(numbering: none, keep-order: true, shift: true)[So is this.]
 
-For more advanced use-cases, you can also pass a function as the `block-style`. It will be called with one argument, either ```typc "left"``` of ```typc "right"```, depending on the side the note will be placed on.
-Additionally, inside the function context is avaliable if neccessary.
+For more advanced use-cases, you can also pass a function as the #link(label("marginalia-note.block-style"), [```typc block-style```]).
+It will be called with one argument, either ```typc "left"``` of ```typc "right"```, depending on the side the note will be placed on.
+Inside the function, context is avaliable.
 #let block-style = (side) => {
   if side == "left" {
     (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
@@ -386,39 +393,54 @@ Additionally, inside the function context is avaliable if neccessary.
 = Wide Blocks
 #wideblock[
   The command
-  ```typst #wideblock[...]```
+  #link(label("marginalia-wideblock()"), [```typ #wideblock[]```])
   can be used to wrap content in a wide block which spans into the margin-note-column.
 
-  Note: when using an asyymetric page layout with `book: true`, wideblocks which span across pagebreaks are messy, because there is no way for the wideblock to detect the pagebreak and adjust ist position after it.
+  Note: when using an asyymetric page layout with #link(label("marginalia-setup.book"), [```typc setup.book```])```typc : true```, wideblocks which span across pagebreaks are messy, because there is no way for the wideblock to detect the pagebreak and adjust ist position after it.
 
   It is possible to use notes in a wide block:#note[Voila.]#note(side: "inner")[Wow!].
   They will automatically shift downwards to avoid colliding with the wideblock.
-  #note(dy: -8em)[Unless they are given a `dy` argument moving them above the block.]
+  #note(dy: -10em)[Unless they are given a #link(label("marginalia-note.dy"))[```typ dy```] argument moving them above the block.]
 ]
 
 #wideblock(side: "inner")[
-  ```typst #wideblock(side: "inner")[...]```: The `side` option allows extending the block into the inside margin instead.
-  This is analogous to the `side` option on notes and allows placing notes in their usual column.
+  ```typst #wideblock(side: "inner")[...]```: The #link(label("marginalia-wideblock.side"), [```typc side```]) option allows extending the block into the inside margin instead.
+  This is analogous to the #link(label("marginalia-note.side"), [```typc side```]) option on notes and notefigures and allows placing notes in their usual column.
 
   In this manual, an inner wideblock is used to set the appendix to make it take up fewer pages.
-  This is also why the appendix is no longer using `book: true`.
-  #note[Notes above a `wideblock` will shift upwards if necessary.]
+  This is also why the appendix is no longer using #link(label("marginalia-setup.book"), [```typc setup.book```])```typc : true```.
+  #note[Notes above a #link(label("marginalia-wideblock()"), [```typ #wideblock[]```]) will shift upwards if necessary.]
 ]
 
 #wideblock(side: "both")[
-  ```typst #wideblock(side: "both")[...]```: Additionally, wideblocks can extend on both sides, for extra wide content...
+  ```typst #wideblock(side: "both")[...]```: Additionally, wideblocks can extend on both sides, for extra wide content.
+  This is especially useful for figures, more on that below.
 ]
 
 // #pagebreak(weak: true)
 = Figures
 
+// #show figure.caption: block.with(fill: green, width: 100% + 3em)
+
+#set figure(gap: 0pt)
+// If you want captions aligned with the bottom of your figures:
+#show figure.caption.where(position: bottom): note.with(numbering: none)
+// If you want captions aligned with the top of your figures:
+// #set figure.caption(position: top)
+#show figure.caption.where(position: top): note.with(numbering: none, align-baseline: false)
+
 == Notefigures
-For small figures, you can place them in the margin with ```typ #notefigure()```.
+For small figures, you can place them in the margin with #link(label("marginalia-notefigure()"), [```typ #notefigure()```]).
 #notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.mako)),
   caption: [A notefigure.],
 )
-It accepts all arguments `figure` takes (except `placement` and `scope`), plus all arguments `note` takes (except `align-baseline`). However, by default it has no marker, and to get a marker like other notes, you must pass ```typc numbering: marginalia.note-numbering```, it will get a marker like other notes:
+It accepts all arguments ```typ #figure()``` takes (except `placement` and `scope`),
+plus all arguments #link(label("marginalia-note()"), [```typ #note[]```]) takes
+(except #link(label("marginalia-note.align-baseline"))[```typ align-baseline```]).
+However, by default it has no marker, and to get a marker like other notes, you must pass
+#link(label("marginalia-notefigure.numbering"))[```typ numbering```]```typc : marginalia.note-numbering```,
+and it will get a marker like other notes:
 #notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.turbo)),
   numbering: marginalia.note-numbering,
@@ -426,9 +448,10 @@ It accepts all arguments `figure` takes (except `placement` and `scope`), plus a
   caption: [A marked notefigure.],
 )
 
-Additionally, the `dy` argument now takes a relative length, where ```typc 100%``` is the distance between the top of the figure content and the first baseline of the caption.
+Additionally, the #link(label("marginalia-notefigure.dy"))[```typ dy```] argument now takes a relative length,
+where ```typc 100%``` is the distance between the top of the figure content and the first baseline of the caption.
 //height of the figure content + gap, but without the caption.
-By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the caption being aligned horizontally to the text.
+By default, figures have a #link(label("marginalia-notefigure.dy"))[```typ dy```] of ```typc 0pt - 100%```, which results in the caption being aligned horizontally to the text.
 #notefigure(
   dy: 0pt,
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.crest)),
@@ -436,10 +459,16 @@ By default, figures have a `dy` of ```typc 0pt - 100%```, which results in the c
   caption: [Aligned to top of figure with `dy: 0pt`.],
 )
 
-A label can be attached to the figure using the `label` argument, as was done here for @markedfigure.
+A label can be attached to the figure using the #link(label("marginalia-notefigure.label"))[```typ label```] argument, as was done here for @markedfigure.
+(Sadly, it is not possible to attach labels normally.)
 
-Notefigures can also be given `side`, `text-style`, `par-style` and `block-style` parameters,
-as demonstrated in @styled-fig.
+Notefigures can also be given
+#link(label("marginalia-notefigure.side"), [```typc side```]),
+#link(label("marginalia-notefigure.text-style"), [```typc text-style```]),
+#link(label("marginalia-notefigure.par-style"), [```typc par-style```]),
+and #link(label("marginalia-notefigure.block-style"), [```typc block-style```]) parameters,
+-- like #link(label("marginalia-note()"), [```typ #note[]```]) --
+as is demonstrated in @styled-fig.
 #notefigure(
   side: "inner",
   rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
@@ -453,24 +482,30 @@ Furthermore, the `numbering`, `anchor-numbering`, and `flush-numbering` paramete
 #notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.plasma)),
   caption: [Figure with custom numbering],
-  numbering: (.., i) => text(font: "Inter", weight: 500)[#i#h(0.5em)],
+  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
   anchor-numbering: (.., i) => super[#i],
-  // flush-numbering: false,
 )
+
+Note that ```typ #show figure.caption: /**/``` rules are ignored for #link(label("marginalia-notefigure()"))[```typ #notefigure[]```]s,
+use the #link(label("marginalia-notefigure.show-caption"))[```typc show-caption```] parameter instead.
+#note[
+  NB: #link(label("marginalia-notefigure.show-caption"))[```typc show-caption```] expects a function with two arguments, check the #link(label("marginalia-notefigure.show-caption"))[docs].
+]
 
 == Large Figures
 For larger figures, use the following set and show rules:
 #codeblock[
   ```typ
-  #set figure(gap: 0pt)
+  #set figure(gap: 0pt) // neccessary in both cases
+
+  // If you want captions aligned with the bottom of your figures:
+  #show figure.caption.where(position: bottom): note.with(numbering: none)
+
+  // If you want captions aligned with the top of your figures:
   #set figure.caption(position: top)
-  #show figure.caption.where(position: top): note.with(numbering:none, dy:1em)
+  #show figure.caption.where(position: top): note.with(numbering: none, align-baseline: false)
   ```
 ]
-
-#set figure(gap: 0pt)
-#set figure.caption(position: top)
-#show figure.caption.where(position: top): note.with(numbering: none, dy: 1em)
 
 #figure(
   rect(width: 100%, fill: gradient.linear(..color.map.inferno)),
@@ -620,9 +655,6 @@ And here's the code for the lines in the background:
   In nearly all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
   - Just use multiple paragraphs in one note, or place multiple notes in the main text instead.
   - If really neccessary, use `shift: "ignore"` on the nested notes and manually set `dy`.
-
-- `notefigure`s does not take a `flush-numbering` parameter,
-  because it is not easily possible for this package to insert the marker _into_ the caption#note[Which is a block-level element] without adding a newline.
 
 - If `book` is `true`, wideblocks that break across pages are broken. Sadly there doesn't seem to be a way to detect and react to page-breaks from within a `block`, so I don't know how to fix this.
 
