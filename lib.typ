@@ -246,7 +246,6 @@
   body
 }
 
-
 /// #internal[Mostly internal.]
 /// Calculates positions for notes.
 ///
@@ -953,3 +952,101 @@
     pad(left: -left, right: -right, body)
   }
 )
+
+
+// #let header(
+//   /// Will be used to ```typc set``` the text style.
+//   /// -> dictionary
+//   text-style: (:),
+//   /// -> optional | (content, content, content)
+//   even: (none, none, none),
+//   /// -> optional | (content, content, content)
+//   odd: (none, none, none),
+//   /// -> optional | content
+//   inner,
+//   /// -> optional | content
+//   center,
+//   /// -> optional | content
+//   outer,
+// ) = {}
+
+/// This generates a @wideblock and divides its arguments into three boxes sized to match the margin setup.
+/// -> content
+#let header(
+  /// Will be used to ```typc set``` the text style.
+  /// -> dictionary
+  text-style: (:),
+  /// Up to three positional arguments.
+  /// They are interpreted as `⟨outer⟩`, `⟨center⟩⟨outer⟩`, or `⟨inner⟩⟨center⟩⟨outer⟩`,
+  /// depending on how many there are.
+  ..args,
+  /// This is ignored if there are positional parameters or if @setup.book is ```typc false```.
+  ///
+  /// Otherwise, it is interpreted as `(⟨outer⟩, ⟨center⟩, ⟨inner⟩)` on even pages.
+  /// -> array
+  even: (),
+  /// This is ignored if there are positional parameters.
+  ///
+  /// Otherwise, it is interpreted as `(⟨inner⟩, ⟨center⟩, ⟨outer⟩)` on odd pages or, if @setup.book is ```typc false```, on all pages.
+  /// -> array
+  odd: (),
+) = context {
+  let leftm = get-left()
+  let rightm = get-right()
+  let is-odd = not _config.get().book or calc.odd(here().page())
+
+  set text(..text-style)
+
+  let pos = args.pos()
+  if pos.len() > 0 {
+    // if args.named().len() > 0 { panic("cannot have named and positional arguments") }
+    if pos.len() == 1 {
+      pos = (none, none, ..pos)
+    } else if pos.len() == 2 {
+      pos = (none, ..pos)
+    }
+    let (inner, center, outer) = pos
+    wideblock(
+      side: "both",
+      {
+        box(width: leftm.width, if is-odd { inner } else { outer })
+        h(leftm.sep)
+        box(width: 1fr, center)
+        h(rightm.sep)
+        box(width: rightm.width, if is-odd { outer } else { inner })
+      }
+    )
+  } else {
+    wideblock(
+      side: "both",
+      {
+        box(
+          width: leftm.width,
+          if is-odd {
+            odd.at(0, default: none)
+          } else {
+            even.at(0, default: none)
+          }
+        )
+        h(leftm.sep)
+        box(
+          width: 1fr,
+          if is-odd {
+            odd.at(1, default: none)
+          } else {
+            even.at(1, default: none)
+          }
+        )
+        h(rightm.sep)
+        box(
+          width: rightm.width,
+          if is-odd {
+            odd.at(2, default: none)
+          } else {
+            even.at(2, default: none)
+          }
+        )
+      }
+    )
+  }
+}

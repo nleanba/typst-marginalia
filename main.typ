@@ -7,7 +7,6 @@
   bottom: 16mm,
   book: true,
   // clearance: 30pt,
-  // flush-numbers: false,
 )
 
 #show: marginalia.setup.with(..config)
@@ -16,53 +15,20 @@
 // #show: everything => context {
 //   if target() == "paged" {
 #set page(
-  // ..marginalia.page-setup(..config),
   header-ascent: 16mm,
-  header: context {
-    // marginalia.notecounter.update(0)
-    set text(size: 8.5pt, number-type: "old-style")
-    let book = marginalia._config.get().book
-    let leftm = marginalia.get-left()
-    let rightm = marginalia.get-right()
-    if here().page() > 1 {
-      wideblock(
-        side: "both",
-        {
-          box(
-            width: leftm.width,
-            {
-              if not (book) or calc.odd(here().page()) [
-                Page
-                #counter(page).display("1 of 1", both: true)
-              ] else [
-                #datetime.today().display("[day]. [month repr:long] [year]")
-              ]
-            },
-          )
-          h(leftm.sep)
-          box(width: 1fr, smallcaps[Marginalia 0.2.1])
-          h(rightm.sep)
-          box(
-            width: rightm.width,
-            {
-              if not (book) or calc.odd(here().page()) [
-                #datetime.today().display("[day]. [month repr:long] [year]")
-              ] else [
-                Page
-                #counter(page).display("1 of 1", both: true)
-              ]
-            },
-          )
-        },
-      )
-    }
-  },
+  header: context marginalia.header(
+    text-style: (size: 8.5pt, number-type: "old-style"),
+    [Page #counter(page).display("1 of 1", both: true)],
+    smallcaps[Marginalia 0.2.1],
+    datetime.today().display("[day]. [month repr:long] [year]")
+  )
 )
 //     everything
 //   } else {
 //     everything
 //   }
 // }
+
 
 #show: marginalia.show-frame
 
@@ -71,7 +37,7 @@
 
 #set par(justify: true, linebreaks: "optimized")
 #set text(fill: luma(30), size: 10pt)
-#show raw: set text(font: ("Iosevka Term", "IBM Plex Mono", "DejaVu Sans Mono"), size: 1.25 * 0.8em)
+#show raw: set text(font: ("Iosevka Term", "IBM Plex Mono", "DejaVu Sans Mono"), size: 1.25 * 0.85em)
 #show link: underline
 
 #let note = note.with(text-style: (size: 8.5pt))
@@ -97,7 +63,7 @@
   wideblock(
     side: "inner",
     {
-      // #set text(size: 0.84em)
+      set text(size: 0.95em)
       block(stroke: 0.5pt + luma(90%), fill: white, width: 100%, inset: (y: 5pt), code)
     },
   )
@@ -533,6 +499,7 @@ The caption gets placed beneath the figure automatically, courtesy of regular wi
   )
 ]
 
+#pagebreak(weak: true)
 = Other Tidbits
 == Absolute Placement
 You can place notes in absolute positions relative to the page using `place`:
@@ -568,47 +535,52 @@ They're mostly here to showcase the columns and help me verify that everything g
   ```]
 
 == Headers
-This is not (yet) a polished feature and requires to access ```typc marginalia._config.get().book``` to read the respective config option.
-In your documents, consider removing this check and simplifying the ```typc if``` a bit.
-#note[Also, please don't ```typc .update()``` the `marginalia._config` directly, this can easily break the notes.]
-
 Here's how the headers in this document were made:
 #codeblock[
   // #set text(size: 0.84em)
   ```typst
-  #set page(header: context {
-    marginalia.notecounter.update(0)
-    let book = marginalia._config.get().book
-    let leftm = marginalia.get-left()
-    let rightm = marginalia.get-right()
-    if here().page() > 1 {
-      wideblock(side: "both", {
-        box(width: leftm.width, {
-          if not (book) or calc.odd(here().page()) [
-            Page
-            #counter(page).display("1 of 1", both: true)
-          ] else [
-            #datetime.today().display(/**/)
-          ]
-        })
-        h(leftm.sep)
-        box(width: 1fr, smallcaps[Marginalia])
-        h(rightm.sep)
-        box(width: rightm.width, {
-          if not (book) or calc.odd(here().page()) [
-            #datetime.today().display(/**/)
-          ] else [
-            Page
-            #counter(page).display("1 of 1", both: true)
-          ]
-        })
-      })
-    }
-  })
+  #set page(
+    header-ascent: 16mm,
+    header: context marginalia.header(
+      text-style: (size: 8.5pt, number-type: "old-style"),
+      [Page #counter(page).display("1 of 1", both: true)],
+      smallcaps[Marginalia 0.2.1],
+      datetime.today().display("[day]. [month repr:long] [year]")
+    )
+  )
   ```
 ]
 
-// #pagebreak(weak: true)
+The  #link(label("marginalia-header()"))[```typ #marginalia.header()```]
+#note(numbering: none)[
+  Despite the name, this function can be used anywhere, and not solely for headers.
+  It simply creates a wideblock and fills it with properly sized ```typc box```es.
+]
+function is pretty flexible in the arguments it expects.
+Any of the following will work:
+#codeblock[
+  ```typ
+  #marginalia.header(                   [outer]) == #marginalia.header[outer]
+  #marginalia.header(         [center], [outer]) == #marginalia.header[center][outer]
+  #marginalia.header([inner], [center], [outer]) == #marginalia.header[inner][center][outer]
+
+  #marginalia.header(
+    even: ([left outer], [center], [right inner]),
+    odd: ([left inner], [center], [right outer]),
+  )
+  ```
+]
+
+For convenience, you may pass a #link(label("marginalia-header.text-style"))[`text-style`] parameter also.
+
+#v(1em)
+#marginalia.header(
+  text-style: (style: "italic"),
+  even: ([left outer], block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is an even page], [right inner]),
+  odd: ([left inner], block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is on odd page or book is false], [right outer]),
+)
+
+#pagebreak(weak: true)
 = Troubleshooting / Known Bugs
 
 - If the document needs multiple passes to figure out page-breaks,
