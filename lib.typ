@@ -135,7 +135,7 @@
 ///     [`flush-numbers` has been replaced by @note.flush-numbering.
 ///      #ergo[set \````typc flush-numbering: true```\` directly on your notes instead of via @setup.\ Use ```typ #let note = note.with(flush-numbering: /**/)``` for consistency.]],
 ///   ),
-///   "0.2.0": (
+///   "0.2.1": (
 ///     [This function does no longer apply the configuration partially, but will reset all unspecified options to the default.
 ///      Additionally, it replaces the `page-setup()` function that was needed previously and is no longer called `configure()`],
 ///   ),

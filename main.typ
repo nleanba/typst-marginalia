@@ -40,7 +40,7 @@
             },
           )
           h(leftm.sep)
-          box(width: 1fr, smallcaps[Marginalia 0.2.0])
+          box(width: 1fr, smallcaps[Marginalia 0.2.1])
           h(rightm.sep)
           box(
             width: rightm.width,
@@ -152,7 +152,7 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
-  #import "@preview/marginalia:0.2.0" as marginalia: note, notefigure, wideblock
+  #import "@preview/marginalia:0.2.1" as marginalia: note, notefigure, wideblock
 
   #show: marginalia.setup.with(
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -714,7 +714,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
   = Detailed Documentation of all Exported Symbols <appendix>
 
   #compat((
-    "0.2.0": (
+    "0.2.1": (
       [The functions `configure()` and `page-setup()` have been combined into one #link(label("marginalia-setup()"), [```typc setup()```]) function.],
     )
   ))
