@@ -117,7 +117,7 @@
 
 #set par(justify: true, linebreaks: "optimized")
 #set text(fill: luma(30), size: 10pt)
-#show raw: set text(font: ("IBM Plex Mono", "DejaVu Sans Mono"))
+#show raw: set text(font: ("Iosevka Term", "IBM Plex Mono", "DejaVu Sans Mono"))
 #show link: underline
 
 #let note = note.with(text-style: (size: 8.5pt))
@@ -168,7 +168,7 @@ Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.
 #note[You can also skip the configuration step if you’re happy with these defaults, but 15mm is not a lot to write in.]
 
-If `book` is `false`, `inner` and `outer` correspond to the left and right
+If `book` is ```typc false```, `inner` and `outer` correspond to the left and right
 margins respectively. If book is true, the margins swap sides on even and odd
 pages. Notes are placed in the outside margin by default.
 

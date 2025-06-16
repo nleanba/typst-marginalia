@@ -53,7 +53,7 @@
   pad(
     left: 10pt,
     {
-      set text(font: ("IBM Plex Mono", "DejaVu Sans Mono"), size: 0.85em)
+      set text(font: ("Iosevka Term", "IBM Plex Mono", "DejaVu Sans Mono"), size: 0.85em)
       let items = ()
       let args = fn.args
       for (name, info) in fn.args {

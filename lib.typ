@@ -551,7 +551,7 @@
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// Will be passed to the `block` containing the note body.
-  /// If this is a function, it will be called with "left" or "right" as its argument, and the result is passed to the `block`.
+  /// If this is a function, it will be called with ```typc "left"``` or ```typc "right"``` as its argument, and the result is passed to the `block`.
   /// -> dictionary | function
   block-style: (width: 100%),
   /// -> content
@@ -673,7 +673,6 @@
   /// - If ```typc auto```, acts like ```typc false``` if @note.anchor-numbering is ```typc auto```.
   /// -> auto | boolean
   flush-numbering: auto,
-  /// Same as @note.side:
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
   /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
@@ -684,10 +683,8 @@
   /// Thus ```typc dy: 0pt - 100%``` aligns the text and caption baselines.
   /// -> relative length
   dy: 0pt - 100%,
-  //  Same as @note.keep-order
   /// -> boolean
   keep-order: false,
-  // Same as @note.shift.
   /// -> boolean | auto | "avoid" | "ignore"
   shift: auto,
   // Will be used to ```typc set``` the text style.
@@ -696,7 +693,7 @@
   /// -> dictionary
   par-style: (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt),
   /// Will be passed to the `block` containing the note body (this contains the entire figure).
-  /// If this is a function, it will be called with "left" or "right" as its argument, and the result is passed to the `block`.
+  /// If this is a function, it will be called with ```typc "left"``` or ```typc "right"``` as its argument, and the result is passed to the `block`.
   /// -> dictionary | function
   block-style: (width: 100%),
   /// A function with two arguments, the number and the caption.
