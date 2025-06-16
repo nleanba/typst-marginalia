@@ -124,6 +124,22 @@
 #let note = note.with(text-style: (size: 8.5pt))
 #let notefigure = notefigure.with(text-style: (size: 8.5pt))
 
+#set figure(gap: 0pt) // neccessary in both cases
+#set figure.caption(position: bottom) // (this is the default)
+#show figure.caption.where(position: bottom): it => context {
+  let text-style= (size: 8.5pt)
+  let par-style= (/* your par-style here */:)
+  let height = measure(
+    width: marginalia._config.get().outer.width,
+    { // we need to set the style here to simulate measuring the note
+      set text(size: 9.35pt, style: "normal", weight: "regular", ..text-style)
+      set par(spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
+      it
+    },
+  ).height
+  note(numbering: none, anchor-numbering: none, dy: -height, align-baseline: false, shift: "avoid", keep-order: true, text-style: text-style, par-style: par-style, it)
+}
+
 #let codeblock(code) = {
   wideblock(
     side: "inner",
@@ -420,15 +436,6 @@ Inside the function, context is avaliable.
 // #pagebreak(weak: true)
 = Figures
 
-// #show figure.caption: block.with(fill: green, width: 100% + 3em)
-
-#set figure(gap: 0pt)
-// If you want captions aligned with the bottom of your figures:
-#show figure.caption.where(position: bottom): note.with(numbering: none)
-// If you want captions aligned with the top of your figures:
-// #set figure.caption(position: top)
-#show figure.caption.where(position: top): note.with(numbering: none, align-baseline: false)
-
 == Notefigures
 For small figures, you can place them in the margin with #link(label("marginalia-notefigure()"), [```typ #notefigure()```]).
 #notefigure(
@@ -493,17 +500,48 @@ use the #link(label("marginalia-notefigure.show-caption"))[```typc show-caption`
 ]
 
 == Large Figures
-For larger figures, use the following set and show rules:
+
+// #show figure.caption: block.with(fill: green, width: 100% + 3em)
+
+For larger figures, use the following set and show rules if you want top-aligned captions:
 #codeblock[
   ```typ
   #set figure(gap: 0pt) // neccessary in both cases
-
-  // If you want captions aligned with the bottom of your figures:
-  #show figure.caption.where(position: bottom): note.with(numbering: none)
-
-  // If you want captions aligned with the top of your figures:
   #set figure.caption(position: top)
   #show figure.caption.where(position: top): note.with(numbering: none, align-baseline: false)
+  ```
+]
+
+#[
+  #set figure(gap: 0pt)
+  #set figure.caption(position: top)
+  #show figure.caption.where(position: top): note.with(numbering: none, align-baseline: false)
+
+  #figure(
+    rect(width: 100%, fill: gradient.linear(..color.map.inferno)),
+    caption: [A figure.],
+  )
+]
+
+If you want bottom-aligned captions, it gets a bit more complicated, as there isn’t a way (yet) to align a
+#link(label("marginalia-note()"))[```typ #note[]```] with it’s bottom edge, so we need to measure the caption:
+#codeblock[
+  ```typ
+  #set figure(gap: 0pt) // neccessary in both cases
+  #set figure.caption(position: bottom) // (this is the default)
+  #show figure.caption.where(position: bottom): it => context {
+    let text-style= (/* your text-style here */:)
+    let par-style= (/* your par-style here */:)
+    let height = measure(
+      width: marginalia._config.get().outer.width,
+      { // we need to set the style here to simulate measuring the note
+        set text(size: 9.35pt, style: "normal", weight: "regular", ..text-style)
+        set par(spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
+        it
+      },
+    ).height
+    note(numbering: none, anchor-numbering: none, dy: -height, align-baseline: false, shift: "avoid", keep-order: true, text-style: text-style, par-style: par-style, it)
+  }
   ```
 ]
 
@@ -512,8 +550,11 @@ For larger figures, use the following set and show rules:
   caption: [A figure.],
 )
 
+=== Wide Figures
+
 For wide figures, simply place a figure in a wideblock.
 The caption gets placed beneath the figure automatically, courtesy of regular wide-block-avoidance.
+#note(numbering: none)[(this is assuming you have one of the above ```typc show``` rules)]
 #codeblock[
   ```typ
   #wideblock(figure(image(..), caption: [A figure in a wide block.]))
@@ -637,13 +678,16 @@ And here's the code for the lines in the background:
   ```
 ]
 
-// #pagebreak(weak: true)
+#pagebreak(weak: true)
 = Troubleshooting / Known Bugs
 
 - If the document needs multiple passes to figure out page-breaks,
   #note[This can happen for example with outlines which barely fit/don't fit onto the page.]
   it can break the note positioning.
   - This can usually be resolved by placing a ```typ #pagebreak()``` or ```typ #pagebreak(weak: true)``` in an appropriate location.
+
+- Relatedly, everything breaks if you try to use pages with width or height set to ```typc auto```,
+  as this package needs to know the actual measurements of the page to figure out where to place stuff.
 
 - Nested notes may or may not work.
   #note[
