@@ -16,12 +16,14 @@
 //   if target() == "paged" {
 #set page(
   header-ascent: 16mm,
-  header: context marginalia.header(
-    text-style: (size: 8.5pt, number-type: "old-style"),
-    [Page #counter(page).display("1 of 1", both: true)],
-    smallcaps[Marginalia 0.2.1],
-    datetime.today().display("[day]. [month repr:long] [year]")
-  )
+  header: context if here().page() > 1 {
+    marginalia.header(
+      text-style: (size: 8.5pt, number-type: "old-style"),
+      [Page #counter(page).display("1 of 1", both: true)],
+      smallcaps[Marginalia 0.2.1],
+      datetime.today().display("[day]. [month repr:long] [year]")
+    )
+  },
 )
 //     everything
 //   } else {
@@ -541,12 +543,14 @@ Here's how the headers in this document were made:
   ```typst
   #set page(
     header-ascent: 16mm,
-    header: context marginalia.header(
-      text-style: (size: 8.5pt, number-type: "old-style"),
-      [Page #counter(page).display("1 of 1", both: true)],
-      smallcaps[Marginalia 0.2.1],
-      datetime.today().display("[day]. [month repr:long] [year]")
-    )
+    header: context if here().page() > 1 {
+      marginalia.header(
+        text-style: (size: 8.5pt, number-type: "old-style"),
+        [Page #counter(page).display("1 of 1", both: true)],
+        smallcaps[Marginalia 0.2.1],
+        datetime.today().display("[day]. [month repr:long] [year]")
+      )
+    },
   )
   ```
 ]
