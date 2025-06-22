@@ -221,26 +221,40 @@
   /// ```
   /// -> color
   stroke: 0.5pt + luma(90%),
+  /// Set to false to hide the header line
+  /// -> boolean
+  header: true,
+  /// Set to false to hide the footer line
+  /// -> boolean
+  footer: true,
   /// -> content
   body
 ) = {
   set page(background: context {
     let leftm = get-left()
     let rightm = get-right()
-    place(top, dy: _config.get().top,
-          line(length: 100%, stroke: stroke))
-    place(top, dy: _config.get().top - page.header-ascent,
-          line(length: 100%, stroke: stroke))
-    place(bottom, dy: -_config.get().bottom,
-          line(length: 100%, stroke: stroke))
+
+    let topm = _config.get().top
+    let ascent = page.header-ascent.ratio * topm + page.header-ascent.length
+    place(top, dy: topm, line(length: 100%, stroke: stroke))
+    if header {
+      place(top, dy: topm - ascent, line(length: 100%, stroke: stroke))
+    }
+
+    let bottomm = _config.get().bottom
+    let descent = page.footer-descent.ratio * bottomm + page.footer-descent.length
+    place(bottom, dy: -bottomm, line(length: 100%, stroke: stroke))
+    if footer {
+      place(bottom, dy: -bottomm + descent, line(length: 100%, stroke: stroke))
+    }
+
     place(dx: leftm.far,
           rect(width: leftm.width, height: 100%, stroke: (x: stroke)))
-    place(dx: leftm.far + leftm.width + leftm.sep,
-          rect(width: 10pt, height: 100%, stroke: (left: stroke)))
+    place(dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
+
     place(right, dx: -rightm.far,
           rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
-    place(right, dx: -rightm.far - rightm.width - rightm.sep,
-          rect(width: 10pt, height: 100%, stroke: (right: stroke)))
+    place(right, dx: -rightm.far - rightm.width - rightm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
   })
 
   body

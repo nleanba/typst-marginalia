@@ -20,7 +20,7 @@
     marginalia.header(
       text-style: (size: 8.5pt, number-type: "old-style"),
       [Page #counter(page).display("1 of 1", both: true)],
-      smallcaps[Marginalia 0.2.1],
+      smallcaps[Marginalia],
       datetime.today().display("[day]. [month repr:long] [year]")
     )
   },
@@ -32,7 +32,8 @@
 // }
 
 
-#show: marginalia.show-frame
+#show: marginalia.show-frame.with(footer: false)
+
 
 #show heading.where(level: 1): set block(above: 42pt, below: 14pt)
 #show heading.where(level: 2): set block(above: 28pt, below: 12pt)
@@ -501,7 +502,7 @@ The caption gets placed beneath the figure automatically, courtesy of regular wi
   )
 ]
 
-#pagebreak(weak: true)
+// #pagebreak(weak: true)
 = Other Tidbits
 == Absolute Placement
 You can place notes in absolute positions relative to the page using `place`:
@@ -535,6 +536,13 @@ They're mostly here to showcase the columns and help me verify that everything g
 #codeblock[```typ
   #show: marginalia.show-frame
   ```]
+
+You can also hide the lines for the header and footer with
+#codeblock[```typ
+  #show: marginalia.show-frame.with(header: false, footer: false)
+  ```]
+
+#pagebreak(weak: true)
 
 == Headers
 Here's how the headers in this document were made:
@@ -668,6 +676,8 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
       [The functions `configure()` and `page-setup()` have been combined into one #link(label("marginalia-setup()"), [```typc setup()```]) function.],
     )
   ))
+
+  #block(height: 3em)
 
   #import "@preview/tidy:0.4.2"
   #import "tidy-style.typ" as style
