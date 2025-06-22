@@ -577,21 +577,25 @@
   /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
   /// -> auto | "outer" | "inner" | "left" | "right"
   side: auto,
-  /// Inital vertical offset of the note.
-  /// Note may get shifted still to avoid other notes.
+  /// Vertical alignment of the note.
+  /// #let note = note.with(block-style: (outset: (left: 5cm), fill: oklch(70%, 0.1, 120deg, 20%)), shift: "ignore")
+  /// - ```typc "bottom"``` aligns the bottom edge of the note with the main text baseline.#note(alignment: "bottom")[Bottom\ ...]
+  /// - ```typc "baseline"``` aligns the first baseline of the note with the main text baseline.#note(alignment: "baseline")[Baseline\ ...]
+  /// - ```typc "top"``` aligns the top edge of the note with the main text baseline.#note(alignment: "top")[Top\ ...]
+  ///
+  /// -> "baseline" | "top" | "bottom"
+  alignment: "baseline",
+  /// Inital vertical offset of the note, relative to the alignment point.
+  /// The Note may get shifted still to avoid other notes depending on @note.shift.
   /// -> length
   dy: 0pt,
-  /// Whether to align the baselines or not.
-  /// - If ```typc false```, the top of the note is aligned with the main-text baseline.
-  /// -> boolean
-  align-baseline: true,
   /// Notes with ```typc keep-order: true``` are not re-ordered relative to one another.
   ///
   /// // If ```typc auto```, defaults to false unless ```typc numbering``` is ```typc none``.
   /// // -> boolean | auto
   /// -> boolean
   keep-order: false,
-  /// Whether the note may get shifted around to avoid other notes.
+  /// Whether the note may get shifted vertically to avoid other notes.
   /// - ```typc true```: The note may shift to avoid other notes, wide-blocks and the top/bottom margins.
   /// - ```typc false```: The note is placed exactly where it appears, and other notes may shift to avoid it.
   /// - ```typc "avoid"```: The note is only shifted if shifting other notes is not sufficent to avoid a collision.
@@ -624,9 +628,6 @@
   let par-style = (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
 
   context {
-    let lineheight = if align-baseline { measure(text(..text-style, sym.zws)).height } else { 0pt }
-    let dy = dy - lineheight
-
     let side = if side == "outer" or side == auto {
       if _config.get().book and calc.even(here().page()) { "left" } else { "right" }
     } else if side == "inner" {
@@ -693,6 +694,22 @@
         },
       ),
     )
+
+    let dy-adjust = if alignment == "baseline" {
+      measure(text(..text-style, sym.zws)).height
+    } else if alignment == "top" {
+      0pt
+    } else if alignment == "bottom" {
+      let width = if side == "left" {
+        get-left().width
+      } else {
+        get-right().width
+      }
+      measure(width: width, body).height
+    } else {
+      panic("Unknown value for alignment")
+    }
+    let dy = dy - dy-adjust
 
     h(0pt, weak: true)
     box({
@@ -869,7 +886,7 @@
       numbering: none,
       side: side,
       dy: dy.length + dy.ratio * height,
-      align-baseline: false,
+      alignment: "top",
       keep-order: keep-order,
       shift: shift,
       text-style: text-style,

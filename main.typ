@@ -48,32 +48,8 @@
 
 #set figure(gap: 0pt) // neccessary in both cases
 #set figure.caption(position: bottom) // (this is the default)
-#show figure.caption.where(position: bottom): it => context {
-  let text-style = (size: 8.5pt)
-  let par-style = (:
-    /* your par-style here */
-  )
-  let height = measure(
-    width: marginalia._config.get().outer.width,
-    {
-      // we need to set the style here to simulate measuring the note
-      set text(size: 9.35pt, style: "normal", weight: "regular", ..text-style)
-      set par(spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
-      it
-    },
-  ).height
-  note(
-    numbering: none,
-    anchor-numbering: none,
-    dy: -height,
-    align-baseline: false,
-    shift: "avoid",
-    keep-order: true,
-    text-style: text-style,
-    par-style: par-style,
-    it,
-  )
-}
+#show figure.caption.where(position: bottom): note.with(alignment: "bottom", anchor-numbering: none, numbering: none, shift: "avoid", keep-order: true)
+
 
 #let codeblock(code) = {
   wideblock(
@@ -383,8 +359,7 @@ For small figures, you can place them in the margin with #link(label("marginalia
   caption: [A notefigure.],
 )
 It accepts all arguments ```typ #figure()``` takes (except `placement` and `scope`),
-plus all arguments #link(label("marginalia-note()"), [```typ #note[]```]) takes
-(except #link(label("marginalia-note.align-baseline"))[```typ align-baseline```]).
+plus all arguments #link(label("marginalia-note()"), [```typ #note[]```]) takes.
 However, by default it has no marker, and to get a marker like other notes, you must pass
 #link(label("marginalia-notefigure.numbering"))[```typ numbering```]```typc : marginalia.note-numbering```,
 and it will get a marker like other notes:
@@ -395,6 +370,7 @@ and it will get a marker like other notes:
   caption: [A marked notefigure.],
 )
 
+TODO
 Additionally, the #link(label("marginalia-notefigure.dy"))[```typ dy```] argument now takes a relative length,
 where ```typc 100%``` is the distance between the top of the figure content and the first baseline of the caption.
 //height of the figure content + gap, but without the caption.
@@ -448,14 +424,14 @@ For larger figures, use the following set and show rules if you want top-aligned
   ```typ
   #set figure(gap: 0pt) // neccessary in both cases
   #set figure.caption(position: top)
-  #show figure.caption.where(position: top): note.with(numbering: none, align-baseline: false)
+  #show figure.caption.where(position: top): note.with(alignment: "top", anchor-numbering: none, numbering: none, shift: "avoid", keep-order: true)
   ```
 ]
 
 #[
   #set figure(gap: 0pt)
   #set figure.caption(position: top)
-  #show figure.caption.where(position: top): note.with(numbering: none, align-baseline: false)
+  #show figure.caption.where(position: top): note.with(alignment: "top", anchor-numbering: none, numbering: none, shift: "avoid", keep-order: true)
 
   #figure(
     rect(width: 100%, fill: gradient.linear(..color.map.inferno)),
@@ -463,25 +439,12 @@ For larger figures, use the following set and show rules if you want top-aligned
   )
 ]
 
-If you want bottom-aligned captions, it gets a bit more complicated, as there isn’t a way (yet) to align a
-#link(label("marginalia-note()"))[```typ #note[]```] with it’s bottom edge, so we need to measure the caption:
+And if you want bottom-aligned captions, use the following:
 #codeblock[
   ```typ
   #set figure(gap: 0pt) // neccessary in both cases
   #set figure.caption(position: bottom) // (this is the default)
-  #show figure.caption.where(position: bottom): it => context {
-    let text-style= (/* your text-style here */:)
-    let par-style= (/* your par-style here */:)
-    let height = measure(
-      width: marginalia._config.get().outer.width,
-      { // we need to set the style here to simulate measuring the note
-        set text(size: 9.35pt, style: "normal", weight: "regular", ..text-style)
-        set par(spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
-        it
-      },
-    ).height
-    note(numbering: none, anchor-numbering: none, dy: -height, align-baseline: false, shift: "avoid", keep-order: true, text-style: text-style, par-style: par-style, it)
-  }
+  #show figure.caption.where(position: bottom): note.with(alignment: "bottom", anchor-numbering: none, numbering: none, shift: "avoid", keep-order: true)
   ```
 ]
 
@@ -545,9 +508,10 @@ To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if y
 #place(bottom, note(numbering: none, shift: false)[Bottom (no shift)])
 
 By default, notes are aligned to their first baseline.
-To align the top of the note instead, set #link(label("marginalia-note.align-baseline"))[```typc align-baseline```] to ```typc false```.
-#place(top, note(numbering: none, shift: false, align-baseline: false)[Top (no shift, no baseline align)])
-#place(bottom, note(numbering: none, shift: false, align-baseline: false)[Bottom (no shift, no baseline al.)])
+To align the top of the note instead, set #link(label("marginalia-note.alignment"))[```typc alignment```] to ```typc "top"```.
+#note[(Or set #link(label("marginalia-note.alignment"))[```typc alignment```] to ```typc "bottom"``` to align the bottom of the note.)]
+#place(top, note(numbering: none, shift: false, alignment: "top")[Top (no shift, no baseline alignment)])
+#place(bottom, note(numbering: none, shift: false, alignment: "top")[Bottom (no shift, no baseline al.)])
 
 == Background Lines
 They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using
@@ -711,6 +675,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
     name: "marginalia",
     // preamble: "notecounter.update(1);",
     scope: (
+      note: marginalia.note,
       notecounter: marginalia.notecounter,
       note-numbering: marginalia.note-numbering,
       note-markers: marginalia.note-markers,
