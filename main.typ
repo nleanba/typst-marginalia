@@ -517,8 +517,8 @@ To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if y
 By default, notes are aligned to their first baseline.
 To align the top of the note instead, set #link(label("marginalia-note.alignment"))[```typc alignment```] to ```typc "top"```.
 #note[(Or set #link(label("marginalia-note.alignment"))[```typc alignment```] to ```typc "bottom"``` to align the bottom of the note.)]
-#place(top, note(numbering: none, shift: false, alignment: "top")[Top (no shift, no baseline alignment)])
-#place(bottom, note(numbering: none, shift: false, alignment: "top")[Bottom (no shift, no baseline al.)])
+#place(top, note(numbering: none, shift: false, alignment: "top")[Top (no shift, top-aligned)])
+#place(bottom, note(numbering: none, shift: false, alignment: "top")[Bottom (no shift, top-aligned)])
 
 == Background Lines
 They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using
