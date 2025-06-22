@@ -661,7 +661,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
   = Detailed Documentation of all Exported Symbols <appendix>
 
   #compat((
-    "0.2.1": (
+    "0.2.0": (
       [The functions `configure()` and `page-setup()` have been combined into one #link(label("marginalia-setup()"), [```typc setup()```]) function.],
     ),
   ))
