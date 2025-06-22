@@ -357,29 +357,36 @@ For small figures, you can place them in the margin with #link(label("marginalia
 #notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.mako)),
   caption: [A notefigure.],
-)
-It accepts all arguments ```typ #figure()``` takes (except `placement` and `scope`),
+);It accepts all arguments ```typ #figure()``` takes (except `placement` and `scope`),
 plus all arguments #link(label("marginalia-note()"), [```typ #note[]```]) takes.
 However, by default it has no marker, and to get a marker like other notes, you must pass
 #link(label("marginalia-notefigure.numbering"))[```typ numbering```]```typc : marginalia.note-numbering```,
 and it will get a marker like other notes:
 #notefigure(
-  rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.turbo)),
+  rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.turbo)),
   numbering: marginalia.note-numbering,
   label: <markedfigure>,
   caption: [A marked notefigure.],
 )
 
-TODO
-Additionally, the #link(label("marginalia-notefigure.dy"))[```typ dy```] argument now takes a relative length,
-where ```typc 100%``` is the distance between the top of the figure content and the first baseline of the caption.
-//height of the figure content + gap, but without the caption.
-By default, figures have a #link(label("marginalia-notefigure.dy"))[```typ dy```] of ```typc 0pt - 100%```, which results in the caption being aligned horizontally to the text.
+
+Additionally, the #link(label("marginalia-notefigure.alignment"))[```typ alignment```] parameter can now also be ```typc "caption-top"```,
+which results in alignment with the top of the caption.
 #notefigure(
-  dy: 0pt,
-  rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.crest)),
+  alignment: "caption-top",
+  rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.crest)),
   numbering: marginalia.note-numbering,
-  caption: [Aligned to top of figure with `dy: 0pt`.],
+  caption: [Aligned to top of caption.],
+)
+
+By default, like normal #link(label("marginalia-note()"), [```typ #note[]```]);s,
+it uses #link(label("marginalia-notefigure.alignment"))[```typc alignment```]```typc : "baseline"```
+which leads to the caption's being aligned with the main text.
+#notefigure(
+  alignment: "top",
+  rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.icefire)),
+  numbering: marginalia.note-numbering,
+  caption: [Aligned to top of figure with #link(label("marginalia-notefigure.alignment"))[```typc alignment```]```typc : "top"```.],
 )
 
 A label can be attached to the figure using the #link(label("marginalia-notefigure.label"))[```typ label```] argument, as was done here for @markedfigure.
@@ -676,6 +683,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
     // preamble: "notecounter.update(1);",
     scope: (
       note: marginalia.note,
+      notefigure: marginalia.notefigure,
       notecounter: marginalia.notecounter,
       note-numbering: marginalia.note-numbering,
       note-markers: marginalia.note-markers,

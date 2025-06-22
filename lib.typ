@@ -590,7 +590,7 @@
   /// -> "baseline" | "top" | "bottom"
   alignment: "baseline",
   /// Inital vertical offset of the note, relative to the alignment point.
-  /// The Note may get shifted still to avoid other notes depending on @note.shift.
+  /// The note may get shifted still to avoid other notes depending on @note.shift.
   /// -> length
   dy: 0pt,
   /// Notes with ```typc keep-order: true``` are not re-ordered relative to one another.
@@ -736,6 +736,9 @@
 ///     [`numbered` has been replaced with @notefigure.numbering.
 ///      #ergo[use \````typc numbering: marginalia.note-numbering```\` instead of \````typc numbered: true```\`]],
 ///   ),
+///   "0.2.2": (
+///     [@notefigure.dy no longer takes a relative length, instead @notefigure.alignment was added.],
+///   ),
 /// ))
 /// -> content
 #let notefigure(
@@ -755,11 +758,23 @@
   /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
   /// -> auto | "outer" | "inner" | "left" | "right"
   side: auto,
-  /// How much to shift the note. ```typc 100%``` corresponds to the height of `content` + `gap` + the first baseline.
+  /// Vertical alignment of the notefigure.
+  /// #let notefigure = notefigure.with(shift: "ignore", show-caption: (number, caption) => block(outset: (left: 5cm), width: 100%, fill: oklch(70%, 0.1, 120deg, 20%), {
+  ///   number; caption.supplement; [ ]; caption.counter.display(caption.numbering); caption.separator; caption.body
+  /// }))
+  /// - ```typc "top"```, ```typc "bottom"``` work the same as @note.alignment.
+  /// - ```typc "baseline"``` aligns the first baseline of the _caption_ with the main text baseline.
+  ///   #notefigure(rect(width: 100%, height: 2pt, stroke: 0.5pt + gray), alignment: "baseline", caption: [Baseline])
+  /// - ```typc "caption-top"``` aligns the top of the caption with the main text baseline.
+  ///   #notefigure(rect(width: 100%, height: 2pt, stroke: 0.5pt + gray), alignment: "caption-top", caption: [Caption-top])
   ///
-  /// Thus ```typc dy: 0pt - 100%``` aligns the text and caption baselines.
-  /// -> relative length
-  dy: 0pt - 100%,
+  /// -> "baseline" | "top" | "bottom" | "caption-top"
+  alignment: "baseline",
+  /// Inital vertical offset of the notefigure, relative to the alignment point.
+  ///
+  /// The notefigure may get shifted still to avoid other notes depending on ```typc notefigure.shift```.
+  /// -> length
+  dy: 0pt,
   /// -> boolean
   keep-order: false,
   /// -> boolean | auto | "avoid" | "ignore"
@@ -774,7 +789,7 @@
   /// If this is a function, it will be called with ```typc "left"``` or ```typc "right"``` as its argument, and the result is passed to the `block`.
   /// -> dictionary | function
   block-style: (width: 100%),
-  /// A function with two arguments, the number and the caption.
+  /// A function with two arguments, the (note-)number and the caption.
   /// Will be called as the caption show rule.
   ///
   /// If @notefigure.numbering is ```typc none```, `number` will be ```typc none```.
@@ -879,18 +894,26 @@
         },
       ).height
         + measure(text(..text-style, v(gap))).height
-        + measure(text(..text-style, sym.zws)).height
     )
-    h(0pt, weak: true)
-    if anchor-numbering != none {
-      context { notecounter.display(anchor-numbering) }
+    let baseline-height = measure(text(..text-style, sym.zws)).height
+    let alignment = alignment
+    let dy = dy
+    if alignment == "baseline" {
+      alignment = "top"
+      dy = dy - height - baseline-height
+    } else if alignment == "caption-top" {
+      alignment = "top"
+      dy = dy - height
     }
-    let dy = 0% + 0pt + dy
+
+
+    h(0pt, weak: true)
     note(
       numbering: none,
+      anchor-numbering: anchor-numbering,
       side: side,
-      dy: dy.length + dy.ratio * height,
-      alignment: "top",
+      dy: dy,
+      alignment: alignment,
       keep-order: keep-order,
       shift: shift,
       text-style: text-style,
@@ -902,7 +925,7 @@
         gap: gap,
         placement: none,
         ..figureargs,
-      ) #label
+      )#label
     ]
   }
 }
