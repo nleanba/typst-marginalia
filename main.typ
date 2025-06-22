@@ -79,7 +79,7 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
-  #import "@preview/marginalia:0.2.1" as marginalia: note, notefigure, wideblock
+  #import "@preview/marginalia:0.2.2" as marginalia: note, notefigure, wideblock
 
   #show: marginalia.setup.with(
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -544,7 +544,7 @@ Here's how the headers in this document were made:
       marginalia.header(
         text-style: (size: 8.5pt, number-type: "old-style"),
         [Page #counter(page).display("1 of 1", both: true)],
-        smallcaps[Marginalia 0.2.1],
+        smallcaps[Marginalia],
         datetime.today().display("[day]. [month repr:long] [year]")
       )
     },
