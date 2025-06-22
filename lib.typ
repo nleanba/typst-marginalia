@@ -120,12 +120,12 @@
 
 /// This will update the marginalia config and setup the page with the provided config options.
 /// (This means this will insert a pagebreak.)
-/// 
+///
 /// Use as
 /// ```typ
 /// #show: marginalia.setup.with(/* options here */)
 /// ```
-/// 
+///
 /// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
 ///
 /// #compat((
@@ -172,7 +172,7 @@
 ) = { }
 #let setup(..config, body) = {
   _config.update(_fill_config(..config))
-  set page( .._page-setup(..config) )
+  set page(.._page-setup(..config))
   body
 }
 
@@ -228,34 +228,37 @@
   /// -> boolean
   footer: true,
   /// -> content
-  body
+  body,
 ) = {
-  set page(background: context {
-    let leftm = get-left()
-    let rightm = get-right()
+  set page(
+    background: context {
+      let leftm = get-left()
+      let rightm = get-right()
 
-    let topm = _config.get().top
-    let ascent = page.header-ascent.ratio * topm + page.header-ascent.length
-    place(top, dy: topm, line(length: 100%, stroke: stroke))
-    if header {
-      place(top, dy: topm - ascent, line(length: 100%, stroke: stroke))
-    }
+      let topm = _config.get().top
+      let ascent = page.header-ascent.ratio * topm + page.header-ascent.length
+      place(top, dy: topm, line(length: 100%, stroke: stroke))
+      if header {
+        place(top, dy: topm - ascent, line(length: 100%, stroke: stroke))
+      }
 
-    let bottomm = _config.get().bottom
-    let descent = page.footer-descent.ratio * bottomm + page.footer-descent.length
-    place(bottom, dy: -bottomm, line(length: 100%, stroke: stroke))
-    if footer {
-      place(bottom, dy: -bottomm + descent, line(length: 100%, stroke: stroke))
-    }
+      let bottomm = _config.get().bottom
+      let descent = page.footer-descent.ratio * bottomm + page.footer-descent.length
+      place(bottom, dy: -bottomm, line(length: 100%, stroke: stroke))
+      if footer {
+        place(bottom, dy: -bottomm + descent, line(length: 100%, stroke: stroke))
+      }
 
-    place(dx: leftm.far,
-          rect(width: leftm.width, height: 100%, stroke: (x: stroke)))
-    place(dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
+      place(
+        dx: leftm.far,
+        rect(width: leftm.width, height: 100%, stroke: (x: stroke)),
+      )
+      place(dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
 
-    place(right, dx: -rightm.far,
-          rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
-    place(right, dx: -rightm.far - rightm.width - rightm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
-  })
+      place(right, dx: -rightm.far, rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
+      place(right, dx: -rightm.far - rightm.width - rightm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
+    },
+  )
 
   body
 }
@@ -757,7 +760,10 @@
   /// -> function
   show-caption: (number, caption) => {
     number
-    caption.supplement; [ ]; caption.counter.display(caption.numbering); caption.separator
+    caption.supplement
+    [ ]
+    caption.counter.display(caption.numbering)
+    caption.separator
     caption.body
   },
   /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.
@@ -800,10 +806,13 @@
       set align(left)
       if numbering != none {
         context if flush-numbering {
-          show-caption({
-            notecounter.display(numbering)
-            h(2pt)
-          }, it)
+          show-caption(
+            {
+              notecounter.display(numbering)
+              h(2pt)
+            },
+            it,
+          )
         } else {
           let number = notecounter.display(numbering)
           show-caption(
@@ -821,7 +830,7 @@
                 },
               ),
             ),
-            it
+            it,
           )
         }
       } else {
@@ -915,7 +924,10 @@
       if _config.get().book and calc.even(here().page()) { "right" } else { "left" }
     } else { side }
 
-    assert(side == "left" or side == "right" or side == "both", message: "side must be auto, both, left, right, outer, or inner.")
+    assert(
+      side == "left" or side == "right" or side == "both",
+      message: "side must be auto, both, left, right, outer, or inner.",
+    )
 
     let left = if side == "both" or side == "left" {
       left-margin.width + left-margin.sep
@@ -1028,7 +1040,7 @@
         box(width: 1fr, center)
         h(rightm.sep)
         box(width: rightm.width, if is-odd { outer } else { inner })
-      }
+      },
     )
   } else {
     wideblock(
@@ -1040,7 +1052,7 @@
             odd.at(0, default: none)
           } else {
             even.at(0, default: none)
-          }
+          },
         )
         h(leftm.sep)
         box(
@@ -1049,7 +1061,7 @@
             odd.at(1, default: none)
           } else {
             even.at(1, default: none)
-          }
+          },
         )
         h(rightm.sep)
         box(
@@ -1058,9 +1070,9 @@
             odd.at(2, default: none)
           } else {
             even.at(2, default: none)
-          }
+          },
         )
-      }
+      },
     )
   }
 }

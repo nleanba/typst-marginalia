@@ -21,7 +21,7 @@
       text-style: (size: 8.5pt, number-type: "old-style"),
       [Page #counter(page).display("1 of 1", both: true)],
       smallcaps[Marginalia],
-      datetime.today().display("[day]. [month repr:long] [year]")
+      datetime.today().display("[day]. [month repr:long] [year]"),
     )
   },
 )
@@ -49,17 +49,30 @@
 #set figure(gap: 0pt) // neccessary in both cases
 #set figure.caption(position: bottom) // (this is the default)
 #show figure.caption.where(position: bottom): it => context {
-  let text-style= (size: 8.5pt)
-  let par-style= (/* your par-style here */:)
+  let text-style = (size: 8.5pt)
+  let par-style = (:
+    /* your par-style here */
+  )
   let height = measure(
     width: marginalia._config.get().outer.width,
-    { // we need to set the style here to simulate measuring the note
+    {
+      // we need to set the style here to simulate measuring the note
       set text(size: 9.35pt, style: "normal", weight: "regular", ..text-style)
       set par(spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
       it
     },
   ).height
-  note(numbering: none, anchor-numbering: none, dy: -height, align-baseline: false, shift: "avoid", keep-order: true, text-style: text-style, par-style: par-style, it)
+  note(
+    numbering: none,
+    anchor-numbering: none,
+    dy: -height,
+    align-baseline: false,
+    shift: "avoid",
+    keep-order: true,
+    text-style: text-style,
+    par-style: par-style,
+    it,
+  )
 }
 
 #let codeblock(code) = {
@@ -138,7 +151,7 @@ By giving the argument #link(label("marginalia-note.side"))[```typc side```]```t
 If #link(label("marginalia-setup.book"))[```typc setup.book```] is ```typc true```, the side will of course be adjusted automatically.
 It is also possible to pass #link(label("marginalia-note.side"))[```typc side```]```typc : "left"``` or #link(label("marginalia-note.side"))[```typc side```]```typc : "right"``` if you want a fixed side even in books.
 
-If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy:15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(side: "inner", dy:15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy:10cm)[This note was given ```typc 10cm``` dy and was shifted less than that to stay on the page.] they automatically adjust their positions.
+If~#note[Note 1] we~#note[Note 2] place~#note[Note 3] multiple~#note[Note 4] notes~#note[Note 5] in~#note(dy: 15pt)[This note was given ```typc 15pt``` dy, but it was shifted more than that to avoid Notes 1--5.] one~#note(side: "inner", dy: 15pt)[This note was given ```typc 15pt``` dy.] line,#note(dy: 10cm)[This note was given ```typc 10cm``` dy and was shifted less than that to stay on the page.] they automatically adjust their positions.
 Additionally, a ```typc dy``` argument can be passed to shift their initial position by that amount vertically. They may still get shifted around, unless configured otherwise via the #link(label("marginalia-note.shift"))[```typc shift```] parameter of #link(label("marginalia-note()"))[```typst #note[]```].
 
 Notes will shift vertically to avoid other notes, wideblocks, and the top page margin.
@@ -182,11 +195,11 @@ If a different style is deisred for the marker in the text and in the margins, y
   anchor-numbering: (.., i) => super[#i],
 )[The ```typc -2pt``` in the ```typ #h()``` is there because ```typ #note()``` inserts a ```typc 2pt``` space.]
 #codeblock[```typ
-#note(
-  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
-  anchor-numbering: (.., i) => super[#i],
-)[...]
-```]
+  #note(
+    numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
+    anchor-numbering: (.., i) => super[#i],
+  )[...]
+  ```]
 Note that doing this implies #link(label("marginalia-note.flush-numbering"), [```typc flush-numbering```])```typc : true```.
 This is based on the assumption that if you have set two different numbering functions, you want to handle the placement yourself.
 Non-flush numbers, which are `place`d, complicate this.
@@ -213,7 +226,7 @@ Both #link(label("marginalia-note()"))[```typc note()```] and #link(label("margi
 accept #link(label("marginalia-note.text-style"), [```typc text-style```]),
 #link(label("marginalia-note.par-style"), [```typc par-style```]),
 and #link(label("marginalia-note.block-style"), [```typc block-style```]) parameters:
-- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(text-style: (size: 5pt, font: ("Iosevka Extended")))[#lorem(10)]
+- ```typc text-style: (size: 5pt, font: ("Iosevka Extended"))``` gives~#note(text-style: (size: 5pt, font: "Iosevka Extended"))[#lorem(10)]
 - ```typc par-style: (spacing: 20pt, leading: -2pt)``` gives~#note(par-style: (spacing: 20pt, leading: -2pt))[
     #lorem(10)
 
@@ -243,7 +256,10 @@ To style the block containing the note body, use the #link(label("marginalia-not
   #note-with-separator(keep-order: true)[This is a note with a dotted stroke above.]
   #note-with-separator(numbering: none, keep-order: true, shift: true)[So is this.]
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt)``` gives:
-  #note-with-background(flush-numbering: true, keep-order: true)[This is a note with a green background and `flush-numbering: true`.]
+  #note-with-background(
+    flush-numbering: true,
+    keep-order: true,
+  )[This is a note with a green background and `flush-numbering: true`.]
   #note-with-background(numbering: none, keep-order: true, shift: true)[So is this.]
 
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt)``` gives:
@@ -253,7 +269,7 @@ To style the block containing the note body, use the #link(label("marginalia-not
 For more advanced use-cases, you can also pass a function as the #link(label("marginalia-note.block-style"), [```typc block-style```]).
 It will be called with one argument, either ```typc "left"``` of ```typc "right"```, depending on the side the note will be placed on.
 Inside the function, context is avaliable.
-#let block-style = (side) => {
+#let block-style = side => {
   if side == "left" {
     (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
   } else {
@@ -338,7 +354,9 @@ Inside the function, context is avaliable.
 
   It is possible to use notes in a wide block:#note[Voila.]#note(side: "inner")[Wow!].
   They will automatically shift downwards to avoid colliding with the wideblock.
-  #note(dy: -10em)[Unless they are given a #link(label("marginalia-note.dy"))[```typ dy```] argument moving them above the block.]
+  #note(
+    dy: -10em,
+  )[Unless they are given a #link(label("marginalia-note.dy"))[```typ dy```] argument moving them above the block.]
 ]
 
 #wideblock(side: "inner")[
@@ -403,7 +421,7 @@ as is demonstrated in @styled-fig.
   rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
   caption: [Styled figure.],
   block-style: block-style,
-  text-style: (size: 5pt, font: ("Iosevka Extended")),
+  text-style: (size: 5pt, font: "Iosevka Extended"),
   par-style: (spacing: 20pt, leading: 0pt),
   label: <styled-fig>,
 )
@@ -563,7 +581,7 @@ Here's how the headers in this document were made:
   ```
 ]
 
-The  #link(label("marginalia-header()"))[```typ #marginalia.header()```]
+The #link(label("marginalia-header()"))[```typ #marginalia.header()```]
 #note(numbering: none)[
   Despite the name, this function can be used anywhere, and not solely for headers.
   It simply creates a wideblock and fills it with properly sized ```typc box```es.
@@ -589,7 +607,11 @@ For convenience, you may pass a #link(label("marginalia-header.text-style"))[`te
 #marginalia.header(
   text-style: (style: "italic"),
   even: ([left outer], block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is an even page], [right inner]),
-  odd: ([left inner], block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is on odd page or book is false], [right outer]),
+  odd: (
+    [left inner],
+    block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is on odd page or book is false],
+    [right outer],
+  ),
 )
 
 #pagebreak(weak: true)
@@ -655,17 +677,20 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
           [- #change]
         }
       }
-    }
+    },
   )
 }
 #let ergo(do) = {
   linebreak()
   h(30pt)
-  box(width: 1fr, {
-    h(-15pt)
-    box(width: 15pt)[→]
-    do
-  })
+  box(
+    width: 1fr,
+    {
+      h(-15pt)
+      box(width: 15pt)[→]
+      do
+    },
+  )
 }
 
 #wideblock(side: "inner")[
@@ -674,7 +699,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
   #compat((
     "0.2.1": (
       [The functions `configure()` and `page-setup()` have been combined into one #link(label("marginalia-setup()"), [```typc setup()```]) function.],
-    )
+    ),
   ))
 
   #block(height: 3em)
