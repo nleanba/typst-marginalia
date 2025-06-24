@@ -449,7 +449,6 @@
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
-    let pagewidth = page.width
     let page = here().page()
 
     let width = get-left().width
@@ -485,7 +484,7 @@
   context {
     let dy = dy.to-absolute()
     let anchor = here().position()
-    let pagewidth = page.width
+    let pagewidth = if page.flipped { page.height } else { page.width }
     let page = here().page()
 
     let width = get-right().width
@@ -986,8 +985,9 @@
 
     let position = here().position().y
     let page_num = str(here().page())
+    let pagewidth = if page.flipped { page.height } else { page.width }
     let linewidth = (
-      page.width
+      pagewidth
         - left-margin.far
         - left-margin.width
         - left-margin.sep
