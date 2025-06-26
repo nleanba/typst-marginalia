@@ -79,7 +79,7 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
-  #import "@preview/marginalia:0.2.2" as marginalia: note, notefigure, wideblock
+  #import "@preview/marginalia:0.2.3" as marginalia: note, notefigure, wideblock
 
   #show: marginalia.setup.with(
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
