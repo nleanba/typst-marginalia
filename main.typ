@@ -163,14 +163,22 @@ we obtain notes without icon/number:#note(numbering: none)[Like this.]
 
 To change the markers, you can override the #link(label("marginalia-note.numbering"), [```typc numbering```]) function which is used to generate the markers.
 
-You can also change the #link(label("marginalia-note.counter"), [```typc counter```]) used. This can be useful if you want some of youre notes to have independent numberings.
-#let bnote-counter = counter("bnote")
-#let bnote = note.with(
-  counter: bnote-counter,
+You can also change the #link(label("marginalia-note.counter"), [```typc counter```]) used. This can be useful if you want some of your notes to have independent numberings.
+#let a-note-counter = counter("a-note")
+#let a-note = note.with(
+  counter: a-note-counter,
   numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
 )
-#bnote[alphabetized note]
-#bnote[another one]
+#a-note[alphabetized note]
+#note[regular one]
+#a-note[another alphabetized note]
+#codeblock[```typ
+  #let a-note-counter = counter("a-note")
+  #let a-note = note.with(
+    counter: a-note-counter,
+    numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
+  )
+  ```]
 
 === Advanced Markers
 
