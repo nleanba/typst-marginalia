@@ -94,7 +94,7 @@ Put something akin to the following at the start of your `.typ` file:
 
 Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.
-#note[You can also skip the configuration step if you’re happy with these defaults, but 15mm is not a lot to write in.]
+#note[You can also skip the configuration step if you’re using a4 paper and are happy with these defaults, but 15mm is not a lot to write in.]
 
 If #link(label("marginalia-setup.book"))[```typc book```] is ```typc false```, `inner` and `outer` correspond to the left and right
 margins respectively. If book is true, the margins swap sides on even and odd
