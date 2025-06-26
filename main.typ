@@ -606,7 +606,7 @@ For convenience, you may pass a #link(label("marginalia-header.text-style"))[`te
   ),
 )
 
-#pagebreak(weak: true)
+// #pagebreak(weak: true)
 = Troubleshooting / Known Bugs
 
 - If the document needs multiple passes to figure out page-breaks,
