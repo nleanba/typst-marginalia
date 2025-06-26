@@ -163,6 +163,15 @@ we obtain notes without icon/number:#note(numbering: none)[Like this.]
 
 To change the markers, you can override the #link(label("marginalia-note.numbering"), [```typc numbering```]) function which is used to generate the markers.
 
+You can also change the #link(label("marginalia-note.counter"), [```typc counter```]) used. This can be useful if you want some of youre notes to have independent numberings.
+#let bnote-counter = counter("bnote")
+#let bnote = note.with(
+  counter: bnote-counter,
+  numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
+)
+#bnote[alphabetized note]
+#bnote[another one]
+
 === Advanced Markers
 
 If a different style is deisred for the marker in the text and in the margins, you can use the #link(label("marginalia-note.anchor-numbering"), [```typc anchor-numbering```]) parameter to control the in-text marker:
@@ -368,6 +377,18 @@ and it will get a marker like other notes:
   label: <markedfigure>,
   caption: [A marked notefigure.],
 )
+
+If you want, you can override the #link(label("marginalia-notefigure.counter"))[```typc counter```] and #link(label("marginalia-notefigure.anchor-numbering"))[```typc anchor-numbering```] to get an anchor using the figure-numbering.
+#notefigure(
+  rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.crest)),
+  caption: [resuing figure counter],
+  counter: counter(figure),
+  anchor-numbering: (.., i) => super[#(i + 1)],
+)
+
+#codeblock[```typ
+  #notefigure(/**/, counter: counter(figure), anchor-numbering: (.., i) => super[#(i + 1)], )
+  ```]
 
 
 Additionally, the #link(label("marginalia-notefigure.alignment"))[```typ alignment```] parameter can now also be ```typc "caption-top"```,

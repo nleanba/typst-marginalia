@@ -1,13 +1,12 @@
 
 /* Config Setup */
 
-/// #internal[Mostly internal.]
-/// The counter used for the note icons.
+/// The default counter used for the note icons.
 ///
 /// If you use @note-numbering without @note-numbering.repeat, it is recommended you reset this occasionally, e.g. per heading or per page.
 /// #example(scale-preview: 100%, ```typc notecounter.update(1)```)
 /// -> counter
-#let notecounter = counter("notecounter")
+#let notecounter = counter("marginalia-note")
 
 /// Icons to use for note markers.
 ///
@@ -176,7 +175,7 @@
   body
 }
 
-/// #internal[Mostly internal.]
+/// // #internal[(mostly for internal use)]
 /// Returns a dictionary with the keys `far`, `width`, `sep` containing the respective widths of the
 /// left margin on the current page. (On both even and odd pages.)
 ///
@@ -191,7 +190,7 @@
   }
 }
 
-/// #internal[Mostly internal.]
+/// // #internal[(mostly for internal use)]
 /// Returns a dictionary with the keys `far`, `width`, `sep` containing the respective widths of the
 /// right margin on the current page. (On both even and odd pages.)
 ///
@@ -263,7 +262,7 @@
   body
 }
 
-/// #internal[Mostly internal.]
+/// #internal[(mostly for internal use)]
 /// Calculates positions for notes.
 ///
 /// Return type is of the form `(<index/id>: offset)`
@@ -559,7 +558,7 @@
 /// ))
 #let note(
   /// Function or `numbering`-string to generate the note markers from the `notecounter`.
-  /// If none, will not step the @notecounter.
+  /// If none, will not step the `counter`.
   ///
   /// Examples:
   /// - ```typc (..i) => super(numbering("1", ..i))``` for superscript numbers
@@ -571,6 +570,12 @@
   /// - If ```typc auto```, will use the given @note.numbering.
   /// -> none | auto | function | string
   anchor-numbering: auto,
+  /// Counter to use for this note.
+  /// Can be set to ```typc none``` do disable numbering this note.
+  ///
+  /// Will only be stepped if `numbering` is not ```typc none```.
+  /// -> counter | none
+  counter: notecounter,
   /// Disallow note markers hanging into the whitespace.
   /// - If ```typc auto```, acts like ```typc false``` if @note.anchor-numbering is ```typc auto```.
   /// -> auto | boolean
@@ -623,7 +628,8 @@
   // let keep-order = if keep-order == auto { not numbered } else { keep-orders }
   let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
 
-  if numbering != none { notecounter.step() }
+  let numbering = if counter == none { none } else { numbering }
+  if numbering != none { counter.step() }
   let flush-numbering = if flush-numbering == auto { anchor-numbering != auto } else { flush-numbering }
   let anchor-numbering = if anchor-numbering == auto { numbering } else { anchor-numbering }
 
@@ -647,14 +653,14 @@
     let body = if numbering != none {
       if flush-numbering {
         box({
-          notecounter.display(numbering)
+          counter.display(numbering)
           h(2pt)
         })
         h(0pt, weak: true)
         body
       } else {
         body
-        let number = notecounter.display(numbering)
+        let number = counter.display(numbering)
         let width = measure({
           set text(..text-style)
           set par(..par-style)
@@ -717,7 +723,7 @@
     h(0pt, weak: true)
     box({
       if anchor-numbering != none {
-        notecounter.display(anchor-numbering)
+        counter.display(anchor-numbering)
       }
       note-fn(dy: dy, keep-order: keep-order, shift: shift, body)
     })
@@ -748,6 +754,12 @@
   /// - If ```typc auto```, will use the given @notefigure.numbering.
   /// -> none | auto | function | string
   anchor-numbering: auto,
+  /// Counter to use for this note.
+  /// Can be set to ```typc none``` do disable numbering this note.
+  ///
+  /// Will only be stepped if `numbering` is not ```typc none```.
+  /// -> counter | none
+  counter: notecounter,
   /// Disallow note markers hanging into the whitespace.
   /// - If ```typc auto```, acts like ```typc false``` if @note.anchor-numbering is ```typc auto```.
   /// -> auto | boolean
@@ -818,7 +830,8 @@
 ) = {
   let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
 
-  if numbering != none { notecounter.step() }
+  let numbering = if counter == none { none } else { numbering }
+  if numbering != none { counter.step() }
   let flush-numbering = if flush-numbering == auto { anchor-numbering != auto } else { flush-numbering }
   let anchor-numbering = if anchor-numbering == auto { numbering } else { anchor-numbering }
 
@@ -827,7 +840,7 @@
 
   context {
     let number-width = if numbering != none and not flush-numbering {
-      let number = notecounter.display(numbering)
+      let number = counter.display(numbering)
       let width = measure({
         set text(..text-style)
         set par(..par-style)
@@ -843,13 +856,13 @@
         context if flush-numbering {
           show-caption(
             {
-              notecounter.display(numbering)
+              counter.display(numbering)
               h(2pt)
             },
             it,
           )
         } else {
-          let number = notecounter.display(numbering)
+          let number = counter.display(numbering)
           show-caption(
             place(
               // top + left,
@@ -910,6 +923,7 @@
     note(
       numbering: none,
       anchor-numbering: anchor-numbering,
+      counter: counter,
       side: side,
       dy: dy,
       alignment: alignment,
