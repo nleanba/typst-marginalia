@@ -17,45 +17,51 @@
 /// ```typc ("●", "○", "◆", "◇", "■", "□", "▲", "△", "♥", "♡")```
 #let note-markers-alternating = ("●", "○", "◆", "◇", "■", "□", "▲", "△", "♥", "♡")
 
-/// Format note marker
+/// Format note marker.
 /// -> content
 #let note-numbering(
   /// #example(```typ
-  /// #for i in array.range(1,15) [
-  ///   #note-numbering(markers: note-markers, i)
-  /// ]\
-  /// #for i in array.range(1,15) [
-  ///   #note-numbering(markers: note-markers-alternating, i)
-  /// ]\
-  /// #for i in array.range(1,15) [
-  ///   #note-numbering(markers: (), i)
-  /// ]
+  /// #for i in array.range(1,15) {
+  ///   note-numbering(markers: note-markers, i) }
+  ///
+  /// #for i in array.range(1,15) {
+  ///   note-numbering(markers: note-markers-alternating, i) }
+  ///
+  /// #for i in array.range(1,15) {
+  ///   note-numbering(markers: (), i) }
   /// ```)
-  /// -> array(string)
+  /// -> array
   markers: note-markers-alternating,
   /// Whether to (```typc true```) loop over the icons, or (```typc false```) continue with numbers after icons run out.
   /// #example(```typ
-  /// #for i in array.range(1,15) [
-  ///   #note-numbering(repeat: true, i)
-  /// ]\
-  /// #for i in array.range(1,15) [
-  ///   #note-numbering(repeat: false, i)
-  /// ]
+  /// #for i in array.range(1,15) {
+  ///   note-numbering(repeat: true, i) }
+  ///
+  /// #for i in array.range(1,15) {
+  ///   note-numbering(repeat: false, i) }
   /// ```)
   /// -> boolean
   repeat: true,
+  /// Wrap the symbol in a styled text function.
+  /// -> dict
+  style: text.with(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
+  /// Whether to add a space of 2pt after the symbol.
+  /// If ```typc auto```, a space is only added if it is a number (the symbols have ran out).
+  /// -> auto | boolean
+  space: auto,
   ..,
   /// -> int
-  number,
+  i,
 ) = {
-  let index = if repeat and markers.len() > 0 { calc.rem(number - 1, markers.len()) } else { number - 1 }
+  let index = if repeat and markers.len() > 0 { calc.rem(i - 1, markers.len()) } else { i - 1 }
   let symbol = if index < markers.len() {
     markers.at(index)
+    if space == true { h(2pt) }
   } else {
     str(index + 1 - markers.len())
-    h(1.5pt)
+    if space == true or space == auto { h(2pt) }
   }
-  return text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), symbol)
+  style(symbol)
 }
 
 ///#internal()
