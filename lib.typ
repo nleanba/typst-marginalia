@@ -26,6 +26,9 @@
   /// ]\
   /// #for i in array.range(1,15) [
   ///   #note-numbering(markers: note-markers-alternating, i)
+  /// ]\
+  /// #for i in array.range(1,15) [
+  ///   #note-numbering(markers: (), i)
   /// ]
   /// ```)
   /// -> array(string)
@@ -45,7 +48,7 @@
   /// -> int
   number,
 ) = {
-  let index = if repeat { calc.rem(number - 1, markers.len()) } else { number - 1 }
+  let index = if repeat and markers.len() > 0 { calc.rem(number - 1, markers.len()) } else { number - 1 }
   let symbol = if index < markers.len() {
     markers.at(index)
   } else {
@@ -168,7 +171,7 @@
   clearance: 12pt,
   /// -> content
   body,
-) = { }
+) = {}
 #let setup(..config, body) = {
   _config.update(_fill_config(..config))
   set page(.._page-setup(..config))
@@ -229,35 +232,30 @@
   /// -> content
   body,
 ) = {
-  set page(
-    background: context {
-      let leftm = get-left()
-      let rightm = get-right()
+  set page(background: context {
+    let leftm = get-left()
+    let rightm = get-right()
 
-      let topm = _config.get().top
-      let ascent = page.header-ascent.ratio * topm + page.header-ascent.length
-      place(top, dy: topm, line(length: 100%, stroke: stroke))
-      if header {
-        place(top, dy: topm - ascent, line(length: 100%, stroke: stroke))
-      }
+    let topm = _config.get().top
+    let ascent = page.header-ascent.ratio * topm + page.header-ascent.length
+    place(top, dy: topm, line(length: 100%, stroke: stroke))
+    if header {
+      place(top, dy: topm - ascent, line(length: 100%, stroke: stroke))
+    }
 
-      let bottomm = _config.get().bottom
-      let descent = page.footer-descent.ratio * bottomm + page.footer-descent.length
-      place(bottom, dy: -bottomm, line(length: 100%, stroke: stroke))
-      if footer {
-        place(bottom, dy: -bottomm + descent, line(length: 100%, stroke: stroke))
-      }
+    let bottomm = _config.get().bottom
+    let descent = page.footer-descent.ratio * bottomm + page.footer-descent.length
+    place(bottom, dy: -bottomm, line(length: 100%, stroke: stroke))
+    if footer {
+      place(bottom, dy: -bottomm + descent, line(length: 100%, stroke: stroke))
+    }
 
-      place(
-        dx: leftm.far,
-        rect(width: leftm.width, height: 100%, stroke: (x: stroke)),
-      )
-      place(dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
+    place(dx: leftm.far, rect(width: leftm.width, height: 100%, stroke: (x: stroke)))
+    place(dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
 
-      place(right, dx: -rightm.far, rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
-      place(right, dx: -rightm.far - rightm.width - rightm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
-    },
-  )
+    place(right, dx: -rightm.far, rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
+    place(right, dx: -rightm.far - rightm.width - rightm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
+  })
 
   body
 }
@@ -467,13 +465,11 @@
 
     let vadjust = dy + _note_offset_left(str(page)).at(str(index), default: 0pt)
     let hadjust = get-left().far - anchor.x
-    box(
-      place(
-        dx: hadjust,
-        dy: vadjust,
-        notebox,
-      ),
-    )
+    box(place(
+      dx: hadjust,
+      dy: vadjust,
+      notebox,
+    ))
   }
 )
 
@@ -524,19 +520,12 @@
     //     )
     //   )
     // } else {
-    box(
-      width: 0pt,
-      place(
-        dx: hadjust,
-        dy: vadjust,
-        {
-          //_parent-note.update(true)
-          // [#parent]
-          notebox
-          //_parent-note.update(false)
-        },
-      ),
-    )
+    box(width: 0pt, place(dx: hadjust, dy: vadjust, {
+      //_parent-note.update(true)
+      // [#parent]
+      notebox
+      //_parent-note.update(false)
+    }))
     // }
   }
 )
@@ -667,19 +656,12 @@
           number
         }).width
         if width < 8pt { width = 8pt }
-        place(
-          top + left,
-          dx: -width,
-          box(
-            width: width,
-            {
-              h(1fr)
-              sym.zws
-              number
-              h(1fr)
-            },
-          ),
-        )
+        place(top + left, dx: -width, box(width: width, {
+          h(1fr)
+          sym.zws
+          number
+          h(1fr)
+        }))
       }
     } else {
       body
@@ -691,18 +673,11 @@
       block-style
     }
 
-    let body = align(
-      top,
-      block(
-        width: 100%,
-        ..block-style,
-        {
-          set text(..text-style)
-          set par(..par-style)
-          body
-        },
-      ),
-    )
+    let body = align(top, block(width: 100%, ..block-style, {
+      set text(..text-style)
+      set par(..par-style)
+      body
+    }))
 
     let dy-adjust = if alignment == "baseline" {
       measure(text(..text-style, sym.zws)).height
@@ -868,15 +843,12 @@
               // top + left,
               left,
               dx: -number-width,
-              box(
-                width: number-width,
-                {
-                  h(1fr)
-                  sym.zws
-                  number
-                  h(1fr)
-                },
-              ),
+              box(width: number-width, {
+                h(1fr)
+                sym.zws
+                number
+                h(1fr)
+              }),
             ),
             it,
           )
@@ -897,14 +869,11 @@
       get-right().width
     }
     let height = (
-      measure(
-        width: width,
-        {
-          set text(..text-style)
-          set par(..par-style)
-          content
-        },
-      ).height
+      measure(width: width, {
+        set text(..text-style)
+        set par(..par-style)
+        content
+      }).height
         + measure(text(..text-style, v(gap))).height
     )
     let baseline-height = measure(text(..text-style, sym.zws)).height
@@ -1090,47 +1059,32 @@
       pos = (none, ..pos)
     }
     let (inner, center, outer) = pos
-    wideblock(
-      side: "both",
-      {
-        box(width: leftm.width, if is-odd { inner } else { outer })
-        h(leftm.sep)
-        box(width: 1fr, center)
-        h(rightm.sep)
-        box(width: rightm.width, if is-odd { outer } else { inner })
-      },
-    )
+    wideblock(side: "both", {
+      box(width: leftm.width, if is-odd { inner } else { outer })
+      h(leftm.sep)
+      box(width: 1fr, center)
+      h(rightm.sep)
+      box(width: rightm.width, if is-odd { outer } else { inner })
+    })
   } else {
-    wideblock(
-      side: "both",
-      {
-        box(
-          width: leftm.width,
-          if is-odd {
-            odd.at(0, default: none)
-          } else {
-            even.at(0, default: none)
-          },
-        )
-        h(leftm.sep)
-        box(
-          width: 1fr,
-          if is-odd {
-            odd.at(1, default: none)
-          } else {
-            even.at(1, default: none)
-          },
-        )
-        h(rightm.sep)
-        box(
-          width: rightm.width,
-          if is-odd {
-            odd.at(2, default: none)
-          } else {
-            even.at(2, default: none)
-          },
-        )
-      },
-    )
+    wideblock(side: "both", {
+      box(width: leftm.width, if is-odd {
+        odd.at(0, default: none)
+      } else {
+        even.at(0, default: none)
+      })
+      h(leftm.sep)
+      box(width: 1fr, if is-odd {
+        odd.at(1, default: none)
+      } else {
+        even.at(1, default: none)
+      })
+      h(rightm.sep)
+      box(width: rightm.width, if is-odd {
+        odd.at(2, default: none)
+      } else {
+        even.at(2, default: none)
+      })
+    })
   }
 }
