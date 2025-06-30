@@ -184,12 +184,12 @@ You can also change the #link(label("marginalia-note.counter"), [```typc counter
 
 If a different style is deisred for the marker in the text and in the margins, you can use the #link(label("marginalia-note.anchor-numbering"), [```typc anchor-numbering```]) parameter to control the in-text marker:
 #note(
-  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
+  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
   anchor-numbering: (.., i) => super[#i],
-)[The ```typc -2pt``` in the ```typ #h()``` is there because ```typ #note()``` inserts a ```typc 2pt``` space.]
+)[This note has a custom numbering, but the same counter.]
 #codeblock[```typ
   #note(
-    numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
+    numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
     anchor-numbering: (.., i) => super[#i],
   )[...]
   ```]
@@ -209,7 +209,7 @@ This can also be used to create notes that have an anchor,
 ]
 but no numbering in the note itself.
 #note(
-  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
+  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
   anchor-numbering: (.., i) => super[#i],
 )[(the #link(label("marginalia-notecounter"), [```typc notecounter```]) is unaffected by the previous note, as it has #link(label("marginalia-note.numbering"), [```typc numbering```])```typc : none```)]
 
@@ -441,7 +441,7 @@ Furthermore, the `numbering`, `anchor-numbering`, and `flush-numbering` paramete
 #notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.plasma)),
   caption: [Figure with custom numbering],
-  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em - 2pt)],
+  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
   anchor-numbering: (.., i) => super[#i],
 )
 

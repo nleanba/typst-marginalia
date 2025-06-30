@@ -553,12 +553,16 @@
 /// ))
 #let note(
   /// Function or `numbering`-string to generate the note markers from the `notecounter`.
-  /// If none, will not step the `counter`.
+  /// - If ```typc none```, will not step the `counter`.
+  /// - Will be ignored if `counter` is ```typc none```.
   ///
   /// Examples:
   /// - ```typc (..i) => super(numbering("1", ..i))``` for superscript numbers
+  ///   #note(numbering: (..i) => super(numbering("1", ..i)))[E.g.]
   /// - ```typc (..i) => super(numbering("a", ..i))``` for superscript letters
+  ///   #note(numbering: (..i) => super(numbering("a", ..i)))[E.g.]
   /// - ```typc marginalia.note-numbering.with(repeat: false, markers: ())``` for small blue numbers
+  ///   #note(numbering: marginalia.note-numbering.with(repeat: false, markers: ()))[E.g.]
   /// -> none | function | string
   numbering: note-numbering,
   /// Used to generate the marker for the anchor (i.e. the one in the surrounding text)
@@ -649,7 +653,6 @@
       if flush-numbering {
         box({
           counter.display(numbering)
-          h(2pt)
         })
         h(0pt, weak: true)
         body
@@ -836,10 +839,7 @@
       if numbering != none {
         context if flush-numbering {
           show-caption(
-            {
-              counter.display(numbering)
-              h(2pt)
-            },
+            counter.display(numbering),
             it,
           )
         } else {
