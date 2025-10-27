@@ -401,19 +401,24 @@
     prev-shift-avoid = items.at(key).shift == "avoid"
   }
 
-  let max = page.height - page.bottom
   let positions = ()
-  for (key, position) in positions_d.rev() {
-    if max > position + items.at(key).height {
-      positions.push((key, position))
-      max = position - clearance
-    } else if items.at(key).shift == false {
-      positions.push((key, position))
-      max = calc.min(position - clearance, max)
-    } else {
-      positions.push((key, max - items.at(key).height))
-      max = max - items.at(key).height - clearance
+
+  if page.height != auto {
+    let max = page.height - page.bottom
+    for (key, position) in positions_d.rev() {
+      if max > position + items.at(key).height {
+        positions.push((key, position))
+        max = position - clearance
+      } else if items.at(key).shift == false {
+        positions.push((key, position))
+        max = calc.min(position - clearance, max)
+      } else {
+        positions.push((key, max - items.at(key).height))
+        max = max - items.at(key).height - clearance
+      }
     }
+  } else {
+    positions = positions_d
   }
 
   let result = (:)
@@ -469,7 +474,7 @@
       old
     })
 
-    let offset_page = (height: page.height, bottom: _config.get().bottom, top: _config.get().top)
+    let offset_page = (height: if page.flipped { page.width } else { page.height }, bottom: _config.get().bottom, top: _config.get().top)
     let offset_items = extends
       .final()
       .at(page_num, default: ())
