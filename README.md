@@ -24,8 +24,9 @@ pages. Notes are placed in the outside margin by default.
 Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.
 [Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf?raw=true)
+<!-- [Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true) -->
 
-(Note that the above configuration step is not neccessary if you are happy with the defaults provided and are using a4 paper.)
+(Note that the above configuration step is not necessary if you are happy with the defaults provided and are using a4 paper.)
 
 ## Margin-Notes
 
