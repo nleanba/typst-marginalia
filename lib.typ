@@ -455,8 +455,8 @@
     let page = here().page()
 
     let width = get-left().width
-    let notebox = box(width: width, body)
-    let height = measure(notebox).height
+    let height = measure(body, width: width).height
+    let notebox = box(width: width, height: height, body)
     let natural_position = anchor.y + dy
 
     let current = _note_extends_left.get().at(str(page), default: ())
@@ -489,8 +489,8 @@
     let page = here().page()
 
     let width = get-right().width
-    let notebox = box(width: width, body)
-    let height = measure(notebox).height
+    let height = measure(body, width: width).height
+    let notebox = box(width: width, height: height, body)
     let natural_position = anchor.y + dy
 
     let current = _note_extends_right.get().at(str(page), default: ())
