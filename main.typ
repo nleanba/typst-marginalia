@@ -1,5 +1,12 @@
 #import "lib.typ" as marginalia: note, notefigure, wideblock
 
+#let VERSION = "0.2.4"
+
+#set par(justify: true, linebreaks: "optimized")
+#set text(fill: luma(20%), size: 10pt)
+#show raw: set text(font: ("Iosevka Term", "IBM Plex Mono", "DejaVu Sans Mono"), size: 1.25 * 0.85em)
+#show link: underline
+
 #let config = (
   inner: (far: 16mm, width: 20mm, sep: 8mm),
   outer: (far: 16mm, width: 40mm, sep: 8mm),
@@ -20,8 +27,8 @@
     marginalia.header(
       text-style: (size: 8.5pt, number-type: "old-style"),
       [Page #counter(page).display("1 of 1", both: true)],
-      smallcaps[Marginalia],
-      datetime.today().display("[day]. [month repr:long] [year]"),
+      smallcaps[Marginalia #text(fill: luma(60%))[#VERSION]],
+      [],
     )
   },
 )
@@ -35,13 +42,8 @@
 #show: marginalia.show-frame.with(footer: false)
 
 
-#show heading.where(level: 1): set block(above: 42pt, below: 14pt)
-#show heading.where(level: 2): set block(above: 28pt, below: 12pt)
-
-#set par(justify: true, linebreaks: "optimized")
-#set text(fill: luma(30), size: 10pt)
-#show raw: set text(font: ("Iosevka Term", "IBM Plex Mono", "DejaVu Sans Mono"), size: 1.25 * 0.85em)
-#show link: underline
+#show heading.where(level: 1): set block(above: 34pt, below: 12pt)
+#show heading.where(level: 2): set block(above: 26pt, below: 12pt)
 
 #let note = note.with(text-style: (size: 8.5pt))
 #let notefigure = notefigure.with(text-style: (size: 8.5pt))
@@ -63,8 +65,9 @@
 
 #v(16mm)
 #block(
-  text(size: 3em, weight: "black")[
-    Marginalia
+  text(size: 3em)[
+    #text(weight: "black")[Marginalia]
+    #text(fill: luma(60%), number-type: "old-style")[#VERSION]
     #text(size: 10pt)[#note(numbering: none)[
         #outline(indent: 1em, depth: 2)
       ]]],
@@ -79,7 +82,7 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #codeblock[
   ```typst
-  #import "@preview/marginalia:0.2.3" as marginalia: note, notefigure, wideblock
+  #import "@preview/marginalia:0.2.4" as marginalia: note, notefigure, wideblock
 
   #show: marginalia.setup.with(
     // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -109,7 +112,6 @@ Additionally, I recommend using Typst's partial function application feature to 
   #let notefigure = notefigure.with(/* same options here */)
   ```
 ]
-
 
 // // #context if calc.even(here().page()) {pagebreak(to: "odd", weak: true)}
 // #pagebreak(to: "odd", weak: true)
