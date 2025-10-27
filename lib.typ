@@ -403,22 +403,25 @@
 
   let positions = ()
 
-  if page.height != auto {
-    let max = page.height - page.bottom
-    for (key, position) in positions_d.rev() {
-      if max > position + items.at(key).height {
-        positions.push((key, position))
-        max = position - clearance
-      } else if items.at(key).shift == false {
-        positions.push((key, position))
-        max = calc.min(position - clearance, max)
-      } else {
-        positions.push((key, max - items.at(key).height))
-        max = max - items.at(key).height - clearance
-      }
-    }
+  let max = if page.height == auto {
+    if positions_d.len() > 0 {
+      let (key, position) = positions_d.at(-1)
+      position + items.at(key).height
+    } else { 0pt }
   } else {
-    positions = positions_d
+    page.height - page.bottom
+  }
+  for (key, position) in positions_d.rev() {
+    if max > position + items.at(key).height {
+      positions.push((key, position))
+      max = position - clearance
+    } else if items.at(key).shift == false {
+      positions.push((key, position))
+      max = calc.min(position - clearance, max)
+    } else {
+      positions.push((key, max - items.at(key).height))
+      max = max - items.at(key).height - clearance
+    }
   }
 
   let result = (:)
@@ -474,7 +477,11 @@
       old
     })
 
-    let offset_page = (height: if page.flipped { page.width } else { page.height }, bottom: _config.get().bottom, top: _config.get().top)
+    let offset_page = (
+      height: if page.flipped { page.width } else { page.height },
+      bottom: _config.get().bottom,
+      top: _config.get().top,
+    )
     let offset_items = extends
       .final()
       .at(page_num, default: ())
