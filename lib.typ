@@ -362,9 +362,14 @@
           cur = position + items.at(key).height + clearance
         }
       } else {
-        positions_d.push((key, position + fault - empty))
-        cur = position + fault - empty + items.at(key).height + clearance
-        empty = 0pt
+        if prev-shift-avoid {
+          positions_d.push((key, cur))
+          cur = cur + items.at(key).height + clearance
+        } else {
+          positions_d.push((key, position + fault - empty))
+          cur = position + fault - empty + items.at(key).height + clearance
+          empty = 0pt
+        }
       }
     } else if items.at(key).shift == false {
       // check if we can swap with previous
@@ -375,10 +380,11 @@
           and ((not items.at(key).keep-order) or (not items.at(positions_d.last().at(0)).keep-order))
       ) {
         let (prev, _) = positions_d.pop()
-        let x = cur
+        cur -= items.at(prev).height
         positions_d.push((key, position))
         empty = 0pt
-        cur = calc.max(position + items.at(key).height + clearance, cur)
+        let new_x = calc.max(position + items.at(key).height + clearance, cur)
+        cur = new_x
         positions_d.push((prev, cur))
         cur = cur + items.at(prev).height + clearance
       } else {
@@ -411,7 +417,7 @@
   }
 
   let result = (:)
-  for (key, position) in positions.rev() {
+  for (key, position) in positions {
     result.insert(key, position - items.at(key).natural)
   }
   for key in ignore {
@@ -422,29 +428,11 @@
 
 // #let _parent-note = state("_marginalia_parent-note-natural", false)
 
-#let _note_extends_left = state("_note_extends_left", ("1": ()))
-#let _note_offset_left(page_num) = {
-  let page = (height: page.height, bottom: _config.get().bottom, top: _config.get().top)
-  let items = _note_extends_left
-    .final()
-    .at(page_num, default: ())
-    .enumerate()
-    .map(((key, item)) => (str(key), item))
-    .to-dict()
-  _calculate-offsets(page, items, _config.get().clearance)
-}
+#let _note_extends_left = state("_note_extends_left", (:))
+// #let _note_offsets_left = state("_note_offsets_left", (:))
 
-#let _note_extends_right = state("_note_extends_right", ("1": ()))
-#let _note_offset_right(page_num) = {
-  let page = (height: page.height, bottom: _config.get().bottom, top: _config.get().top)
-  let items = _note_extends_right
-    .final()
-    .at(page_num, default: ())
-    .enumerate()
-    .map(((key, item)) => (str(key), item))
-    .to-dict()
-  _calculate-offsets(page, items, _config.get().clearance)
-}
+#let _note_extends_right = state("_note_extends_right", (:))
+// #let _note_offsets_right = state("_note_offsets_right", (:))
 
 // Internal use.
 #let place-note(
@@ -461,7 +449,7 @@
     let dy = dy.to-absolute()
     let anchor = here().position()
     let pagewidth = if page.flipped { page.height } else { page.width }
-    let page = here().page()
+    let page_num = str(anchor.page)
 
     let width = if side == "right" { get-right().width } else { get-left().width }
     let height = measure(body, width: width).height
@@ -469,30 +457,50 @@
     let natural_position = anchor.y + dy
 
     let extends = if side == "right" { _note_extends_right } else { _note_extends_left }
+    // let offsets = if side == "right" { _note_offsets_right } else { _note_offsets_left }
 
-    let current = extends.get().at(str(page), default: ())
+    let current = extends.get().at(page_num, default: ())
     let index = current.len()
 
     extends.update(old => {
-      let oldpage = old.at(str(page), default: ())
+      let oldpage = old.at(page_num, default: ())
       oldpage.push((natural: natural_position, height: height, shift: shift, keep-order: keep-order))
-      old.insert(str(page), oldpage)
+      old.insert(page_num, oldpage)
       old
     })
 
-    let vadjust = (
-      dy
-        + (
-          if side == "right" {
-            _note_offset_right(str(page)).at(str(index), default: 0pt)
-          } else {
-            _note_offset_left(str(page)).at(str(index), default: 0pt)
-          }
-        )
-    )
+    let offset_page = (height: page.height, bottom: _config.get().bottom, top: _config.get().top)
+    let offset_items = extends
+      .final()
+      .at(page_num, default: ())
+      .enumerate()
+      .map(((key, item)) => (str(key), item))
+      .to-dict()
+    let offset_clearance = _config.get().clearance
+    let dbg = _calculate-offsets(offset_page, offset_items, offset_clearance)
+    // TODO: trying to cache the results does not work.
+    // offsets.update(old => {
+    //   // only do calculations if not yet in old
+    //   if page_num in old {
+    //     old
+    //   } else {
+    //     let new_offsets = _calculate-offsets(offset_page, offset_items, offset_clearance)
+    //     assert(dbg == new_offsets)
+    //     old.insert(page_num, new_offsets)
+    //     old
+    //   }
+    // })
+
+    // let vadjust = dy + offsets.final().at(page_num, default: (:)).at(str(index), default: 0pt)
+    let vadjust = dy + dbg.at(str(index), default: 0pt)
+
+    // box(width: 0pt, place(box(fill: yellow, width: 1cm, text(size: 5pt)[#anchor.y + #vadjust = #(anchor.y + vadjust)])))
+
     let hadjust = if side == "right" {
       pagewidth - anchor.x - get-right().far - get-right().width
     } else { get-left().far - anchor.x }
+
+    // box(width: 0pt, place(box(fill: yellow, width: 1cm, text(size: 5pt)[#get-right().width])))
 
     box(width: 0pt, place(dx: hadjust, dy: vadjust, notebox))
   }

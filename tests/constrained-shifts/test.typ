@@ -17,7 +17,7 @@
 
 #wideblock[
   #lorem(20)
-  #note(shift: "ignore")[Ignored #lorem(13)]
+  #note(shift: "ignore")[Ignored #lorem(10)]
   #lorem(10)
 ]
 
@@ -32,6 +32,3 @@
 #lorem(20)
 #note(side: "inner", shift: false)[Fixed #lorem(5)]
 #lorem(20)
-
-#text(fill: red)[BROKEN: Note 5 should not be shifted.]\
-#text(fill: red)[BROKEN: Note 8 should be higher.]\
