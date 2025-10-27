@@ -102,7 +102,7 @@ pages. Notes are placed in the outside margin by default.
 
 See the appendix for a more detailed explanation of the #link(label("marginalia-setup()"), [```typc setup()```]) function and its options.
 
-Additionally, I recommend using typst’s partial function application feature to customize other aspects of the notes consistently:
+Additionally, I recommend using Typst's partial function application feature to customize other aspects of the notes consistently:
 #codeblock[
   ```typ
   #let note = note.with(/* options here */)
@@ -163,7 +163,7 @@ we obtain notes without icon/number:#note(numbering: none)[Like this.]
 
 To change the markers, you can override the #link(label("marginalia-note.numbering"), [```typc numbering```]) function which is used to generate the markers.
 
-You can also change the #link(label("marginalia-note.counter"), [```typc counter```]) used. This can be useful if you want some of your notes to have independent numberings.
+You can also change the #link(label("marginalia-note.counter"), [```typc counter```]) used. This can be useful if you want some of your notes to have independent numbering.
 #let a-note-counter = counter("a-note")
 #let a-note = note.with(
   counter: a-note-counter,
@@ -182,7 +182,7 @@ You can also change the #link(label("marginalia-note.counter"), [```typc counter
 
 === Advanced Markers
 
-If a different style is deisred for the marker in the text and in the margins, you can use the #link(label("marginalia-note.anchor-numbering"), [```typc anchor-numbering```]) parameter to control the in-text marker:
+If a different style is desired for the marker in the text and in the margins, you can use the #link(label("marginalia-note.anchor-numbering"), [```typc anchor-numbering```]) parameter to control the in-text marker:
 #note(
   numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
   anchor-numbering: (.., i) => super[#i],
@@ -261,7 +261,7 @@ To style the block containing the note body, use the #link(label("marginalia-not
 
 For more advanced use-cases, you can also pass a function as the #link(label("marginalia-note.block-style"), [```typc block-style```]).
 It will be called with one argument, either ```typc "left"``` of ```typc "right"```, depending on the side the note will be placed on.
-Inside the function, context is avaliable.
+Inside the function, context is available.
 #let block-style = side => {
   if side == "left" {
     (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
@@ -343,7 +343,7 @@ Inside the function, context is avaliable.
   #link(label("marginalia-wideblock()"), [```typ #wideblock[]```])
   can be used to wrap content in a wide block which spans into the margin-note-column.
 
-  Note: when using an asyymetric page layout with #link(label("marginalia-setup.book"), [```typc setup.book```])```typc : true```, wideblocks which span across pagebreaks are messy, because there is no way for the wideblock to detect the pagebreak and adjust ist position after it.
+  Note: when using an asymmetric page layout with #link(label("marginalia-setup.book"), [```typc setup.book```])```typc : true```, wideblocks which span across pagebreaks are messy, because there is no way for the wideblock to detect the pagebreak and adjust its position after it.
 
   It is possible to use notes in a wide block:#note[Voila.]#note(side: "inner")[Wow!].
   They will automatically shift downwards to avoid colliding with the wideblock.
@@ -389,7 +389,7 @@ and it will get a marker like other notes:
 If you want, you can override the #link(label("marginalia-notefigure.counter"))[```typc counter```] and #link(label("marginalia-notefigure.anchor-numbering"))[```typc anchor-numbering```] to get an anchor using the figure-numbering.
 #notefigure(
   rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.crest)),
-  caption: [resuing figure counter],
+  caption: [reusing figure counter],
   counter: counter(figure),
   anchor-numbering: (.., i) => super[#(i + 1)],
 )
@@ -634,7 +634,7 @@ For convenience, you may pass a #link(label("marginalia-header.text-style"))[`te
   ]
   In nearly all cases, they seem to lead to a "layout did not converge within 5 attempts" warning, so it is probably best to avoid them if possible.
   - Just use multiple paragraphs in one note, or place multiple notes in the main text instead.
-  - If really neccessary, use `shift: "ignore"` on the nested notes and manually set `dy`.
+  - If really necessary, use `shift: "ignore"` on the nested notes and manually set `dy`.
 
 - If `book` is `true`, wideblocks that break across pages are broken. Sadly there doesn't seem to be a way to detect and react to page-breaks from within a `block`, so I don't know how to fix this.
 

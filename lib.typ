@@ -43,7 +43,7 @@
   /// -> boolean
   repeat: true,
   /// Wrap the symbol in a styled text function.
-  /// -> dict
+  /// -> function
   style: text.with(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
   /// Whether to add a space of 2pt after the symbol.
   /// If ```typc auto```, a space is only added if it is a number (the symbols have ran out).
