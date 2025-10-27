@@ -50,7 +50,13 @@
 
 #set figure(gap: 0pt) // neccessary in both cases
 #set figure.caption(position: bottom) // (this is the default)
-#show figure.caption.where(position: bottom): note.with(alignment: "bottom", anchor-numbering: none, numbering: none, shift: "avoid", keep-order: true)
+#show figure.caption.where(position: bottom): note.with(
+  alignment: "bottom",
+  anchor-numbering: none,
+  numbering: none,
+  shift: "avoid",
+  keep-order: true,
+)
 
 
 #let codeblock(code) = {
@@ -69,8 +75,8 @@
     #text(weight: "black")[Marginalia]
     #text(fill: luma(60%), number-type: "old-style")[#VERSION]
     #text(size: 10pt)[#note(numbering: none)[
-        #outline(indent: 1em, depth: 2)
-      ]]],
+      #outline(indent: 1em, depth: 2)
+    ]]],
 )
 _Write into the margins!_
 #v(1em)
@@ -169,18 +175,21 @@ You can also change the #link(label("marginalia-note.counter"), [```typc counter
 #let a-note-counter = counter("a-note")
 #let a-note = note.with(
   counter: a-note-counter,
-  numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
+  numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering(
+    "A",
+    ..i,
+  )),
 )
 #a-note[alphabetized note]
 #note[regular one]
 #a-note[another alphabetized note]
 #codeblock[```typ
-  #let a-note-counter = counter("a-note")
-  #let a-note = note.with(
-    counter: a-note-counter,
-    numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
-  )
-  ```]
+#let a-note-counter = counter("a-note")
+#let a-note = note.with(
+  counter: a-note-counter,
+  numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
+)
+```]
 
 === Advanced Markers
 
@@ -190,11 +199,11 @@ If a different style is desired for the marker in the text and in the margins, y
   anchor-numbering: (.., i) => super[#i],
 )[This note has a custom numbering, but the same counter.]
 #codeblock[```typ
-  #note(
-    numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
-    anchor-numbering: (.., i) => super[#i],
-  )[...]
-  ```]
+#note(
+  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
+  anchor-numbering: (.., i) => super[#i],
+)[...]
+```]
 Note that doing this implies #link(label("marginalia-note.flush-numbering"), [```typc flush-numbering```])```typc : true```.
 This is based on the assumption that if you have set two different numbering functions, you want to handle the placement yourself.
 Non-flush numbers, which are `place`d, complicate this.
@@ -286,58 +295,6 @@ Inside the function, context is available.
 #note(side: "inner", block-style: block-style)[Purple 2]
 ```)
 
-// #codeblock(```typ
-// #let note-with-wide-background = marginalia.note.with(
-//     block-style: (fill: oklch(90.26%, 0.058, 140.43deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt)
-//   )
-// #let note-with-background = marginalia.note.with(
-//     block-style: (fill: oklch(90.26%, 0.058, 140.43deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt)
-//   )
-// ```)
-
-//
-// #text(fill: red)[TODO: OUTDATED]
-// It is recommended to reset the `notecounter` regularly, either per page:
-// #block[
-//   #set text(size: 0.84em)
-//   ```typ
-//   #set page(header: { marginalia.notecounter.update(0) })
-//   ```
-// ]
-// or per heading:
-// #block[
-//   #set text(size: 0.84em)
-//   ```typ
-//   #show heading.where(level: 1): it =>
-//     { marginalia.notecounter.update(0); it }
-//   ```
-// ]
-//
-// #note(shift: "ignore")[
-//   Vertical offsets in this document:
-//   Right:\
-//   #context marginalia._note_extends_right.get().at("1") \
-//   #context marginalia._note_extends_right.final().at("1") \
-//   #context marginalia._note_offset_right("1") \
-//   #context marginalia._note_offset_right("2") \
-//   #context marginalia._note_offset_right("3") \
-//   #context marginalia._note_offset_right("4") \
-//   #context marginalia._note_offset_right("5") \
-//   #context marginalia._note_offset_right("6") \
-//   #context marginalia._note_offset_right("7") \
-//   #context marginalia._note_offset_right("8")
-
-//   Left:\
-//   #context marginalia._note_offset_left("1") \
-//   #context marginalia._note_offset_left("2") \
-//   #context marginalia._note_offset_left("3") \
-//   #context marginalia._note_offset_left("4") \
-//   #context marginalia._note_offset_left("5") \
-//   #context marginalia._note_offset_left("6") \
-//   #context marginalia._note_offset_left("7") \
-//   #context marginalia._note_offset_left("8")
-// ]
-
 // #pagebreak(weak: true)
 = Wide Blocks
 #wideblock[
@@ -397,8 +354,8 @@ If you want, you can override the #link(label("marginalia-notefigure.counter"))[
 )
 
 #codeblock[```typ
-  #notefigure(/**/, counter: counter(figure), anchor-numbering: (.., i) => super[#(i + 1)], )
-  ```]
+#notefigure(/**/, counter: counter(figure), anchor-numbering: (.., i) => super[#(i + 1)], )
+```]
 
 
 Additionally, the #link(label("marginalia-notefigure.alignment"))[```typ alignment```] parameter can now also be ```typc "caption-top"```,
@@ -469,7 +426,13 @@ For larger figures, use the following set and show rules if you want top-aligned
 #[
   #set figure(gap: 0pt)
   #set figure.caption(position: top)
-  #show figure.caption.where(position: top): note.with(alignment: "top", anchor-numbering: none, numbering: none, shift: "avoid", keep-order: true)
+  #show figure.caption.where(position: top): note.with(
+    alignment: "top",
+    anchor-numbering: none,
+    numbering: none,
+    shift: "avoid",
+    keep-order: true,
+  )
 
   #figure(
     rect(width: 100%, fill: gradient.linear(..color.map.inferno)),
@@ -554,13 +517,13 @@ To align the top of the note instead, set #link(label("marginalia-note.alignment
 == Background Lines
 They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using
 #codeblock[```typ
-  #show: marginalia.show-frame
-  ```]
+#show: marginalia.show-frame
+```]
 
 You can also hide the lines for the header and footer with
 #codeblock[```typ
-  #show: marginalia.show-frame.with(header: false, footer: false)
-  ```]
+#show: marginalia.show-frame.with(header: false, footer: false)
+```]
 
 #pagebreak(weak: true)
 
@@ -615,6 +578,31 @@ For convenience, you may pass a #link(label("marginalia-header.text-style"))[`te
     [right outer],
   ),
 )
+
+== Pages with automatic sizing.
+Pages with ```typc width: auto``` are not supported at all.
+
+Pages with ```typc height: auto``` work -- with the limitation that notes may run over the bottom of the page as they are not considered by Typst when determining the page height.
+
+There are two workarounds for this: (these can be combined)
+
++ If there is not enough space on the page to fit the notes, you can add some vertical space (```typ #v(__pt)```) to make the page taller.
++ If there is left-over space above the notes,#note[I.e. moving notes up would make them fit inside the page], you can try the following:
+
+#codeblock[
+  ```typ
+  // at the TOP of your content (before all notes)
+  //  -- this ensures that notes aren’t moved below the “barrier”
+  #let note = note.with(keep-order: true)
+
+  /* Your content */
+
+  // at the END of your content
+  //   -- this serves as a “barrier” that moves the previous notes up
+  #context note(shift: false, alignment: "top", dy: marginalia._config.get().clearance, keep-order: true, numbering: none, anchor-numbering: auto)[]
+  ```
+]
+
 
 // #pagebreak(weak: true)
 = Troubleshooting / Known Bugs
