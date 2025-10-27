@@ -23,8 +23,7 @@ pages. Notes are placed in the outside margin by default.
 
 Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.
-[Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf?raw=true)
-<!-- [Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true) -->
+[Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true)
 
 (Note that the above configuration step is not necessary if you are happy with the defaults provided and are using a4 paper.)
 
@@ -69,11 +68,8 @@ For small figures, the package also provides a `notefigure` command which places
 
 ## Manual
 
-[Full Manual →](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf?raw=true)
-[![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/heads/main/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf)
-
-<!-- [Full Manual →](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true)
-[![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/tags/v0.2.4/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf) -->
+[Full Manual →](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true)
+[![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/tags/v0.2.4/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true)
 
 ## Feedback
 Have you encountered a bug? [Please report it as an issue in my github repository.](https://github.com/nleanba/typst-marginalia/issues)

@@ -587,19 +587,19 @@ Pages with ```typc height: auto``` work -- with the limitation that notes may ru
 There are two workarounds for this: (these can be combined)
 
 + If there is not enough space on the page to fit the notes, you can add some vertical space (```typ #v(__pt)```) to make the page taller.
-+ If there is left-over space above the notes,#note[I.e. moving notes up would make them fit inside the page], you can try the following:
++ If there is left-over space above the notes,#note[I.e. moving notes up would make them fit inside the page] you can try the following:
 
 #codeblock[
   ```typ
   // at the TOP of your content (before all notes)
-  //  -- this ensures that notes aren’t moved below the “barrier”
+  //   -- this ensures that notes aren’t moved below the “barrier”
   #let note = note.with(keep-order: true)
 
   /* Your content */
 
   // at the END of your content
   //   -- this serves as a “barrier” that moves the previous notes up
-  #context note(shift: false, alignment: "top", dy: marginalia._config.get().clearance, keep-order: true, numbering: none, anchor-numbering: auto)[]
+  #context marginalia.note(shift: false, alignment: "top", dy: marginalia._config.get().clearance, keep-order: true, numbering: none)[]
   ```
 ]
 
