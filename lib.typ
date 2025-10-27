@@ -446,93 +446,55 @@
   _calculate-offsets(page, items, _config.get().clearance)
 }
 
-// absolute left
-/// #internal()
-#let _note_left(dy: 0pt, keep-order: false, shift: true, body) = (
+// Internal use.
+#let place-note(
+  /// -> "right" | "left"
+  side: "right",
+  dy: 0pt,
+  keep-order: false,
+  shift: true,
+  body,
+) = (
   context {
-    let dy = dy.to-absolute()
-    let anchor = here().position()
-    let page = here().page()
+    assert(side == "left" or side == "right", message: "side must be left or right.")
 
-    let width = get-left().width
-    let height = measure(body, width: width).height
-    let notebox = box(width: width, height: height, body)
-    let natural_position = anchor.y + dy
-
-    let current = _note_extends_left.get().at(str(page), default: ())
-    let index = current.len()
-
-    _note_extends_left.update(old => {
-      let oldpage = old.at(str(page), default: ())
-      oldpage.push((natural: natural_position, height: height, shift: shift, keep-order: keep-order))
-      old.insert(str(page), oldpage)
-      old
-    })
-
-    let vadjust = dy + _note_offset_left(str(page)).at(str(index), default: 0pt)
-    let hadjust = get-left().far - anchor.x
-    box(place(
-      dx: hadjust,
-      dy: vadjust,
-      notebox,
-    ))
-  }
-)
-
-// absolute right
-/// #internal()
-#let _note_right(dy: 0pt, keep-order: false, shift: true, body) = (
-  context {
     let dy = dy.to-absolute()
     let anchor = here().position()
     let pagewidth = if page.flipped { page.height } else { page.width }
     let page = here().page()
 
-    let width = get-right().width
+    let width = if side == "right" { get-right().width } else { get-left().width }
     let height = measure(body, width: width).height
     let notebox = box(width: width, height: height, body)
     let natural_position = anchor.y + dy
 
-    let current = _note_extends_right.get().at(str(page), default: ())
+    let extends = if side == "right" { _note_extends_right } else { _note_extends_left }
+
+    let current = extends.get().at(str(page), default: ())
     let index = current.len()
 
-    // let in-parent-offset = 0pt
-    // let parent = _parent-note.get()
-    // if parent {
-    //   let parent-pos = current.last().natural
-    //   in-parent-offset = natural_position - parent-pos
-    //   natural_position = parent-pos
-    // }
-
-    _note_extends_right.update(old => {
+    extends.update(old => {
       let oldpage = old.at(str(page), default: ())
       oldpage.push((natural: natural_position, height: height, shift: shift, keep-order: keep-order))
       old.insert(str(page), oldpage)
       old
     })
 
-    let vadjust = dy + _note_offset_right(str(page)).at(str(index), default: 0pt) // - in-parent-offset
-    let hadjust = pagewidth - anchor.x - get-right().far - get-right().width
+    let vadjust = (
+      dy
+        + (
+          if side == "right" {
+            _note_offset_right(str(page)).at(str(index), default: 0pt)
+          } else {
+            _note_offset_left(str(page)).at(str(index), default: 0pt)
+          }
+        )
+    )
+    let hadjust = if side == "right" {
+      pagewidth - anchor.x - get-right().far - get-right().width
+    } else { get-left().far - anchor.x }
 
-    // if parent {
-    //   box(
-    //     width: 0pt,
-    //     place(
-    //       dx: hadjust,
-    //       dy: vadjust,
-    //       {
-    //         notebox
-    //       }
-    //     )
-    //   )
-    // } else {
-    box(width: 0pt, place(dx: hadjust, dy: vadjust, {
-      //_parent-note.update(true)
-      // [#parent]
-      notebox
-      //_parent-note.update(false)
-    }))
-    // }
+    box(width: 0pt, place(dx: hadjust, dy: vadjust, notebox))
   }
 )
 
@@ -643,12 +605,6 @@
     } else { side }
 
     assert(side == "left" or side == "right", message: "side must be auto, left, right, outer, or inner.")
-    let note-fn = if side == "right" {
-      _note_right
-    } else {
-      _note_left
-    }
-
     let body = if numbering != none {
       if flush-numbering {
         box({
@@ -709,7 +665,7 @@
       if anchor-numbering != none {
         counter.display(anchor-numbering)
       }
-      note-fn(dy: dy, keep-order: keep-order, shift: shift, body)
+      place-note(side: side, dy: dy, keep-order: keep-order, shift: shift, body)
     })
   }
 }
