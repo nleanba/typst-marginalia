@@ -27,7 +27,7 @@
     marginalia.header(
       text-style: (size: 8.5pt, number-type: "old-style"),
       [Page #counter(page).display("1 of 1", both: true)],
-      smallcaps[Marginalia #text(fill: luma(60%))[#VERSION]],
+      [#smallcaps[Marginalia] #text(fill: luma(60%))[#VERSION]],
       [],
     )
   },
