@@ -1,6 +1,6 @@
 #import "lib.typ" as marginalia: note, notefigure, wideblock
 
-#let VERSION = "0.2.4"
+#let VERSION = "?.?.?"
 
 #set par(justify: true, linebreaks: "optimized")
 #set text(fill: luma(20%), size: 10pt)
@@ -87,20 +87,16 @@ _Write into the margins!_
 = Setup
 Put something akin to the following at the start of your `.typ` file:
 #note[Do not #[```typ #import "...": *```], this will shadow built-in functions.]
-#codeblock[
-  ```typst
-  #import "@preview/marginalia:0.2.4" as marginalia: note, notefigure, wideblock
+#codeblock[#raw(block: true, lang: "typ", """#import "@preview/marginalia:"""+ VERSION + """" as marginalia: note, notefigure, wideblock
 
-  #show: marginalia.setup.with(
-    // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
-    // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
-    // top: 2.5cm,
-    // bottom: 2.5cm,
-    // book: false,
-    // clearance: 12pt,
-  )
-  ```
-]
+#show: marginalia.setup.with(
+  // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
+  // outer: ( far: 5mm, width: 15mm, sep: 5mm ),
+  // top: 2.5cm,
+  // bottom: 2.5cm,
+  // book: false,
+  // clearance: 12pt,
+)""")]
 
 Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.

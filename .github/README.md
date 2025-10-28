@@ -32,12 +32,13 @@ Use `tt update <name>` to update the reference of a test, and `tt new <name>` to
 ### New Versions
 
 1. Replace all occurrences of the old version number with the new one, except where it refers to specific changes made in that version.
-  - Also replace placeholder `{NEXT}` with the new number.
+  - Also replace placeholder `?.?.?` with the new number.
 2. Commit and create a tagged release.
 3. “Sync Fork” in https://github.com/nleanba/typst-packages
 4. In `nleanba/typst-packages`, Pull and create new branch from main
 5. Create folder `packages/preview/marginalia/<VERSION>` and copy `LICENSE`, `README.md`, `lib.typ`, and `typst.toml`
 6. Commit and create a pull-request to `typst/packages`.
+7. `main.typ`: reset `#let VERSION = "?.?.?"`.
 
 ### Contributing
 

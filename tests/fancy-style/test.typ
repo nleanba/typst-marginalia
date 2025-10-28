@@ -27,10 +27,23 @@
 
 #lorem(20)
 
+To the side
 #notefigure(
-  side: "inner",
   rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
   caption: [Styled figure.],
   block-style: block-style,
-  label: <styled-fig>,
-)
+)<styled-fig>
+we have @styled-fig.
+
+
+To the side
+#notefigure(
+  rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
+  numbering: (..i) => super(numbering("1", ..i)),
+  anchor-numbering: auto,
+  caption: [Another styled figure.],
+  block-style: block-style,
+  note-label: <xyz>,
+)<xyz-fig>
+we have @xyz-fig.
+Again:@xyz
