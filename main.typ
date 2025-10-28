@@ -42,8 +42,8 @@
 #show: marginalia.show-frame.with(footer: false)
 
 
-#show heading.where(level: 1): set block(above: 34pt, below: 12pt)
-#show heading.where(level: 2): set block(above: 26pt, below: 12pt)
+#show heading.where(level: 1): set block(above: 30pt, below: 12pt)
+#show heading.where(level: 2): set block(above: 20pt, below: 10pt)
 
 #let note = note.with(text-style: (size: 8.5pt))
 #let notefigure = notefigure.with(text-style: (size: 8.5pt))
@@ -86,6 +86,7 @@ _Write into the margins!_
 
 = Setup
 Put something akin to the following at the start of your `.typ` file:
+#note[Do not #[```typ #import "...": *```], this will shadow built-in functions.]
 #codeblock[
   ```typst
   #import "@preview/marginalia:0.2.4" as marginalia: note, notefigure, wideblock
@@ -118,8 +119,6 @@ Additionally, I recommend using Typst's partial function application feature to 
   #let notefigure = notefigure.with(/* same options here */)
   ```
 ]
-
-Do not #strike[```typ #import "@preview/marginalia:0.2.4": *```], this will shadow built-in functions.
 
 // // #context if calc.even(here().page()) {pagebreak(to: "odd", weak: true)}
 // #pagebreak(to: "odd", weak: true)

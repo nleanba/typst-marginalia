@@ -551,7 +551,7 @@
   /// - If ```typc auto```, will use the given @note.numbering.
   /// -> none | auto | function | string
   anchor-numbering: auto,
-  /// Whether to make have the anchor link to the note.
+  /// Whether to have the anchor link to the note, and vice-versa.
   /// -> boolean
   link-anchor: true,
   /// Counter to use for this note.
@@ -629,15 +629,23 @@
 
     assert(side == "left" or side == "right", message: "side must be auto, left, right, outer, or inner.")
     let body = if numbering != none {
-      if flush-numbering {
-        box({
+      let number = {
+        if link-anchor {
+          show link: it => {
+            show underline: i => i.body
+            it
+          }
+          link(here(), counter.display(numbering))
+        } else {
           counter.display(numbering)
-        })
+        }
+      }
+      if flush-numbering {
+        box(number)
         h(0pt, weak: true)
         body
       } else {
         body
-        let number = counter.display(numbering)
         let width = measure({
           set text(..text-style)
           set par(..par-style)
