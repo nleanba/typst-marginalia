@@ -119,6 +119,8 @@ Additionally, I recommend using Typst's partial function application feature to 
   ```
 ]
 
+Do not #strike[```typ #import "@preview/marginalia:0.2.4": *```], this will shadow built-in functions.
+
 // // #context if calc.even(here().page()) {pagebreak(to: "odd", weak: true)}
 // #pagebreak(to: "odd", weak: true)
 // = Showcase

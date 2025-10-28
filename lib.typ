@@ -710,6 +710,47 @@
   }
 }
 
+/// Reference a nearby margin note. Will place the same anchor as that note had.
+///
+/// Be aware that notes without an anchor still count for the offset, but the rendered link is empty.
+///
+/// #example(scale-preview: 100%, ```typ
+///   This is a note: #note[Blah Blah]
+///
+///   This is a link to that note:
+///     #marginalia.ref(-1)
+///
+///   This is an unnumbered note:
+///     #note(counter: none)[Blah Blah]
+///
+///   This is a useless link to that note:
+///     #marginalia.ref(-1)
+///   ```)
+#let ref(
+  /// How many notes away the target note is.
+  /// - ```typc -1```: The previous note.
+  /// - ```typc 0```: Disallowed
+  /// - ```typc 1```: The next note.
+  /// -> integer
+  offset,
+) = context {
+  h(0pt, weak: true)
+  show link: it => {
+    show underline: i => i.body
+    it
+  }
+  assert(offset != 0, message: "marginalia.ref offset must not be 0.")
+  if offset > 0 {
+    let dest = query(selector(<_marginalia_note>).after(here()))
+    assert(dest.len() > offset, message: "Not enough notes after this to reference")
+    link(dest.at(offset - 1).location(), dest.at(offset - 1).value.anchor)
+  } else {
+    let dest = query(selector(<_marginalia_note>).before(here()))
+    assert(dest.len() > -offset, message: "Not enough notes after this to reference")
+    link(dest.at(offset).location(), dest.at(offset).value.anchor)
+  }
+}
+
 /// Creates a figure in the margin.
 ///
 /// Parameters `numbering`, `anchor-numbering`, `flush-numbering`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
