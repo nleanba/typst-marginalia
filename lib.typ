@@ -136,6 +136,8 @@
 ///
 /// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
 ///
+/// This function also sets up the neccesary show-rule to allow referencing labelled notes.
+///
 /// #compat((
 ///   "0.1.5": (
 ///     [`numbering` has been replaced with @note.numbering/@notefigure.numbering.
@@ -181,6 +183,27 @@
 #let setup(..config, body) = {
   _config.update(_fill_config(..config))
   set page(.._page-setup(..config))
+  show ref: it => {
+    if (
+      it.has("element")
+        and it.element != none
+        and it.element.has("children")
+        and it.element.children.len() > 1
+        and it.element.children.first().func() == metadata
+        and it.element.children.first().value == "_marginalia_note"
+    ) {
+      h(0pt, weak: true)
+      show link: it => {
+        show underline: i => i.body
+        it
+      }
+      let dest = query(selector(<_marginalia_note>).after(it.element.location()))
+      assert(dest.len() > 0, message: "Could not find referenced note")
+      link(dest.first().location(), dest.first().value.anchor)
+    } else {
+      it
+    }
+  }
   body
 }
 
@@ -609,6 +632,8 @@
   /// -> content
   body,
 ) = {
+  metadata("_marginalia_note")
+
   let numbering = if counter == none { none } else { numbering }
   if numbering != none { counter.step() }
   let flush-numbering = if flush-numbering == auto { anchor-numbering != auto } else { flush-numbering }

@@ -189,16 +189,24 @@ we obtain notes without number:#note(counter: none)[Like this.]
 
 === References
 
-You can reference another note -- i.e. place its anchor again -- using #link(label("marginalia-ref()"), [```typc marginalia.ref()```]).
-```typ #marginalia.ref(-5)``` gives~#marginalia.ref(-5),
-and ```typ #marginalia.ref(-17)``` should give a link to “Note 1”:~#marginalia.ref(-17).
+There are two ways to reference another note:
 
-You can also reference future notes using a positive offset.
-#marginalia.ref(1)
+1. You can add a ```typ <label>``` to the note and then ```typ @label``` reference it. Note that any supplement is ignored.
+2. You can use #link(label("marginalia-ref()"), [```typc marginalia.ref()```]) and tell it how many notes away the target is.
+  This is mostly useful to reference the most recent note again.
+  
+  Be aware that notes without anchor/number still count towards the offset, and you can also reference them, but doing so results in an invisible link and is a bit pointless.
 
-Be aware that notes without anchor/number still count towards the offset, and you can also reference them, but doing so results in an invisible link and is a bit pointless.
-
-In the future, I might add a way to reference notes without counting how far away they are.
+#codeblock[```typ
+- Original: #note[This is a note]<label>
+- Label Reference: @label @label2
+- Count Reference: #marginalia.ref(-1) #marginalia.ref(1)
+- Original: #note[This is another note]<label2>
+```]
+- Original: #note[This is a note]<label>
+- Label Reference: @label @label2
+- Offset Reference: #marginalia.ref(-1) #marginalia.ref(1)
+- Original: #note[This is another note]<label2>
 
 === Advanced Markers
 
