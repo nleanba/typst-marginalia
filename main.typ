@@ -69,15 +69,20 @@
   )
 }
 
-#v(16mm)
-#block(
-  text(size: 3em)[
-    #text(weight: "black")[Marginalia]
-    #text(fill: luma(60%), number-type: "old-style")[#VERSION]
-    #text(size: 10pt)[#note(numbering: none)[
-      #outline(indent: 1em, depth: 2)
-    ]]],
-)
+#set document(title: [Marginalia Manual #VERSION])
+#show title: it => {
+  v(16mm)
+  block(
+    text(size: 30pt)[
+      #text(weight: "black")[Marginalia]
+      #text(fill: luma(60%), number-type: "old-style")[#VERSION]
+      #text(size: 10pt)[#note(numbering: none)[
+        #outline(indent: 1em, depth: 2)
+      ]]],
+  )
+}
+
+#title()
 _Write into the margins!_
 #v(1em)
 
@@ -87,7 +92,12 @@ _Write into the margins!_
 = Setup
 Put something akin to the following at the start of your `.typ` file:
 #note[Do not #[```typ #import "...": *```], this will shadow built-in functions.]
-#codeblock[#raw(block: true, lang: "typ", """#import "@preview/marginalia:"""+ VERSION + """" as marginalia: note, notefigure, wideblock
+#codeblock[#raw(
+  block: true,
+  lang: "typ",
+  "#import \"@preview/marginalia:"
+    + VERSION
+    + "\" as marginalia: note, notefigure, wideblock
 
 #show: marginalia.setup.with(
   // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -96,11 +106,11 @@ Put something akin to the following at the start of your `.typ` file:
   // bottom: 2.5cm,
   // book: false,
   // clearance: 12pt,
-)""")]
+)",
+)]
 
 Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.
-#note[You can also skip the configuration step if you’re using a4 paper and are happy with these defaults, but 15mm is not a lot to write in.]
 
 If #link(label("marginalia-setup.book"))[```typc book```] is ```typc false```, `inner` and `outer` correspond to the left and right
 margins respectively. If book is true, the margins swap sides on even and odd
@@ -190,7 +200,7 @@ There are two ways to reference another note:
 1. You can add a ```typ <label>``` to the note and then ```typ @label``` reference it. Note that any supplement is ignored.
 2. You can use #link(label("marginalia-ref()"), [```typc marginalia.ref()```]) and tell it how many notes away the target is.
   This is mostly useful to reference the most recent note again.
-  
+
   Be aware that notes without anchor/number still count towards the offset, and you can also reference them, but doing so results in an invisible link and is a bit pointless.
 
 #codeblock[```typ
@@ -355,19 +365,23 @@ and it will get a marker like other notes:
   rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.turbo)),
   numbering: marginalia.note-numbering,
   caption: [A marked notefigure.],
-  note-label: <markedfigure_note>
+  note-label: <markedfigure_note>,
 )<markedfigure>
 
 If you want, you can override the #link(label("marginalia-notefigure.counter"))[```typc counter```] and #link(label("marginalia-notefigure.anchor-numbering"))[```typc anchor-numbering```] to get an anchor using the figure-numbering.
 #notefigure(
   rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.crest)),
   caption: [reusing figure counter],
-  counter: counter(figure),
-  anchor-numbering: (.., i) => super[#(i + 1)],
+  counter: counter(figure.where(kind: image)),
+  anchor-numbering: (.., i) => super[fig. #(i + 1) ],
 )
 
 #codeblock[```typ
-#notefigure(/**/, counter: counter(figure), anchor-numbering: (.., i) => super[#(i + 1)], )
+#notefigure(
+  /**/,
+  counter: counter(figure.where(kind: image)),
+  anchor-numbering: (.., i) => super[fig. #(i + 1) ],
+)
 ```]
 
 
@@ -616,15 +630,12 @@ There are two workarounds for this: (these can be combined)
 
 
 // #pagebreak(weak: true)
-= Troubleshooting / Known Bugs
+= Troubleshooting / Known Limitations
 
 - If the document needs multiple passes to figure out page-breaks,
   #note[This can happen for example with outlines which barely fit/don't fit onto the page.]
   it can break the note positioning.
   - This can usually be resolved by placing a ```typ #pagebreak()``` or ```typ #pagebreak(weak: true)``` in an appropriate location.
-
-- Relatedly, everything breaks if you try to use pages with width or height set to ```typc auto```,
-  as this package needs to know the actual measurements of the page to figure out where to place stuff.
 
 - Nested notes may or may not work.
   #note[
