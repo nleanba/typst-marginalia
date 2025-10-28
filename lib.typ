@@ -551,6 +551,9 @@
   /// - If ```typc auto```, will use the given @note.numbering.
   /// -> none | auto | function | string
   anchor-numbering: auto,
+  /// Whether to make have the anchor link to the note.
+  /// -> boolean
+  link-anchor: true,
   /// Counter to use for this note.
   /// Can be set to ```typc none``` do disable numbering this note.
   ///
@@ -658,10 +661,14 @@
       block-style
     }
 
+    let anchor = if anchor-numbering != none {
+      counter.display(anchor-numbering)
+    } else []
+
     let body = align(top, block(width: 100%, ..block-style, {
       set text(..text-style)
       set par(..par-style)
-      body
+      [#metadata((note: true, anchor: anchor))<_marginalia_note>#body]
     }))
 
     let dy-adjust = if alignment == "baseline" {
@@ -683,7 +690,20 @@
     h(0pt, weak: true)
     box({
       if anchor-numbering != none {
-        counter.display(anchor-numbering)
+        if link-anchor {
+          show link: it => {
+            show underline: i => i.body
+            it
+          }
+          let dest = query(selector(<_marginalia_note>).after(here()))
+          if dest.len() > 0 {
+            link(dest.first().location(), anchor)
+          } else {
+            anchor
+          }
+        } else {
+          anchor
+        }
       }
       place-note(side: side, dy: dy, keep-order: keep-order, shift: shift, body)
     })

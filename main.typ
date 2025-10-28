@@ -171,6 +171,8 @@ we obtain notes without icon/number:#note(numbering: none)[Like this.]
 
 To change the markers, you can override the #link(label("marginalia-note.numbering"), [```typc numbering```]) function which is used to generate the markers.
 
+// TODO: counter: none to skip numbering, interaction with anchor-numbering?
+
 You can also change the #link(label("marginalia-note.counter"), [```typc counter```]) used. This can be useful if you want some of your notes to have independent numbering.
 #let a-note-counter = counter("a-note")
 #let a-note = note.with(
