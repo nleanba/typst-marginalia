@@ -137,6 +137,7 @@
 /// The default values for the margins have been chosen such that they match the default typst margins for a4. It is strongly recommended to change at least one of either `inner` or `outer` to be wide enough to actually contain text.
 ///
 /// This function also sets up the neccesary show-rule to allow referencing labelled notes.
+/// If you also have a custom ```typ #show ref:``` rule, it may be relevant if setup is called before or after that show rule.
 ///
 /// #compat((
 ///   "0.1.5": (
@@ -190,16 +191,23 @@
         and it.element.has("children")
         and it.element.children.len() > 1
         and it.element.children.first().func() == metadata
-        and it.element.children.first().value == "_marginalia_note"
     ) {
-      h(0pt, weak: true)
-      show link: it => {
-        show underline: i => i.body
+      if it.element.children.first().value == "_marginalia_note" {
+        h(0pt, weak: true)
+        show link: it => {
+          show underline: i => i.body
+          it
+        }
+        let dest = query(selector(<_marginalia_note>).after(it.element.location()))
+        assert(dest.len() > 0, message: "Could not find referenced note")
+        link(dest.first().location(), dest.first().value.anchor)
+      } else if true or it.element.children.first().value == "_marginalia_notefigure" {
+        let dest = query(selector(<_marginalia_notefigure_meta>).after(it.element.location()))
+        assert(dest.len() > 0, message: "Could not find referenced notefigure")
+        std.ref(dest.first().value.label, form: it.form, supplement: it.supplement)
+      } else {
         it
       }
-      let dest = query(selector(<_marginalia_note>).after(it.element.location()))
-      assert(dest.len() > 0, message: "Could not find referenced note")
-      link(dest.first().location(), dest.first().value.anchor)
     } else {
       it
     }
@@ -544,6 +552,8 @@
 /// Create a marginnote.
 /// Will adjust it's position downwards to avoid previously placed notes, and upwards to avoid extending past the bottom margin.
 ///
+/// Notes can be attached a label and are referenceable (if @setup was run).
+///
 /// #compat((
 ///   "0.1.5": (
 ///     [`reverse` has been replaced with @note.side.
@@ -745,7 +755,7 @@
 
 /// Reference a nearby margin note. Will place the same anchor as that note had.
 ///
-/// Be aware that notes without an anchor still count for the offset, but the rendered link is empty.
+/// Be aware that notes without an anchor (including notefigures) still count for the offset, but the rendered link is empty.
 ///
 /// #example(scale-preview: 100%, ```typ
 ///   This is a note: #note[Blah Blah]
@@ -779,7 +789,7 @@
     link(dest.at(offset - 1).location(), dest.at(offset - 1).value.anchor)
   } else {
     let dest = query(selector(<_marginalia_note>).before(here()))
-    assert(dest.len() > -offset, message: "Not enough notes after this to reference")
+    assert(dest.len() >= -offset, message: "Not enough notes before this to reference")
     link(dest.at(offset).location(), dest.at(offset).value.anchor)
   }
 }
@@ -787,6 +797,8 @@
 /// Creates a figure in the margin.
 ///
 /// Parameters `numbering`, `anchor-numbering`, `flush-numbering`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
+/// 
+/// Notefigures can be attached a label and are referenceable (if @setup was run). Furthermore, the underlying @note can be given a label using the `note-label` parameter.
 ///
 /// #compat((
 ///   "0.1.5": (
@@ -798,6 +810,10 @@
 ///   "0.2.2": (
 ///     [@notefigure.dy no longer takes a relative length, instead @notefigure.alignment was added.],
 ///   ),
+///   "{NEXT}": (
+///     [The `label` argument has been removed.
+///      #ergo[Instead of ```typ #notefigure(label: <l>, ..)```, use ```typ #notefigure(..)<l>```.]],
+///   )
 /// ))
 /// -> content
 #let notefigure(
@@ -815,7 +831,7 @@
   /// -> counter | none
   counter: notecounter,
   /// Disallow note markers hanging into the whitespace.
-  /// - If ```typc auto```, acts like ```typc false``` if @note.anchor-numbering is ```typc auto```.
+  /// - If ```typc auto```, acts like ```typc false``` if @notefigure.anchor-numbering is ```typc auto```.
   /// -> auto | boolean
   flush-numbering: auto,
   /// Which side to place the note.
@@ -870,9 +886,10 @@
   /// Pass-through to ```typ #figure()```, but used to adjust the vertical position.
   /// -> length
   gap: 0.55em,
-  /// A label to attach to the figure.
+  /// A label to attach to the note. Referencing this label will repeat the anchor,
+  /// so it is only really useful if @notefigure.anchor-numbering is not ```typc none```.
   /// -> none | label
-  label: none,
+  note-label: none,
   /// The figure content, e.g.~an image. Pass-through to ```typ #figure()```, but used to adjust the vertical position.
   /// -> content
   content,
@@ -882,6 +899,8 @@
   /// -> arguments
   ..figureargs,
 ) = {
+  [#metadata("_marginalia_notefigure")<_marginalia_notefigure>]
+
   let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
 
   let numbering = if counter == none { none } else { numbering }
@@ -963,28 +982,30 @@
       dy = dy - height
     }
 
+    let index = query(selector(<_marginalia_notefigure>).before(here())).len()
+    let figure-label = std.label("_marginalia_notefigure__" + str(index))
 
-    h(0pt, weak: true)
-    note(
-      numbering: none,
-      anchor-numbering: anchor-numbering,
-      counter: counter,
-      side: side,
-      dy: dy,
-      alignment: alignment,
-      keep-order: keep-order,
-      shift: shift,
-      text-style: text-style,
-      par-style: par-style,
-      block-style: block-style,
-    )[
-      #figure(
-        content,
-        gap: gap,
-        placement: none,
-        ..figureargs,
-      )#label
-    ]
+    [#note(
+        numbering: none,
+        anchor-numbering: anchor-numbering,
+        counter: counter,
+        side: side,
+        dy: dy,
+        alignment: alignment,
+        keep-order: keep-order,
+        shift: shift,
+        text-style: text-style,
+        par-style: par-style,
+        block-style: block-style,
+        [#figure(
+          content,
+          gap: gap,
+          placement: none,
+          ..figureargs,
+        )#figure-label],
+      )#note-label]
+    // for unclear reasons, if this is placed before the note, it becomes part of the content referenced by note-label.
+    [#metadata((label: figure-label))<_marginalia_notefigure_meta>]
   }
 }
 

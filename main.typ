@@ -312,7 +312,7 @@ Inside the function, context is available.
 #note(side: "inner", block-style: block-style)[Purple 2]
 ```)
 
-// #pagebreak(weak: true)
+#pagebreak(weak: true)
 = Wide Blocks
 #wideblock[
   The command
@@ -358,9 +358,9 @@ and it will get a marker like other notes:
 #notefigure(
   rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.turbo)),
   numbering: marginalia.note-numbering,
-  label: <markedfigure>,
   caption: [A marked notefigure.],
-)
+  note-label: <markedfigure_note>
+)<markedfigure>
 
 If you want, you can override the #link(label("marginalia-notefigure.counter"))[```typc counter```] and #link(label("marginalia-notefigure.anchor-numbering"))[```typc anchor-numbering```] to get an anchor using the figure-numbering.
 #notefigure(
@@ -394,8 +394,7 @@ which leads to the caption's being aligned with the main text.
   caption: [Aligned to top of figure with #link(label("marginalia-notefigure.alignment"))[```typc alignment```]```typc : "top"```.],
 )
 
-A label can be attached to the figure using the #link(label("marginalia-notefigure.label"))[```typ label```] argument, as was done here for @markedfigure.
-(Sadly, it is not possible to attach labels normally.)
+A label can be attached to the figure normally as was done for @markedfigure. You can also add a label to the _note_ by using the #link(label("marginalia-notefigure.note-label"))[```typ note-label```] argument.@markedfigure_note
 
 Notefigures can also be given
 #link(label("marginalia-notefigure.side"), [```typc side```]),
@@ -411,8 +410,7 @@ as is demonstrated in @styled-fig.
   block-style: block-style,
   text-style: (size: 5pt, font: "Iosevka Extended"),
   par-style: (spacing: 20pt, leading: 0pt),
-  label: <styled-fig>,
-)
+)<styled-fig>
 Furthermore, the `numbering`, `anchor-numbering`, and `flush-numbering` parameters work as expected.
 #notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.plasma)),
@@ -542,7 +540,7 @@ You can also hide the lines for the header and footer with
 #show: marginalia.show-frame.with(header: false, footer: false)
 ```]
 
-#pagebreak(weak: true)
+// #pagebreak(weak: true)
 
 == Headers
 Here's how the headers in this document were made:

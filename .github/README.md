@@ -1,7 +1,7 @@
 # Marginalia
 _Configurable margin-notes with smart positioning and matching wide blocks for Typst_
 
-> [!NOTE]  
+> [!NOTE]
 > This is the readme file for the project repository and contains more development-oriented info.
 > 
 > [A more friendly readme for the published package can be found on Typst Universe.](https://typst.app/universe/package/marginalia).
@@ -18,7 +18,6 @@ _Configurable margin-notes with smart positioning and matching wide blocks for T
 ## Development
 
 - Remember to `typst watch main.typ Marginalia.pdf` and `typst watch main.typ preview.svg --pages 1` while development to make these stay current.
-- The documentation (`main.typ`) does not compile without a “layout does not converge”-warning. This is due to the example nested note and is fine.
 
 ### Tests
 
@@ -27,12 +26,13 @@ Use `tt run` to check for test regressions.
 The tests don’t necessarily represent _ideal_ behavior. If the behavior improves, they should be updated.
 Use `tt update <name>` to update the reference of a test, and `tt new <name>` to create a new test.
 
-> [!INFO]
+> [!IMPORTANT]
 > Note that the tests need to have a modified `numbering` style as the GitHub CI runner does not have Inter.
 
 ### New Versions
 
 1. Replace all occurrences of the old version number with the new one, except where it refers to specific changes made in that version.
+  - Also replace placeholder `{NEXT}` with the new number.
 2. Commit and create a tagged release.
 3. “Sync Fork” in https://github.com/nleanba/typst-packages
 4. In `nleanba/typst-packages`, Pull and create new branch from main
