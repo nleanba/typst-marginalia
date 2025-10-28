@@ -46,4 +46,34 @@ To the side
   note-label: <xyz>,
 )<xyz-fig>
 we have @xyz-fig.
-Again:@xyz
+Again: @xyz
+
+#pagebreak()
+
+
+#lorem(20)
+#note(block-style: block-style)[Purple]
+#note(side: "inner", block-style: block-style)[Purple 2]
+
+#lorem(20)
+
+To the side
+#notefigure(
+  rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
+  caption: [Styled figure.],
+  block-style: block-style,
+)<styled-fig2>
+we have @styled-fig2.
+
+
+To the side
+#notefigure(
+  rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
+  numbering: (..i) => super(numbering("1", ..i)),
+  anchor-numbering: auto,
+  caption: [Another styled figure.],
+  block-style: block-style,
+  note-label: <xyz2>,
+)<xyz-fig2>
+we have @xyz-fig2.
+Again: @xyz2

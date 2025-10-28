@@ -1,6 +1,6 @@
 #import "../../lib.typ" as marginalia: note, notefigure, wideblock
 
-#set page(width: 20cm, height: 14cm)
+#set page(width: 20cm, height: 25cm)
 #show: marginalia.setup.with(
   inner: (far: 1cm, width: 2cm, sep: 1cm),
   outer: (far: 1cm, width: 4cm, sep: 1cm),
@@ -8,6 +8,8 @@
   bottom: 2cm,
   book: true,
 )
+
+#set heading(numbering: "1.a")
 
 // using basic numbering as the ci runner does not have Inter
 #let note = note.with(numbering: (..i) => super(numbering("1", ..i)))
@@ -40,3 +42,20 @@
 - Figure reference: @figure
 - Label Reference: @figure_note
 - Offset Reference: #marginalia.ref(-1)
+
+= Other References
+
+#figure(table(columns: 2)[A][B][C][D], caption: [abcd])<plain_figure>
+→ @plain_figure
+
+#import "@preview/theoretic:0.2.0": theorem, show-ref
+#show ref: show-ref
+#theorem(label: <thm>)[Blah]
+→ @thm
+
+== Citations <heading>
+
+→ @clark1990unit
+→ @heading
+
+#bibliography("bib.yml")

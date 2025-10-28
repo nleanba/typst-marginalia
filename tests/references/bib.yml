@@ -1,0 +1,13 @@
+clark1990unit:
+  type: "article"
+  title: "Unit disk graphs"
+  author: ["Clark, Brent N", "Colbourn, Charles J", "Johnson, David S"]
+  date: "1990"
+  publisher: "Elsevier"
+  volume: "86"
+  issue: "1-3"
+  page-range: "165-177"
+  serial-number:
+        doi: "10.1016/0012-365X(90)90358-O"
+  parent:
+    title: "Discrete Mathematics"
