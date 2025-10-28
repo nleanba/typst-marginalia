@@ -143,11 +143,6 @@ Additionally, a ```typc dy``` argument can be passed to shift their initial posi
 Notes will shift vertically to avoid other notes, wideblocks, and the top page margin.
 It will attempt to move one note below a wide-block if there is not enough space above, but if there are multiple notes that would need to be rearranged you must assist by manually setting `dy` such that their initial position is below the wideblock.
 
-// #text(fill: red)[TODO: OUTDATED]
-// Currently, notes (and wideblocks) are not reordered,
-// #note[This note lands below the previous one!]
-// so two ```typ #note```s are placed in the same order vertically as they appear in the markup, even if the first is shifted with a `dy` such that the other would fit above it.
-
 // #pagebreak(weak: true)
 #block(height: 59pt)[
   #columns(3)[
@@ -168,12 +163,7 @@ The margin notes are decorated with little symbols, which by default hang into t
   This note has flush numbering.
 ]
 
-Setting the argument #link(label("marginalia-note.numbering"), [```typc numbering```])```typc : none```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
-we obtain notes without icon/number:#note(numbering: none)[Like this.]
-
 To change the markers, you can override the #link(label("marginalia-note.numbering"), [```typc numbering```]) function which is used to generate the markers.
-
-// TODO: counter: none to skip numbering, interaction with anchor-numbering?
 
 You can also change the #link(label("marginalia-note.counter"), [```typc counter```]) used. This can be useful if you want some of your notes to have independent numbering.
 #let a-note-counter = counter("a-note")
@@ -194,6 +184,22 @@ You can also change the #link(label("marginalia-note.counter"), [```typc counter
   numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
 )
 ```]
+
+Setting the #link(label("marginalia-note.counter"), [```typc counter```]) to ```typc none```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
+we obtain notes without number:#note(counter: none)[Like this.]
+
+=== References
+
+You can reference another note -- i.e. place its anchor again -- using #link(label("marginalia-ref()"), [```typc marginalia.ref()```]).
+```typ #marginalia.ref(-5)``` gives~#marginalia.ref(-5),
+and ```typ #marginalia.ref(-17)``` should give a link to “Note 1”:~#marginalia.ref(-17).
+
+You can also reference future notes using a positive offset.
+#marginalia.ref(1)
+
+Be aware that notes without anchor/number still count towards the offset, and you can also reference them, but doing so results in an invisible link and is a bit pointless.
+
+In the future, I might add a way to reference notes without counting how far away they are.
 
 === Advanced Markers
 
