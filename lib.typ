@@ -181,9 +181,9 @@
   /// -> content
   body,
 ) = {}
-#let setup(..config, body) = {
+#let setup(..config, body) = context {
   _config.update(_fill_config(..config))
-  set page(.._page-setup(..config))
+  set page(.._page-setup(..config)) if target() == "paged"
   show ref: it => {
     if (
       it.has("element")
@@ -677,7 +677,7 @@
           counter.display(numbering)
         }
       }
-      if flush-numbering {
+      if flush-numbering or target() == "html" {
         box(number)
         h(0pt, weak: true)
         body
@@ -710,11 +710,15 @@
       counter.display(anchor-numbering)
     } else []
 
-    let body = align(top, block(width: 100%, ..block-style, {
-      set text(..text-style)
-      set par(..par-style)
-      [#metadata((note: true, anchor: anchor))<_marginalia_note>#body]
-    }))
+    let body = if target() == "html" {
+      [#set text(..text-style);#set par(..par-style);#metadata((note: true, anchor: anchor))<_marginalia_note>#body]
+    } else {
+      body = align(top, block(width: 100%, ..block-style, {
+        set text(..text-style)
+        set par(..par-style)
+        [#metadata((note: true, anchor: anchor))<_marginalia_note>#body]
+      }))
+    }
 
     let dy-adjust = if alignment == "baseline" {
       measure(text(..text-style, sym.zws)).height
@@ -750,8 +754,16 @@
           anchor
         }
       }
-      place-note(side: side, dy: dy, keep-order: keep-order, shift: shift, body)
+      if target() != "html" {
+        place-note(side: side, dy: dy, keep-order: keep-order, shift: shift, body)
+      }
     })
+    if target() == "html" {
+      html.span(
+        style: "float: " + side + "; clear: " + side,
+        body,
+      )
+    }
   }
 }
 
@@ -829,7 +841,7 @@
   /// Set this to `marginalia.notecounter` (or another counter) to enable numbering this note.
   ///
   /// Will only be stepped if `numbering` is not ```typc none```.
-  /// 
+  ///
   /// #example(scale-preview: 100%, dir: ttb, ```typ
   /// Notefigure with marker:
   /// #notefigure(rect(height: 10pt, width: 100%), caption: [...], counter: marginalia.notecounter)
@@ -940,7 +952,7 @@
     show figure.caption: it => {
       set align(left)
       if numbering != none {
-        context if flush-numbering {
+        context if flush-numbering or target() == "html" {
           show-caption(
             counter.display(numbering),
             it,
@@ -1113,7 +1125,9 @@
       })
     }
 
-    pad(left: -left, right: -right, body)
+    if target() == "html" { body } else {
+      pad(left: -left, right: -right, body)
+    }
   }
 )
 

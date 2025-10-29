@@ -32,14 +32,12 @@
     )
   },
 )
+#show: marginalia.show-frame.with(footer: false)
 //     everything
 //   } else {
 //     everything
 //   }
 // }
-
-
-#show: marginalia.show-frame.with(footer: false)
 
 
 #show heading.where(level: 1): set block(above: 30pt, below: 12pt)
