@@ -52,8 +52,7 @@
 #set figure.caption(position: bottom) // (this is the default)
 #show figure.caption.where(position: bottom): note.with(
   alignment: "bottom",
-  anchor-numbering: none,
-  numbering: none,
+  counter: none,
   shift: "avoid",
   keep-order: true,
 )
@@ -76,7 +75,7 @@
     text(size: 30pt)[
       #text(weight: "black")[Marginalia]
       #text(fill: luma(60%), number-type: "old-style")[#VERSION]
-      #text(size: 10pt)[#note(numbering: none)[
+      #text(size: 10pt)[#note(counter: none)[
         #outline(indent: 1em, depth: 2)
       ]]],
   )
@@ -239,7 +238,7 @@ This can also be used to create notes that have an anchor,
     if calc.even(here().page()) [←] else [→]
   },
 )[
-  Like this one.
+  Like this one. The `counter` has to be not none, as it will not display the anchor otherwise.
 ]
 but no numbering in the note itself.
 #note(
@@ -281,17 +280,17 @@ To style the block containing the note body, use the #link(label("marginalia-not
 
 - ```typc block-style: (stroke: (top: (thickness: 0.5pt, dash: "dotted")), outset: (top: 6pt /* clearance is 12pt */), width: 100%)``` gives:
   #note-with-separator(keep-order: true)[This is a note with a dotted stroke above.]
-  #note-with-separator(numbering: none, keep-order: true, shift: true)[So is this.]
+  #note-with-separator(counter: none, keep-order: true, shift: true)[So is this.]
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), outset: (left: 10pt, rest: 4pt), width: 100%, radius: 4pt)``` gives:
   #note-with-background(
     flush-numbering: true,
     keep-order: true,
   )[This is a note with a green background and `flush-numbering: true`.]
-  #note-with-background(numbering: none, keep-order: true, shift: true)[So is this.]
+  #note-with-background(counter: none, keep-order: true, shift: true)[So is this.]
 
 - ```typc block-style: (fill: oklch(90%, 0.06, 140deg), inset: (x: 4pt), outset: (y: 4pt), width: 100%, radius: 4pt)``` gives:
   #note-with-wide-background(keep-order: true)[This is a note with an outset green background.]
-  #note-with-wide-background(numbering: none, keep-order: true, shift: true)[So is this.]
+  #note-with-wide-background(counter: none, keep-order: true, shift: true)[So is this.]
 
 For more advanced use-cases, you can also pass a function as the #link(label("marginalia-note.block-style"), [```typc block-style```]).
 It will be called with one argument, either ```typc "left"``` of ```typc "right"```, depending on the side the note will be placed on.
@@ -358,12 +357,13 @@ For small figures, you can place them in the margin with #link(label("marginalia
   caption: [A notefigure.],
 );It accepts all arguments ```typ #figure()``` takes (except `placement` and `scope`),
 plus all arguments #link(label("marginalia-note()"), [```typ #note[]```]) takes.
+
 However, by default it has no marker, and to get a marker like other notes, you must pass
-#link(label("marginalia-notefigure.numbering"))[```typ numbering```]```typc : marginalia.note-numbering```,
+#link(label("marginalia-notefigure.counter"))[```typ counter```]```typc : marginalia.notecounter```,
 and it will get a marker like other notes:
 #notefigure(
   rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.turbo)),
-  numbering: marginalia.note-numbering,
+  counter: marginalia.notecounter,
   caption: [A marked notefigure.],
   note-label: <markedfigure_note>,
 )<markedfigure>
@@ -374,6 +374,7 @@ If you want, you can override the #link(label("marginalia-notefigure.counter"))[
   caption: [reusing figure counter],
   counter: counter(figure.where(kind: image)),
   anchor-numbering: (.., i) => super[fig. #(i + 1) ],
+  numbering: none,
 )
 
 #codeblock[```typ
@@ -381,6 +382,7 @@ If you want, you can override the #link(label("marginalia-notefigure.counter"))[
   /**/,
   counter: counter(figure.where(kind: image)),
   anchor-numbering: (.., i) => super[fig. #(i + 1) ],
+  numbering: none,
 )
 ```]
 
@@ -390,7 +392,7 @@ which results in alignment with the top of the caption.
 #notefigure(
   alignment: "caption-top",
   rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.crest)),
-  numbering: marginalia.note-numbering,
+  counter: marginalia.notecounter,
   caption: [Aligned to top of caption.],
 )
 
@@ -400,7 +402,7 @@ which leads to the caption's being aligned with the main text.
 #notefigure(
   alignment: "top",
   rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.icefire)),
-  numbering: marginalia.note-numbering,
+  counter: marginalia.notecounter,
   caption: [Aligned to top of figure with #link(label("marginalia-notefigure.alignment"))[```typc alignment```]```typc : "top"```.],
 )
 
@@ -421,10 +423,15 @@ as is demonstrated in @styled-fig.
   text-style: (size: 5pt, font: "Iosevka Extended"),
   par-style: (spacing: 20pt, leading: 0pt),
 )<styled-fig>
-Furthermore, the `numbering`, `anchor-numbering`, and `flush-numbering` parameters work as expected.
+Furthermore, the
+#link(label("marginalia-notefigure.numbering"), [```typc numbering```]),
+#link(label("marginalia-notefigure.anchor-numbering"), [```typc anchor-numbering```]), and
+#link(label("marginalia-notefigure.flush-numbering"), [```typc flush-numbering```])
+parameters work as expected.
 #notefigure(
   rect(width: 100%, height: 15pt, fill: gradient.linear(..color.map.plasma)),
   caption: [Figure with custom numbering],
+  counter: marginalia.notecounter,
   numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
   anchor-numbering: (.., i) => super[#i],
 )
@@ -444,7 +451,10 @@ For larger figures, use the following set and show rules if you want top-aligned
   ```typ
   #set figure(gap: 0pt) // neccessary in both cases
   #set figure.caption(position: top)
-  #show figure.caption.where(position: top): note.with(alignment: "top", anchor-numbering: none, numbering: none, shift: "avoid", keep-order: true)
+  #show figure.caption.where(position: top): note.with(
+    alignment: "top", counter: none, shift: "avoid", keep-order: true,
+    dy: -0.01pt, // this is so that the caption is placed above wide figures.
+  )
   ```
 ]
 
@@ -452,11 +462,8 @@ For larger figures, use the following set and show rules if you want top-aligned
   #set figure(gap: 0pt)
   #set figure.caption(position: top)
   #show figure.caption.where(position: top): note.with(
-    alignment: "top",
-    anchor-numbering: none,
-    numbering: none,
-    shift: "avoid",
-    keep-order: true,
+    alignment: "top", counter: none, shift: "avoid", keep-order: true,
+    dy: -0.01pt,
   )
 
   #figure(
@@ -470,7 +477,8 @@ And if you want bottom-aligned captions, use the following:
   ```typ
   #set figure(gap: 0pt) // neccessary in both cases
   #set figure.caption(position: bottom) // (this is the default)
-  #show figure.caption.where(position: bottom): note.with(alignment: "bottom", anchor-numbering: none, numbering: none, shift: "avoid", keep-order: true)
+  #show figure.caption.where(position: bottom): note.with(
+    alignment: "bottom", counter: none, shift: "avoid", keep-order: true,)
   ```
 ]
 
@@ -482,8 +490,8 @@ And if you want bottom-aligned captions, use the following:
 === Wide Figures
 
 For wide figures, simply place a figure in a wideblock.
-The caption gets placed beneath the figure automatically, courtesy of regular wide-block-avoidance.
-#note(numbering: none)[(this is assuming you have one of the above ```typc show``` rules)]
+The caption gets placed above/beneath the figure automatically, courtesy of regular wide-block-avoidance.
+#note(counter: none)[(this is assuming you have one of the above ```typc show``` rules)]
 #codeblock[
   ```typ
   #wideblock(figure(image(..), caption: [A figure in a wide block.]))
@@ -515,29 +523,29 @@ The caption gets placed beneath the figure automatically, courtesy of regular wi
 You can place notes in absolute positions relative to the page using `place`:
 #codeblock[
   ```typ
-  #place(top, note(numbering: none, side: "inner")[Top])
-  #place(bottom, note(numbering: none, side: "inner")[Bottom])
+  #place(top, note(counter: none, side: "inner")[Top])
+  #place(bottom, note(counter: none, side: "inner")[Bottom])
   ```
 ]
-#place(top, note(numbering: none, side: "inner")[Top])
-#place(bottom, note(numbering: none, side: "inner")[Bottom])
+#place(top, note(counter: none, side: "inner")[Top])
+#place(bottom, note(counter: none, side: "inner")[Bottom])
 
 To avoid these notes moving about, use `shift: false` (or `shift: "ignore"` if you don't mind overlaps.)
 #codeblock[
   // #set text(size: 0.84em)
   ```typ
-  #place(top, note(numbering: none, shift: false)[Top (no shift)])
-  #place(bottom, note(numbering: none, shift: false)[Bottom (no shift)])
+  #place(top, note(counter: none, shift: false)[Top (no shift)])
+  #place(bottom, note(counter: none, shift: false)[Bottom (no shift)])
   ```
 ]
-#place(top, note(numbering: none, shift: false)[Top (no shift)])
-#place(bottom, note(numbering: none, shift: false)[Bottom (no shift)])
+#place(top, note(counter: none, shift: false)[Top (no shift)])
+#place(bottom, note(counter: none, shift: false)[Bottom (no shift)])
 
 By default, notes are aligned to their first baseline.
 To align the top of the note instead, set #link(label("marginalia-note.alignment"))[```typc alignment```] to ```typc "top"```.
 #note[(Or set #link(label("marginalia-note.alignment"))[```typc alignment```] to ```typc "bottom"``` to align the bottom of the note.)]
-#place(top, note(numbering: none, shift: false, alignment: "top")[Top (no shift, top-aligned)])
-#place(bottom, note(numbering: none, shift: false, alignment: "top")[Bottom (no shift, top-aligned)])
+#place(top, note(counter: none, shift: false, alignment: "top")[Top (no shift, top-aligned)])
+#place(bottom, note(counter: none, shift: false, alignment: "top")[Bottom (no shift, top-aligned)])
 
 == Background Lines
 They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using
@@ -572,7 +580,7 @@ Here's how the headers in this document were made:
 ]
 
 The #link(label("marginalia-header()"))[```typ #marginalia.header()```]
-#note(numbering: none)[
+#note(counter: none)[
   Despite the name, this function can be used anywhere, and not solely for headers.
   It simply creates a wideblock and fills it with properly sized ```typc box```es.
 ]
@@ -624,7 +632,7 @@ There are two workarounds for this: (these can be combined)
 
   // at the END of your content
   //   -- this serves as a “barrier” that moves the previous notes up
-  #context marginalia.note(shift: false, alignment: "top", dy: marginalia._config.get().clearance, keep-order: true, numbering: none)[]
+  #context marginalia.note(shift: false, alignment: "top", dy: marginalia._config.get().clearance, keep-order: true, counter: none)[]
   ```
 ]
 
@@ -734,7 +742,7 @@ Also shout-out to #link("https://typst.app/universe/package/tidy")[tidy], which 
       ergo: ergo,
       internal: (..text) => {
         let text = text.pos().at(0, default: [Internal.])
-        note(numbering: none, text)
+        note(counter: none, text)
         h(0pt, weak: true)
         // set text(fill: white, weight: 600, size: 9pt)
         // block(fill: luma(40%), inset: 2pt, outset: 2pt, radius: 2pt, body)

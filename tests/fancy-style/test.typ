@@ -12,6 +12,7 @@
 
 // using basic numbering as the ci runner does not have Inter
 #let note = note.with(numbering: (..i) => super(numbering("1", ..i)))
+#let notefigure = notefigure.with(numbering: (..i) => super(numbering("1", ..i)))
 
 #let block-style = side => {
   if side == "left" {
@@ -39,8 +40,7 @@ we have @styled-fig.
 To the side
 #notefigure(
   rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
-  numbering: (..i) => super(numbering("1", ..i)),
-  anchor-numbering: auto,
+  counter: marginalia.notecounter,
   caption: [Another styled figure.],
   block-style: block-style,
   note-label: <xyz>,
@@ -69,8 +69,7 @@ we have @styled-fig2.
 To the side
 #notefigure(
   rect(width: 100%, height: 15pt, stroke: 0.5pt + purple),
-  numbering: (..i) => super(numbering("1", ..i)),
-  anchor-numbering: auto,
+  counter: marginalia.notecounter,
   caption: [Another styled figure.],
   block-style: block-style,
   note-label: <xyz2>,

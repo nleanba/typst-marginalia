@@ -581,7 +581,9 @@
   /// -> none | function | string
   numbering: note-numbering,
   /// Used to generate the marker for the anchor (i.e. the one in the surrounding text)
+  ///
   /// - If ```typc auto```, will use the given @note.numbering.
+  /// - Will be ignored if `counter` is ```typc none```.
   /// -> none | auto | function | string
   anchor-numbering: auto,
   /// Whether to have the anchor link to the note, and vice-versa.
@@ -704,7 +706,7 @@
       block-style
     }
 
-    let anchor = if anchor-numbering != none {
+    let anchor = if anchor-numbering != none and counter != none {
       counter.display(anchor-numbering)
     } else []
 
@@ -797,7 +799,7 @@
 /// Creates a figure in the margin.
 ///
 /// Parameters `numbering`, `anchor-numbering`, `flush-numbering`, `side`, `keep-order`, `shift`, `text-style`, `par-style`, and `block-style` work the same as for @note.
-/// 
+///
 /// Notefigures can be attached a label and are referenceable (if @setup was run). Furthermore, the underlying @note can be given a label using the `note-label` parameter.
 ///
 /// #compat((
@@ -817,19 +819,31 @@
 /// ))
 /// -> content
 #let notefigure(
-  /// Same as @note.numbering, but with different default value.
+  /// Same as @note.numbering.
   /// -> none | function | string
-  numbering: none,
-  /// Used to generate the marker for the anchor (i.e. the one in the surrounding text)
-  /// - If ```typc auto```, will use the given @notefigure.numbering.
+  numbering: note-numbering,
+  /// Same as @note.anchor-numbering.
   /// -> none | auto | function | string
   anchor-numbering: auto,
-  /// Counter to use for this note.
-  /// Can be set to ```typc none``` do disable numbering this note.
+  /// Same as @note.numbering, but with different default.
+  /// Set this to `marginalia.notecounter` (or another counter) to enable numbering this note.
   ///
   /// Will only be stepped if `numbering` is not ```typc none```.
+  /// 
+  /// #example(scale-preview: 100%, dir: ttb, ```typ
+  /// Notefigure with marker:
+  /// #notefigure(rect(height: 10pt, width: 100%), caption: [...], counter: marginalia.notecounter)
+  /// ```)
+  /// #example(scale-preview: 100%, dir: ttb, ```typ
+  /// Using the figure counter for the numbering:
+  /// #notefigure(
+  ///   rect(height: 10pt, width: 100%), caption: [...],
+  ///   counter: counter(figure.where(kind: image)),
+  ///   anchor-numbering: (.., i) => super[fig. #numbering("1", i+1)], numbering: none,
+  /// )
+  /// ```)
   /// -> counter | none
-  counter: notecounter,
+  counter: none,
   /// Disallow note markers hanging into the whitespace.
   /// - If ```typc auto```, acts like ```typc false``` if @notefigure.anchor-numbering is ```typc auto```.
   /// -> auto | boolean
@@ -901,12 +915,12 @@
 ) = {
   [#metadata("_marginalia_notefigure")<_marginalia_notefigure>]
 
-  let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
-
   let numbering = if counter == none { none } else { numbering }
   if numbering != none { counter.step() }
   let flush-numbering = if flush-numbering == auto { anchor-numbering != auto } else { flush-numbering }
   let anchor-numbering = if anchor-numbering == auto { numbering } else { anchor-numbering }
+
+  let shift = if shift == auto { if numbering != none { true } else { "avoid" } } else { shift }
 
   let text-style = (size: 9.35pt, style: "normal", weight: "regular", ..text-style)
   let par-style = (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
@@ -998,11 +1012,11 @@
         par-style: par-style,
         block-style: block-style,
         [#figure(
-          content,
-          gap: gap,
-          placement: none,
-          ..figureargs,
-        )#figure-label],
+            content,
+            gap: gap,
+            placement: none,
+            ..figureargs,
+          )#figure-label],
       )#note-label]
     // for unclear reasons, if this is placed before the note, it becomes part of the content referenced by note-label.
     [#metadata((label: figure-label))<_marginalia_notefigure_meta>]

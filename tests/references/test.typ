@@ -13,6 +13,7 @@
 
 // using basic numbering as the ci runner does not have Inter
 #let note = note.with(numbering: (..i) => super(numbering("1", ..i)))
+#let notefigure = notefigure.with(numbering: (..i) => super(numbering("1", ..i)))
 
 
 - Original: #note[This is a note]<label>
@@ -24,7 +25,7 @@
 
 - Notefigure: #notefigure(
     rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.turbo)),
-    numbering: (..i) => super(numbering("1", ..i)),
+    counter: marginalia.notecounter,
     caption: [A marked notefigure.],
     note-label: <markedfigure_note>,
   )<markedfigure>
@@ -36,7 +37,7 @@
 
 - Notefigure: #notefigure(
     rect(width: 100%, height: 10pt, fill: gradient.linear(..color.map.turbo)),
-    caption: [A marked notefigure.],
+    caption: [A notefigure.],
     note-label: <figure_note>,
   )<figure>
 - Figure reference: @figure
