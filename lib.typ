@@ -955,7 +955,7 @@
       if numbering != none {
         context if flush-numbering {
           show-caption(
-            counter.display(numbering),
+            number,
             it,
           )
         } else {
