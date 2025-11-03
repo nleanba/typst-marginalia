@@ -203,15 +203,15 @@ There are two ways to reference another note:
   Be aware that notes without anchor/number still count towards the offset, and you can also reference them, but doing so results in an invisible link and is a bit pointless.
 
 #codeblock[```typ
-- Original: #note[This is a note]<label>
-- Label Reference: @label @label2
-- Count Reference: #marginalia.ref(-1) #marginalia.ref(1)
-- Original: #note[This is another note]<label2>
+Original: #note[This is a note]<label>
+Label Reference: @label @label2
+Count Reference: #marginalia.ref(-1) #marginalia.ref(1)
+Original: #note[This is another note]<label2>
 ```]
-- Original: #note[This is a note]<label>
-- Label Reference: @label @label2
-- Offset Reference: #marginalia.ref(-1) #marginalia.ref(1)
-- Original: #note[This is another note]<label2>
+Original: #note[This is a note]<label>
+Label Reference: @label @label2
+Offset Reference: #marginalia.ref(-1) #marginalia.ref(1)
+Original: #note[This is another note]<label2>
 
 === Advanced Markers
 
@@ -462,7 +462,10 @@ For larger figures, use the following set and show rules if you want top-aligned
   #set figure(gap: 0pt)
   #set figure.caption(position: top)
   #show figure.caption.where(position: top): note.with(
-    alignment: "top", counter: none, shift: "avoid", keep-order: true,
+    alignment: "top",
+    counter: none,
+    shift: "avoid",
+    keep-order: true,
     dy: -0.01pt,
   )
 
@@ -519,6 +522,19 @@ The caption gets placed above/beneath the figure automatically, courtesy of regu
 
 // #pagebreak(weak: true)
 = Other Tidbits
+
+== Background Lines
+They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using
+#codeblock[```typ
+#show: marginalia.show-frame
+```]
+
+You can also hide the lines for the header and footer with
+#codeblock[```typ
+#show: marginalia.show-frame.with(header: false, footer: false)
+```]
+
+
 == Absolute Placement
 You can place notes in absolute positions relative to the page using `place`:
 #codeblock[
@@ -547,17 +563,6 @@ To align the top of the note instead, set #link(label("marginalia-note.alignment
 #place(top, note(counter: none, shift: false, alignment: "top")[Top (no shift, top-aligned)])
 #place(bottom, note(counter: none, shift: false, alignment: "top")[Bottom (no shift, top-aligned)])
 
-== Background Lines
-They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using
-#codeblock[```typ
-#show: marginalia.show-frame
-```]
-
-You can also hide the lines for the header and footer with
-#codeblock[```typ
-#show: marginalia.show-frame.with(header: false, footer: false)
-```]
-
 // #pagebreak(weak: true)
 
 == Headers
@@ -566,13 +571,12 @@ Here's how the headers in this document were made:
   // #set text(size: 0.84em)
   ```typst
   #set page(
-    header-ascent: 16mm,
     header: context if here().page() > 1 {
       marginalia.header(
         text-style: (size: 8.5pt, number-type: "old-style"),
         [Page #counter(page).display("1 of 1", both: true)],
-        smallcaps[Marginalia],
-        datetime.today().display("[day]. [month repr:long] [year]")
+        [#smallcaps[Marginalia] #text(fill: luma(60%))[#VERSION]],
+        [],
       )
     },
   )
@@ -591,7 +595,6 @@ Any of the following will work:
   #marginalia.header(                   [outer]) == #marginalia.header[outer]
   #marginalia.header(         [center], [outer]) == #marginalia.header[center][outer]
   #marginalia.header([inner], [center], [outer]) == #marginalia.header[inner][center][outer]
-
   #marginalia.header(
     even: ([left outer], [center], [right inner]),
     odd: ([left inner], [center], [right outer]),
@@ -604,10 +607,10 @@ For convenience, you may pass a #link(label("marginalia-header.text-style"))[`te
 #v(1em)
 #marginalia.header(
   text-style: (style: "italic"),
-  even: ([left outer], block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is an even page], [right inner]),
+  even: ([left outer], block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is on an even page], [right inner]),
   odd: (
     [left inner],
-    block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is on odd page or book is false],
+    block(fill: luma(90%), width: 100%, outset: (y: 3pt))[this is on an odd page or book is false],
     [right outer],
   ),
 )
