@@ -40,14 +40,14 @@
   /// #for i in array.range(1,15) {
   ///   note-numbering(repeat: false, i) }
   /// ```)
-  /// -> boolean
+  /// -> bool
   repeat: true,
   /// Wrap the symbol in a styled text function.
   /// -> function
   style: text.with(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
   /// Whether to add a space of 2pt after the symbol.
   /// If ```typc auto```, a space is only added if it is a number (the symbols have ran out).
-  /// -> auto | boolean
+  /// -> auto | bool
   space: auto,
   ..,
   /// -> int
@@ -173,7 +173,7 @@
   bottom: 2.5cm,
   ///- If ```typc true```, will use inside/outside margins, alternating on each page.
   ///- If ```typc false```, will use left/right margins with all pages the same.
-  /// -> boolean
+  /// -> bool
   book: false,
   /// Minimal vertical distance between notes and to wide blocks.
   /// -> length
@@ -261,10 +261,10 @@
   /// -> color
   stroke: 0.5pt + luma(90%),
   /// Set to false to hide the header line
-  /// -> boolean
+  /// -> bool
   header: true,
   /// Set to false to hide the footer line
-  /// -> boolean
+  /// -> bool
   footer: true,
   /// -> content
   body,
@@ -320,8 +320,8 @@
   ///   height: length,     // vertical space needed for item
   ///   clearance: length,  // vertical padding required.
   ///                       // may be collapsed at top & bottom of page, and above separators
-  ///   shift: boolean | "ignore" | "avoid", // whether the item may be moved about. `auto` = move only if neccessary
-  ///   keep-order: boolean,   // if false, may be reordered. if true, order relative to other `false` items is kept
+  ///   shift: bool | "ignore" | "avoid", // whether the item may be moved about. `auto` = move only if neccessary
+  ///   keep-order: bool,   // if false, may be reordered. if true, order relative to other `false` items is kept
   /// )
   /// ```
   /// -> dictionary
@@ -567,6 +567,12 @@
 ///   ),
 /// ))
 #let note(
+  /// Counter to use for this note.
+  /// Can be set to ```typc none``` do disable numbering this note.
+  ///
+  /// Will only be stepped if `numbering` is not ```typc none```.
+  /// -> counter | none
+  counter: notecounter,
   /// Function or `numbering`-string to generate the note markers from the `notecounter`.
   /// - If ```typc none```, will not step the `counter`.
   /// - Will be ignored if `counter` is ```typc none```.
@@ -587,17 +593,11 @@
   /// -> none | auto | function | string
   anchor-numbering: auto,
   /// Whether to have the anchor link to the note, and vice-versa.
-  /// -> boolean
+  /// -> bool
   link-anchor: true,
-  /// Counter to use for this note.
-  /// Can be set to ```typc none``` do disable numbering this note.
-  ///
-  /// Will only be stepped if `numbering` is not ```typc none```.
-  /// -> counter | none
-  counter: notecounter,
   /// Disallow note markers hanging into the whitespace.
   /// - If ```typc auto```, acts like ```typc false``` if @note.anchor-numbering is ```typc auto```.
-  /// -> auto | boolean
+  /// -> auto | bool
   flush-numbering: auto,
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
@@ -619,8 +619,8 @@
   /// Notes with ```typc keep-order: true``` are not re-ordered relative to one another.
   ///
   /// // If ```typc auto```, defaults to false unless ```typc numbering``` is ```typc none``.
-  /// // -> boolean | auto
-  /// -> boolean
+  /// // -> bool | auto
+  /// -> bool
   keep-order: false,
   /// Whether the note may get shifted vertically to avoid other notes.
   /// - ```typc true```: The note may shift to avoid other notes, wide-blocks and the top/bottom margins.
@@ -629,7 +629,7 @@
   ///   E.g. if it would collide with a wideblock or a note with ```typc shift: false```.
   /// - ```typc "ignore"```: Like ```typc false```, but other notes do not try to avoid it.
   /// - ```typc auto```: ```typc true``` if numbered, ```typc "avoid"``` otherwise.
-  /// -> boolean | auto | "avoid" | "ignore"
+  /// -> bool | auto | "avoid" | "ignore"
   shift: auto,
   /// Will be used to ```typc set``` the text style.
   /// -> dictionary
@@ -819,17 +819,11 @@
 /// ))
 /// -> content
 #let notefigure(
-  /// Same as @note.numbering.
-  /// -> none | function | string
-  numbering: note-numbering,
-  /// Same as @note.anchor-numbering.
-  /// -> none | auto | function | string
-  anchor-numbering: auto,
   /// Same as @note.numbering, but with different default.
   /// Set this to `marginalia.notecounter` (or another counter) to enable numbering this note.
   ///
   /// Will only be stepped if `numbering` is not ```typc none```.
-  /// 
+  ///
   /// #example(scale-preview: 100%, dir: ttb, ```typ
   /// Notefigure with marker:
   /// #notefigure(rect(height: 10pt, width: 100%), caption: [...], counter: marginalia.notecounter)
@@ -844,9 +838,18 @@
   /// ```)
   /// -> counter | none
   counter: none,
+  /// Same as @note.numbering.
+  /// -> none | function | string
+  numbering: note-numbering,
+  /// Same as @note.anchor-numbering.
+  /// -> none | auto | function | string
+  anchor-numbering: auto,
+  /// Whether to have the anchor link to the note, and vice-versa.
+  /// -> bool
+  link-anchor: true,
   /// Disallow note markers hanging into the whitespace.
   /// - If ```typc auto```, acts like ```typc false``` if @notefigure.anchor-numbering is ```typc auto```.
-  /// -> auto | boolean
+  /// -> auto | bool
   flush-numbering: auto,
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
@@ -870,9 +873,9 @@
   /// The notefigure may get shifted still to avoid other notes depending on ```typc notefigure.shift```.
   /// -> length
   dy: 0pt,
-  /// -> boolean
+  /// -> bool
   keep-order: false,
-  /// -> boolean | auto | "avoid" | "ignore"
+  /// -> bool | auto | "avoid" | "ignore"
   shift: auto,
   /// Will be used to ```typc set``` the text style.
   /// -> dictionary
@@ -926,8 +929,18 @@
   let par-style = (spacing: 1.2em, leading: 0.5em, hanging-indent: 0pt, ..par-style)
 
   context {
+    let number = if counter != none and numbering != none {
+      if link-anchor {
+        show link: it => {
+          show underline: i => i.body
+          it
+        }
+        link(here(), counter.display(numbering))
+      } else {
+        counter.display(numbering)
+      }
+    } else { none }
     let number-width = if numbering != none and not flush-numbering {
-      let number = counter.display(numbering)
       let width = measure({
         set text(..text-style)
         set par(..par-style)
@@ -946,7 +959,6 @@
             it,
           )
         } else {
-          let number = counter.display(numbering)
           show-caption(
             place(
               // top + left,
@@ -1002,6 +1014,7 @@
     [#note(
         numbering: none,
         anchor-numbering: anchor-numbering,
+        link-anchor: link-anchor,
         counter: counter,
         side: side,
         dy: dy,
