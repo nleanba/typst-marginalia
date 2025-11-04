@@ -1,6 +1,6 @@
 #import "lib.typ" as marginalia: note, notefigure, wideblock
 
-#let VERSION = "0.3.0"
+#let VERSION = "?.?.?"
 
 #set par(justify: true, linebreaks: "optimized")
 #set text(fill: luma(20%), size: 10pt)
