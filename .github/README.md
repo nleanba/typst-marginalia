@@ -8,7 +8,7 @@ _Configurable margin-notes with smart positioning and matching wide blocks for T
 
 ## Docs
 
-- [Current Published Version: v0.2.4](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true)
+- [Current Published Version: v0.3.0](https://github.com/nleanba/typst-marginalia/blob/v0.3.0/Marginalia.pdf?raw=true)
 
 - [Working Copy](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf?raw=true)
 

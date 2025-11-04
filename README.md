@@ -5,7 +5,7 @@
 Put something akin to the following at the start of your `.typ` file:
 
 ```typ
-#import "@preview/marginalia:0.2.4" as marginalia: note, notefigure, wideblock
+#import "@preview/marginalia:0.3.0" as marginalia: note, notefigure, wideblock
 
 #show: marginalia.setup.with(
   // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -23,7 +23,7 @@ pages. Notes are placed in the outside margin by default.
 
 Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.
-[Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true)
+[Please refer to the PDF documentation for more details on the configuration and the provided commands.](https://github.com/nleanba/typst-marginalia/blob/v0.3.0/Marginalia.pdf?raw=true)
 
 Additionally, I recommend using Typst's partial function application feature to customize other aspects of the notes consistently:
 
@@ -112,8 +112,8 @@ It takes all the same options as `#note[]`, with some additions. In particular,
 
 ## Manual
 
-[Full Manual →](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true)
-[![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/tags/v0.2.4/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/v0.2.4/Marginalia.pdf?raw=true)
+[Full Manual →](https://github.com/nleanba/typst-marginalia/blob/v0.3.0/Marginalia.pdf?raw=true)
+[![first page of the documentation](https://github.com/nleanba/typst-marginalia/raw/refs/tags/v0.3.0/preview.svg)](https://github.com/nleanba/typst-marginalia/blob/v0.3.0/Marginalia.pdf?raw=true)
 
 ## Feedback
 Have you encountered a bug? [Please report it as an issue in my GitHub repository.](https://github.com/nleanba/typst-marginalia/issues)

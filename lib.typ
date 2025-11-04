@@ -812,7 +812,7 @@
 ///   "0.2.2": (
 ///     [@notefigure.dy no longer takes a relative length, instead @notefigure.alignment was added.],
 ///   ),
-///   "?.?.?": (
+///   "0.3.0": (
 ///     [The `label` argument has been removed.
 ///      #ergo[Instead of ```typ #notefigure(label: <l>, ..)```, use ```typ #notefigure(..)<l>```.]],
 ///   )
