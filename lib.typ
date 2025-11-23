@@ -477,9 +477,28 @@
 #let _note_extends_right = state("_note_extends_right", (:))
 // #let _note_offsets_right = state("_note_offsets_right", (:))
 
+
+// Internal use.
+// Requires Context.
+// -> "left" | "right"
+#let _get-near-side() = {
+  let anchor = here().position()
+  let pagewidth = if page.flipped { page.height } else { page.width }
+  let left = get-left()
+  let right = get-right()
+  if (
+    anchor.x - left.far - left.width - left.sep
+      < (pagewidth - left.far - left.width - left.sep - right.far - right.width - right.sep) / 2
+  ) {
+    "left"
+  } else {
+    "right"
+  }
+}
+
 // Internal use.
 #let place-note(
-  /// -> "right" | "left"
+  /// -> "right" | "left" | "near"
   side: "right",
   dy: 0pt,
   keep-order: false,
@@ -487,14 +506,16 @@
   body,
 ) = (
   context {
-    assert(side == "left" or side == "right", message: "side must be left or right.")
+    assert(side == "left" or side == "right" or side == "near", message: "side must be left or right.")
 
     let dy = dy.to-absolute()
     let anchor = here().position()
     let pagewidth = if page.flipped { page.height } else { page.width }
     let page_num = str(anchor.page)
 
-    let width = if side == "right" { get-right().width } else { get-left().width }
+    let side = if side == "near" { _get-near-side() } else { side }
+
+    let width = if side == "left" { get-left().width } else { get-right().width }
     let height = measure(body, width: width).height
     let notebox = box(width: width, height: height, body)
     let natural_position = anchor.y + dy
@@ -543,9 +564,9 @@
 
     // box(width: 0pt, place(box(fill: yellow, width: 1cm, text(size: 5pt)[#anchor.y + #vadjust = #(anchor.y + vadjust)])))
 
-    let hadjust = if side == "right" {
+    let hadjust = if side == "left" { get-left().far - anchor.x } else {
       pagewidth - anchor.x - get-right().far - get-right().width
-    } else { get-left().far - anchor.x }
+    }
 
     // box(width: 0pt, place(box(fill: yellow, width: 1cm, text(size: 5pt)[#get-right().width])))
 
@@ -606,7 +627,8 @@
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
   /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
-  /// -> auto | "outer" | "inner" | "left" | "right"
+  /// ```typc "near"``` will place the note in the left or right margin, depending which is nearer.
+  /// -> auto | "outer" | "inner" | "left" | "right" | "near"
   side: auto,
   /// Vertical alignment of the note.
   /// #let note = note.with(block-style: (outset: (left: 5cm), fill: oklch(70%, 0.1, 120deg, 20%)), shift: "ignore")
@@ -668,7 +690,10 @@
       if _config.get().book and calc.even(here().page()) { "right" } else { "left" }
     } else { side }
 
-    assert(side == "left" or side == "right", message: "side must be auto, left, right, outer, or inner.")
+    assert(
+      side == "left" or side == "right" or side == "near",
+      message: "side must be auto, left, right, near, outer, or inner.",
+    )
     let body = if numbering != none {
       let number = {
         if link-anchor {
@@ -858,7 +883,7 @@
   /// Which side to place the note.
   /// ```typc auto``` defaults to ```typc "outer"```.
   /// In non-book documents, ```typc "outer"```/```typc "inner"``` are equivalent to ```typc "right"```/```typc "left"``` respectively.
-  /// -> auto | "outer" | "inner" | "left" | "right"
+  /// -> auto | "outer" | "inner" | "left" | "right" | "near"
   side: auto,
   /// Vertical alignment of the notefigure.
   /// #let notefigure = notefigure.with(shift: "ignore", show-caption: (number, caption) => block(outset: (left: 5cm), width: 100%, fill: oklch(70%, 0.1, 120deg, 20%), {
@@ -987,7 +1012,12 @@
       if _config.get().book and calc.even(here().page()) { "left" } else { "right" }
     } else if side == "inner" {
       if _config.get().book and calc.even(here().page()) { "right" } else { "left" }
-    } else { side }
+    } else if side == "near" {
+      _get-near-side()
+    } else {
+      side
+    }
+
     let width = if side == "left" {
       get-left().width
     } else {
