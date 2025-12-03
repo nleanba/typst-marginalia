@@ -291,8 +291,8 @@
       place(bottom, dy: -bottomm + descent, line(length: 100%, stroke: stroke))
     }
 
-    place(dx: leftm.far, rect(width: leftm.width, height: 100%, stroke: (x: stroke)))
-    place(dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
+    place(left, dx: leftm.far, rect(width: leftm.width, height: 100%, stroke: (x: stroke)))
+    place(left, dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
 
     place(right, dx: -rightm.far, rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
     place(right, dx: -rightm.far - rightm.width - rightm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
