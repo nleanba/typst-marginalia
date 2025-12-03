@@ -505,7 +505,7 @@
   shift: true,
   body,
 ) = (
-  context {
+  box(width: 0pt, context {
     assert(side == "left" or side == "right" or side == "near", message: "side must be left or right.")
 
     let dy = dy.to-absolute()
@@ -568,10 +568,8 @@
       pagewidth - anchor.x - get-right().far - get-right().width
     }
 
-    // box(width: 0pt, place(box(fill: yellow, width: 1cm, text(size: 5pt)[#get-right().width])))
-
-    box(width: 0pt, place(dx: hadjust, dy: vadjust, notebox))
-  }
+    place(left, dx: hadjust, dy: vadjust, notebox)
+  })
 )
 
 /// Create a marginnote.
