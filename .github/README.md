@@ -11,7 +11,7 @@ Typst_
 
 ## Docs
 
-- [Current Published Version: v0.3.0](https://github.com/nleanba/typst-marginalia/blob/v0.3.0/Marginalia.pdf?raw=true)
+- [Current Published Version: v0.3.1](https://github.com/nleanba/typst-marginalia/blob/v0.3.1/Marginalia.pdf?raw=true)
 
 - [Working Copy](https://github.com/nleanba/typst-marginalia/blob/main/Marginalia.pdf?raw=true)
 
