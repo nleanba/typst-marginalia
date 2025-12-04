@@ -15,6 +15,14 @@
 #let note = note.with(numbering: (..i) => super(numbering("1", ..i)))
 #let notefigure = notefigure.with(numbering: (..i) => super(numbering("1", ..i)))
 
+#let block-style = side => {
+  if side == "left" {
+    (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, right: 9pt, rest: 4pt))
+  } else {
+    (stroke: (right: none, rest: 0.5pt + purple), outset: (right: marginalia.get-right().far, left: 9pt, rest: 4pt))
+  }
+}
+
 #show: marginalia.show-frame
 
 #set text(dir: rtl)
@@ -28,32 +36,24 @@
 #note(side:"inner")[inner note]
 
 Hmm.
-#let block-style = side => {
-  if side == "left" {
-    (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
-  } else {
-    (stroke: (right: none, rest: 0.5pt + purple), outset: (right: marginalia.get-right().far, left: 9pt, rest: 4pt))
-  }
-}
 #note(block-style: block-style)[Purple]
 #note(side: "inner", block-style: block-style)[Purple 2]
 
-يولد جميع الناس أحراراً ومتساوين#note[A ومتساوين Z] في الكرامة والحقوق. وهم قد وهبوا العقل والوجدان وعليهم أن يعاملوا بعضهم بعضاً بروح الإخاء.
+يولد جميع الناس أحراراً ومتساوين#note[A ومتساوين Z] في الكرامة والحقوق. وهم قد وهبوا العقل والوجدان وعليهم أن يعاملوا بعضهم بعضاً بروح الإخاء.#note[المادة 1]
 
 
 #set text(dir: ltr)
+#marginalia.notecounter.update(0)
 #pagebreak()
 
 #lorem(10)
 #note[note]
 #lorem(10)
 #note(side:"inner")[inner note]
-#let block-style = side => {
-  if side == "left" {
-    (stroke: (left: none, rest: 0.5pt + purple), outset: (left: marginalia.get-left().far, rest: 4pt))
-  } else {
-    (stroke: (right: none, rest: 0.5pt + purple), outset: (right: marginalia.get-right().far, left: 9pt, rest: 4pt))
-  }
-}
+
+Hmm.
 #note(block-style: block-style)[Purple]
 #note(side: "inner", block-style: block-style)[Purple 2]
+
+يولد جميع الناس أحراراً ومتساوين#note[A ومتساوين Z] في الكرامة والحقوق. وهم قد وهبوا العقل والوجدان وعليهم أن يعاملوا بعضهم بعضاً بروح الإخاء.#note[المادة 1]
+

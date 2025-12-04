@@ -716,12 +716,15 @@
           number
         }).width
         if width < 8pt { width = 8pt }
-        place(top + left, dx: -width, box(width: width, {
-          h(1fr)
-          sym.zws
-          number
-          h(1fr)
-        }))
+        place(top + start, {
+          h(-width) // HACK: uses `h` instad of `dx` so it works in ltr and rtl contexts
+          box(width: width, {
+            h(1fr)
+            sym.zws
+            number
+            h(1fr)
+          })
+        })
       }
     } else {
       body
@@ -737,11 +740,11 @@
       counter.display(anchor-numbering)
     } else []
 
-    let body = align(top, block(width: 100%, ..block-style, {
+    let body = align(top, block(width: 100%, ..block-style, align(start, { // HACK: inner align ensures text-direction is unaffected by `place(left,..)`
       set text(..text-style)
       set par(..par-style)
       [#metadata((note: true, anchor: anchor))<_marginalia_note>#body]
-    }))
+    })))
 
     let dy-adjust = if alignment == "baseline" {
       measure(text(..text-style, sym.zws)).height
