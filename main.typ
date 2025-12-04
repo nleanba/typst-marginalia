@@ -520,8 +520,36 @@ The caption gets placed above/beneath the figure automatically, courtesy of regu
   )
 ]
 
-// #pagebreak(weak: true)
+#pagebreak(weak: true)
 = Other Tidbits
+
+== Right-to-Left
+
+RTL-text should be supported out of the box since version 0.3.1:
+
+#[
+  #set text(lang: "ar")
+  هذا هو النص المثال، الذي تمت ترجمته آليًا.
+  #note[(لا أتحدث العربية ولا أي لغة أخرى تكتب من اليمين إلى اليسار.)]
+  كيف تكتب "lorem ipsum" بالعربية؟ أعتقد أنه لا يهم هنا؛ سطرين كافيتان لهذه العرض التوضيحي.
+  #text(lang: "en", note[(The arabic is only filler text)])
+]
+
+However, there are a few things to be aware of:
+
++ Marginalia forces the page binding to be on the `left` side, even in right-to-left contexts.
+  Hence you might need to mentally swap "inner" and "outer" when you want right binding.
+
+  This is because it is not possible to automatically detect the binding side if it is not set explictly, so this would lead to misplaced notes otherwise.
+
++ If you mix LTR and RTL text, make sure that you _surround_ notes in the other language by the appropriate `text(lang: "..")`.
+  Otherwise, text alignment and placement of the marker might be off.
+
+  For example, the above English note was written as
+
+#codeblock[```typ
+#text(lang: "en", note[(The arabic is only filler text)])
+```]
 
 == Background Lines
 They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using

@@ -107,6 +107,7 @@
   let config = _fill_config(..config)
   if config.book {
     return (
+      binding: left,
       margin: (
         inside: config.inner.far + config.inner.width + config.inner.sep,
         outside: config.outer.far + config.outer.width + config.outer.sep,
@@ -116,6 +117,7 @@
     )
   } else {
     return (
+      binding: left,
       margin: (
         left: config.inner.far + config.inner.width + config.inner.sep,
         right: config.outer.far + config.outer.width + config.outer.sep,
