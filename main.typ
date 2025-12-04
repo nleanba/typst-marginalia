@@ -76,8 +76,8 @@
       #text(weight: "black")[Marginalia]
       #text(fill: luma(60%), number-type: "old-style")[#VERSION]
       #text(size: 10pt)[#note(counter: none)[
-        #outline(indent: 1em, depth: 2)
-      ]]],
+          #outline(indent: 1em, depth: 2)
+        ]]],
   )
 }
 
@@ -92,11 +92,11 @@ _Write into the margins!_
 Put something akin to the following at the start of your `.typ` file:
 #note[Do not #[```typ #import "...": *```], this will shadow built-in functions.]
 #codeblock[#raw(
-  block: true,
-  lang: "typ",
-  "#import \"@preview/marginalia:"
-    + VERSION
-    + "\" as marginalia: note, notefigure, wideblock
+    block: true,
+    lang: "typ",
+    "#import \"@preview/marginalia:"
+      + VERSION
+      + "\" as marginalia: note, notefigure, wideblock
 
 #show: marginalia.setup.with(
   // inner: ( far: 5mm, width: 15mm, sep: 5mm ),
@@ -106,7 +106,7 @@ Put something akin to the following at the start of your `.typ` file:
   // book: false,
   // clearance: 12pt,
 )",
-)]
+  )]
 
 Where you can then customize these options to your preferences.
 Shown here (as comments) are the default values taken if the corresponding keys are unset.
@@ -173,21 +173,28 @@ You can also change the #link(label("marginalia-note.counter"), [```typc counter
 #let a-note-counter = counter("a-note")
 #let a-note = note.with(
   counter: a-note-counter,
-  numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering(
-    "A",
-    ..i,
-  )),
+  numbering: (..i) => text(
+    weight: 900,
+    font: "Inter",
+    size: 5pt,
+    style: "normal",
+    fill: rgb(54%, 72%, 95%),
+    numbering(
+      "A",
+      ..i,
+    ),
+  ),
 )
 #a-note[alphabetized note]
 #note[regular one]
 #a-note[another alphabetized note]
 #codeblock[```typ
-#let a-note-counter = counter("a-note")
-#let a-note = note.with(
-  counter: a-note-counter,
-  numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
-)
-```]
+  #let a-note-counter = counter("a-note")
+  #let a-note = note.with(
+    counter: a-note-counter,
+    numbering: (..i) => text(weight: 900, font: "Inter", size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%), numbering("A", ..i)),
+  )
+  ```]
 
 Setting the #link(label("marginalia-note.counter"), [```typc counter```]) to ```typc none```,#note[Unnumbered notes ```typc "avoid"``` being shifted if possible, preferring to shift other notes up.]
 we obtain notes without number:#note(counter: none)[Like this.]
@@ -203,11 +210,11 @@ There are two ways to reference another note:
   Be aware that notes without anchor/number still count towards the offset, and you can also reference them, but doing so results in an invisible link and is a bit pointless.
 
 #codeblock[```typ
-Original: #note[This is a note]<label>
-Label Reference: @label @label2
-Count Reference: #marginalia.ref(-1) #marginalia.ref(1)
-Original: #note[This is another note]<label2>
-```]
+  Original: #note[This is a note]<label>
+  Label Reference: @label @label2
+  Count Reference: #marginalia.ref(-1) #marginalia.ref(1)
+  Original: #note[This is another note]<label2>
+  ```]
 Original: #note[This is a note]<label>
 Label Reference: @label @label2
 Offset Reference: #marginalia.ref(-1) #marginalia.ref(1)
@@ -221,11 +228,11 @@ If a different style is desired for the marker in the text and in the margins, y
   anchor-numbering: (.., i) => super[#i],
 )[This note has a custom numbering, but the same counter.]
 #codeblock[```typ
-#note(
-  numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
-  anchor-numbering: (.., i) => super[#i],
-)[...]
-```]
+  #note(
+    numbering: (.., i) => text(font: "Inria Sans")[#i#h(0.5em)],
+    anchor-numbering: (.., i) => super[#i],
+  )[...]
+  ```]
 Note that doing this implies #link(label("marginalia-note.flush-numbering"), [```typc flush-numbering```])```typc : true```.
 This is based on the assumption that if you have set two different numbering functions, you want to handle the placement yourself.
 Non-flush numbers, which are `place`d, complicate this.
@@ -378,13 +385,13 @@ If you want, you can override the #link(label("marginalia-notefigure.counter"))[
 )
 
 #codeblock[```typ
-#notefigure(
-  /**/,
-  counter: counter(figure.where(kind: image)),
-  anchor-numbering: (.., i) => super[fig. #(i + 1) ],
-  numbering: none,
-)
-```]
+  #notefigure(
+    /**/,
+    counter: counter(figure.where(kind: image)),
+    anchor-numbering: (.., i) => super[fig. #(i + 1) ],
+    numbering: none,
+  )
+  ```]
 
 
 Additionally, the #link(label("marginalia-notefigure.alignment"))[```typ alignment```] parameter can now also be ```typc "caption-top"```,
@@ -548,19 +555,19 @@ However, there are a few things to be aware of:
   For example, the above English note was written as
 
 #codeblock[```typ
-#text(lang: "en", note[(The arabic is only filler text)])
-```]
+  #text(lang: "en", note[(The arabic is only filler text)])
+  ```]
 
 == Background Lines
 They're mostly here to showcase the columns and help me verify that everything gets placed in the right spot, but if you want, you can enable the lines in the background simply by using
 #codeblock[```typ
-#show: marginalia.show-frame
-```]
+  #show: marginalia.show-frame
+  ```]
 
 You can also hide the lines for the header and footer with
 #codeblock[```typ
-#show: marginalia.show-frame.with(header: false, footer: false)
-```]
+  #show: marginalia.show-frame.with(header: false, footer: false)
+  ```]
 
 
 == Absolute Placement

@@ -182,7 +182,7 @@
   clearance: 12pt,
   /// -> content
   body,
-) = {}
+) = { }
 #let setup(..config, body) = {
   _config.update(_fill_config(..config))
   set page(.._page-setup(..config))
@@ -275,30 +275,32 @@
   /// -> content
   body,
 ) = {
-  set page(background: context {
-    let leftm = get-left()
-    let rightm = get-right()
+  set page(
+    background: context {
+      let leftm = get-left()
+      let rightm = get-right()
 
-    let topm = _config.get().top
-    let ascent = page.header-ascent.ratio * topm + page.header-ascent.length
-    place(top, dy: topm, line(length: 100%, stroke: stroke))
-    if header {
-      place(top, dy: topm - ascent, line(length: 100%, stroke: stroke))
-    }
+      let topm = _config.get().top
+      let ascent = page.header-ascent.ratio * topm + page.header-ascent.length
+      place(top, dy: topm, line(length: 100%, stroke: stroke))
+      if header {
+        place(top, dy: topm - ascent, line(length: 100%, stroke: stroke))
+      }
 
-    let bottomm = _config.get().bottom
-    let descent = page.footer-descent.ratio * bottomm + page.footer-descent.length
-    place(bottom, dy: -bottomm, line(length: 100%, stroke: stroke))
-    if footer {
-      place(bottom, dy: -bottomm + descent, line(length: 100%, stroke: stroke))
-    }
+      let bottomm = _config.get().bottom
+      let descent = page.footer-descent.ratio * bottomm + page.footer-descent.length
+      place(bottom, dy: -bottomm, line(length: 100%, stroke: stroke))
+      if footer {
+        place(bottom, dy: -bottomm + descent, line(length: 100%, stroke: stroke))
+      }
 
-    place(left, dx: leftm.far, rect(width: leftm.width, height: 100%, stroke: (x: stroke)))
-    place(left, dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
+      place(left, dx: leftm.far, rect(width: leftm.width, height: 100%, stroke: (x: stroke)))
+      place(left, dx: leftm.far + leftm.width + leftm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
 
-    place(right, dx: -rightm.far, rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
-    place(right, dx: -rightm.far - rightm.width - rightm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
-  })
+      place(right, dx: -rightm.far, rect(width: rightm.width, height: 100%, stroke: (x: stroke)))
+      place(right, dx: -rightm.far - rightm.width - rightm.sep, line(length: 100%, stroke: stroke, angle: 90deg))
+    },
+  )
 
   body
 }
@@ -507,71 +509,74 @@
   shift: true,
   body,
 ) = (
-  box(width: 0pt, context {
-    assert(side == "left" or side == "right" or side == "near", message: "side must be left or right.")
+  box(
+    width: 0pt,
+    context {
+      assert(side == "left" or side == "right" or side == "near", message: "side must be left or right.")
 
-    let dy = dy.to-absolute()
-    let anchor = here().position()
-    let pagewidth = if page.flipped { page.height } else { page.width }
-    let page_num = str(anchor.page)
+      let dy = dy.to-absolute()
+      let anchor = here().position()
+      let pagewidth = if page.flipped { page.height } else { page.width }
+      let page_num = str(anchor.page)
 
-    let side = if side == "near" { _get-near-side() } else { side }
+      let side = if side == "near" { _get-near-side() } else { side }
 
-    let width = if side == "left" { get-left().width } else { get-right().width }
-    let height = measure(body, width: width).height
-    let notebox = box(width: width, height: height, body)
-    let natural_position = anchor.y + dy
+      let width = if side == "left" { get-left().width } else { get-right().width }
+      let height = measure(body, width: width).height
+      let notebox = box(width: width, height: height, body)
+      let natural_position = anchor.y + dy
 
-    let extends = if side == "right" { _note_extends_right } else { _note_extends_left }
-    // let offsets = if side == "right" { _note_offsets_right } else { _note_offsets_left }
+      let extends = if side == "right" { _note_extends_right } else { _note_extends_left }
+      // let offsets = if side == "right" { _note_offsets_right } else { _note_offsets_left }
 
-    let current = extends.get().at(page_num, default: ())
-    let index = current.len()
+      let current = extends.get().at(page_num, default: ())
+      let index = current.len()
 
-    extends.update(old => {
-      let oldpage = old.at(page_num, default: ())
-      oldpage.push((natural: natural_position, height: height, shift: shift, keep-order: keep-order))
-      old.insert(page_num, oldpage)
-      old
-    })
+      extends.update(old => {
+        let oldpage = old.at(page_num, default: ())
+        oldpage.push((natural: natural_position, height: height, shift: shift, keep-order: keep-order))
+        old.insert(page_num, oldpage)
+        old
+      })
 
-    let offset_page = (
-      height: if page.flipped { page.width } else { page.height },
-      bottom: _config.get().bottom,
-      top: _config.get().top,
-    )
-    let offset_items = extends
-      .final()
-      .at(page_num, default: ())
-      .enumerate()
-      .map(((key, item)) => (str(key), item))
-      .to-dict()
-    let offset_clearance = _config.get().clearance
-    let dbg = _calculate-offsets(offset_page, offset_items, offset_clearance)
-    // TODO: trying to cache the results does not work.
-    // offsets.update(old => {
-    //   // only do calculations if not yet in old
-    //   if page_num in old {
-    //     old
-    //   } else {
-    //     let new_offsets = _calculate-offsets(offset_page, offset_items, offset_clearance)
-    //     assert(dbg == new_offsets)
-    //     old.insert(page_num, new_offsets)
-    //     old
-    //   }
-    // })
+      let offset_page = (
+        height: if page.flipped { page.width } else { page.height },
+        bottom: _config.get().bottom,
+        top: _config.get().top,
+      )
+      let offset_items = extends
+        .final()
+        .at(page_num, default: ())
+        .enumerate()
+        .map(((key, item)) => (str(key), item))
+        .to-dict()
+      let offset_clearance = _config.get().clearance
+      let dbg = _calculate-offsets(offset_page, offset_items, offset_clearance)
+      // TODO: trying to cache the results does not work.
+      // offsets.update(old => {
+      //   // only do calculations if not yet in old
+      //   if page_num in old {
+      //     old
+      //   } else {
+      //     let new_offsets = _calculate-offsets(offset_page, offset_items, offset_clearance)
+      //     assert(dbg == new_offsets)
+      //     old.insert(page_num, new_offsets)
+      //     old
+      //   }
+      // })
 
-    // let vadjust = dy + offsets.final().at(page_num, default: (:)).at(str(index), default: 0pt)
-    let vadjust = dy + dbg.at(str(index), default: 0pt)
+      // let vadjust = dy + offsets.final().at(page_num, default: (:)).at(str(index), default: 0pt)
+      let vadjust = dy + dbg.at(str(index), default: 0pt)
 
-    // box(width: 0pt, place(box(fill: yellow, width: 1cm, text(size: 5pt)[#anchor.y + #vadjust = #(anchor.y + vadjust)])))
+      // box(width: 0pt, place(box(fill: yellow, width: 1cm, text(size: 5pt)[#anchor.y + #vadjust = #(anchor.y + vadjust)])))
 
-    let hadjust = if side == "left" { get-left().far - anchor.x } else {
-      pagewidth - anchor.x - get-right().far - get-right().width
-    }
+      let hadjust = if side == "left" { get-left().far - anchor.x } else {
+        pagewidth - anchor.x - get-right().far - get-right().width
+      }
 
-    place(left, dx: hadjust, dy: vadjust, notebox)
-  })
+      place(left, dx: hadjust, dy: vadjust, notebox)
+    },
+  )
 )
 
 /// Create a marginnote.
@@ -718,15 +723,21 @@
           number
         }).width
         if width < 8pt { width = 8pt }
-        place(top + start, {
-          h(-width) // HACK: uses `h` instad of `dx` so it works in ltr and rtl contexts
-          box(width: width, {
-            h(1fr)
-            sym.zws
-            number
-            h(1fr)
-          })
-        })
+        place(
+          top + start,
+          {
+            h(-width) // HACK: uses `h` instad of `dx` so it works in ltr and rtl contexts
+            box(
+              width: width,
+              {
+                h(1fr)
+                sym.zws
+                number
+                h(1fr)
+              },
+            )
+          },
+        )
       }
     } else {
       body
@@ -742,11 +753,22 @@
       counter.display(anchor-numbering)
     } else []
 
-    let body = align(top, block(width: 100%, ..block-style, align(start, { // HACK: inner align ensures text-direction is unaffected by `place(left,..)`
-      set text(..text-style)
-      set par(..par-style)
-      [#metadata((note: true, anchor: anchor))<_marginalia_note>#body]
-    })))
+    let body = align(
+      top,
+      block(
+        width: 100%,
+        ..block-style,
+        align(
+          start,
+          {
+            // HACK: inner align ensures text-direction is unaffected by `place(left,..)`
+            set text(..text-style)
+            set par(..par-style)
+            [#metadata((note: true, anchor: anchor))<_marginalia_note>#body]
+          },
+        ),
+      ),
+    )
 
     let dy-adjust = if alignment == "baseline" {
       measure(text(..text-style, sym.zws)).height
@@ -996,12 +1018,15 @@
               // top + left,
               left,
               dx: -number-width,
-              box(width: number-width, {
-                h(1fr)
-                sym.zws
-                number
-                h(1fr)
-              }),
+              box(
+                width: number-width,
+                {
+                  h(1fr)
+                  sym.zws
+                  number
+                  h(1fr)
+                },
+              ),
             ),
             it,
           )
@@ -1027,11 +1052,14 @@
       get-right().width
     }
     let height = (
-      measure(width: width, {
-        set text(..text-style)
-        set par(..par-style)
-        content
-      }).height
+      measure(
+        width: width,
+        {
+          set text(..text-style)
+          set par(..par-style)
+          content
+        },
+      ).height
         + measure(text(..text-style, v(gap))).height
     )
     let baseline-height = measure(text(..text-style, sym.zws)).height
@@ -1220,32 +1248,47 @@
       pos = (none, ..pos)
     }
     let (inner, center, outer) = pos
-    wideblock(side: "both", {
-      box(width: leftm.width, if is-odd { inner } else { outer })
-      h(leftm.sep)
-      box(width: 1fr, center)
-      h(rightm.sep)
-      box(width: rightm.width, if is-odd { outer } else { inner })
-    })
+    wideblock(
+      side: "both",
+      {
+        box(width: leftm.width, if is-odd { inner } else { outer })
+        h(leftm.sep)
+        box(width: 1fr, center)
+        h(rightm.sep)
+        box(width: rightm.width, if is-odd { outer } else { inner })
+      },
+    )
   } else {
-    wideblock(side: "both", {
-      box(width: leftm.width, if is-odd {
-        odd.at(0, default: none)
-      } else {
-        even.at(0, default: none)
-      })
-      h(leftm.sep)
-      box(width: 1fr, if is-odd {
-        odd.at(1, default: none)
-      } else {
-        even.at(1, default: none)
-      })
-      h(rightm.sep)
-      box(width: rightm.width, if is-odd {
-        odd.at(2, default: none)
-      } else {
-        even.at(2, default: none)
-      })
-    })
+    wideblock(
+      side: "both",
+      {
+        box(
+          width: leftm.width,
+          if is-odd {
+            odd.at(0, default: none)
+          } else {
+            even.at(0, default: none)
+          },
+        )
+        h(leftm.sep)
+        box(
+          width: 1fr,
+          if is-odd {
+            odd.at(1, default: none)
+          } else {
+            even.at(1, default: none)
+          },
+        )
+        h(rightm.sep)
+        box(
+          width: rightm.width,
+          if is-odd {
+            odd.at(2, default: none)
+          } else {
+            even.at(2, default: none)
+          },
+        )
+      },
+    )
   }
 }
